@@ -227,7 +227,7 @@
     /* App shell main panel — flex column that fills viewport height beside the
        sidebar.  Named .app-body (not .body) so the class doesn't collide with
        per-component .body usage (thread row, email pre, etc). */
-    .app-body { flex: 1; min-width: 0; padding: var(--sp-2) var(--sp-2) var(--sp-2) 0; height: 100vh; }
+    .app-body { flex: 1; min-width: 0; padding: var(--sp-2) var(--sp-2) var(--sp-2) 0; height: 100vh; position: relative; }
     .surface {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -2591,9 +2591,9 @@
 
     /* ── Agent chat button + panel ─────────────────────────────── */
     #agent-btn {
-      position: fixed;
-      bottom: 16px;
-      right: 20px;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -2613,9 +2613,9 @@
     #agent-btn.hidden { display: none; }
 
     #agent-panel {
-      position: fixed;
-      bottom: 58px;
-      right: 20px;
+      position: absolute;
+      bottom: 50px;
+      right: 10px;
       width: 440px;
       height: 620px;
       background: var(--bg);
@@ -2850,23 +2850,15 @@
 
         <main class="main" id="main"></main>
       </div>
-    </div>
-  </div>
 
-  <!-- Mobile nav backdrop — sits behind the slid-in sidebar on small screens -->
-  <div id="mobile-nav-backdrop" class="mobile-nav-backdrop"></div>
+      <!-- ── Agent chat floating button (outside surface, in gray gutter) ── -->
+      <button id="agent-btn" class="hidden">
+        <i class="ph ph-star-four" style="font-size:15px"></i>
+        Agent
+      </button>
 
-  <!-- New Submission modal mount point — render() fills this in -->
-  <div id="ns-root"></div>
-
-  <!-- ── Agent chat floating button ──────────────────────────── -->
-  <button id="agent-btn" class="hidden">
-    <i class="ph ph-star-four" style="font-size:15px"></i>
-    Agent
-  </button>
-
-  <!-- ── Agent chat panel ─────────────────────────────────────── -->
-  <div id="agent-panel" class="hidden">
+      <!-- ── Agent chat panel ─────────────────────────────────────── -->
+      <div id="agent-panel" class="hidden">
     <div class="ap-header">
       <span class="ap-header-title">Chat</span>
       <div class="ap-header-btns">
@@ -2887,7 +2879,7 @@
         <span class="ap-chip">Loss Runs</span>
         <span class="ap-chip">Claims</span>
       </div>
-      <span class="ap-chip-primary">Submission: BDE Florida</span>
+      <span class="ap-chip-primary" id="agent-page-tag">Submission: BDE Florida</span>
       <div class="ap-input-wrap">
         <textarea class="ap-textarea" placeholder="How can I help you today?" rows="2"></textarea>
         <div class="ap-input-row">
@@ -2897,6 +2889,14 @@
       </div>
     </div>
   </div>
+    </div><!-- /app-body -->
+  </div><!-- /shell -->
+
+  <!-- Mobile nav backdrop — sits behind the slid-in sidebar on small screens -->
+  <div id="mobile-nav-backdrop" class="mobile-nav-backdrop"></div>
+
+  <!-- New Submission modal mount point — render() fills this in -->
+  <div id="ns-root"></div>
 
   <!-- Bottom-right toast (shown on Home) -->
   <div class="toast" id="toast" hidden>
@@ -6637,6 +6637,22 @@
       if (agentPanel && State.page === 'chat') {
         State.agentChatOpen = false;
         agentPanel.classList.add('hidden');
+      }
+      // Update context tag to reflect current page
+      const pageTagEl = document.getElementById('agent-page-tag');
+      if (pageTagEl) {
+        const PAGE_LABELS = {
+          inbox: 'Inbox', home: 'Inbox',
+          growth: 'Submissions', detail: 'Submissions',
+          applications: 'Applications',
+          policies: 'Policies', 'policy-detail': 'Policies',
+          renewals: 'Renewals',
+          claims: 'Claims',
+          radar: 'Radar',
+          settings: 'Settings',
+          actuarial: 'Actuarial Controls',
+        };
+        pageTagEl.textContent = PAGE_LABELS[State.page] || 'Submissions';
       }
 
       // Mobile-nav class toggle on the shell
