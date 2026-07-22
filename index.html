@@ -2940,9 +2940,12 @@
     .main.radar-mode { padding: 0; position: relative; overflow: hidden; }
     .radar-wrap { position: relative; width: 100%; height: 100%; }
     #radar-map { width: 100%; height: 100%; }
-    #radar-map .leaflet-tile-pane { filter: grayscale(1) brightness(1.05); }
-    #radar-map .leaflet-control-zoom { border: 1px solid #ebebeb !important; border-radius: 6px !important; overflow: hidden; }
-    #radar-map .leaflet-control-zoom a { color: #252424 !important; border-bottom-color: #ebebeb !important; }
+    #radar-map .leaflet-control-zoom { border: 1px solid #ebebeb !important; border-radius: 6px !important; overflow: hidden; box-shadow: none !important; }
+    #radar-map .leaflet-control-zoom a { color: #252424 !important; border-bottom-color: #ebebeb !important; background: #fbfbfb !important; }
+    #radar-map .leaflet-control-zoom a:hover { background: #f0f0f0 !important; }
+    #radar-map .leaflet-popup-content-wrapper { border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.1); border: 1px solid #ebebeb; padding: 0; }
+    #radar-map .leaflet-popup-content { margin: 12px 14px; }
+    #radar-map .leaflet-popup-tip { background: #fff; }
 
     .radar-filter {
       position: absolute;
@@ -7048,30 +7051,59 @@
     let chatStreaming      = false;
     let radarMap          = null;
 
+    const RADAR_PINS = [
+      { lat: 28.15, lng: -82.45, name: 'BDE Florida, LLC',        product: 'General Liability',   premium: '$290,000', status: 'Active' },
+      { lat: 27.92, lng: -82.15, name: 'Hibachi Holdings LLC',     product: 'General Liability',   premium: '$184,500', status: 'Active' },
+      { lat: 27.55, lng: -81.85, name: 'Pulse Fitness Co.',        product: 'GL + Umbrella',       premium: '$212,500', status: 'Quoted' },
+      { lat: 28.50, lng: -81.50, name: 'Iron & Oak Crossfit',      product: 'General Liability',   premium: '$68,000',  status: 'Bound'  },
+      { lat: 27.35, lng: -82.50, name: 'Bellwether Bistro',        product: 'Liquor Liability',    premium: '$75,500',  status: 'Quoted' },
+      { lat: 26.95, lng: -82.08, name: 'Sunrise Yoga Studio LLC',  product: 'Professional Liab.', premium: '$75,500',  status: 'Bound'  },
+      { lat: 27.75, lng: -82.72, name: 'Borg Restaurant Group',    product: 'General Liability',   premium: '$184,500', status: 'Active' },
+    ];
+
     function initRadarMap() {
       if (typeof L === 'undefined') return;
-      const mapEl = document.getElementById('radar-map');
-      if (!mapEl) return;
       if (radarMap) { radarMap.remove(); radarMap = null; }
 
-      radarMap = L.map('radar-map', {
-        zoomControl: true,
-        attributionControl: false,
-      }).setView([27.95, -82.35], 9);
+      // Defer so the container has computed dimensions after CSS layout
+      requestAnimationFrame(() => {
+        const mapEl = document.getElementById('radar-map');
+        if (!mapEl) return; // user navigated away
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-      }).addTo(radarMap);
+        radarMap = L.map('radar-map', {
+          zoomControl: true,
+          attributionControl: true,
+        }).setView([27.95, -82.35], 9);
 
-      // 7 Florida-area pins (matching Figma positions)
-      [
-        [28.15, -82.45], [27.92, -82.15], [27.55, -81.85],
-        [28.50, -81.50], [27.35, -82.50], [26.95, -82.08], [27.75, -82.72],
-      ].forEach(([lat, lng]) => {
-        L.circleMarker([lat, lng], {
-          radius: 5, fillColor: '#cf5c3f',
-          color: '#fff', weight: 1.5, fillOpacity: 1,
+        // CartoDB Positron — clean light/grayscale tiles, no API key needed
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 20,
         }).addTo(radarMap);
+
+        RADAR_PINS.forEach(pin => {
+          const marker = L.circleMarker([pin.lat, pin.lng], {
+            radius: 6, fillColor: '#cf5c3f',
+            color: '#fff', weight: 2, fillOpacity: 1,
+          }).addTo(radarMap);
+
+          marker.bindPopup(`
+            <div style="font-family:'DM Sans',sans-serif;min-width:180px">
+              <div style="font-weight:600;font-size:13px;color:#252424;margin-bottom:6px">${pin.name}</div>
+              <div style="font-size:12px;color:#868585;line-height:1.6">
+                <div>${pin.product}</div>
+                <div style="font-weight:500;color:#252424">${pin.premium}</div>
+                <div style="margin-top:4px">
+                  <span style="padding:2px 8px;border-radius:999px;font-size:11px;background:${pin.status==='Bound'?'#d1fae5':pin.status==='Quoted'?'#dbeafe':'#ede9fe'};color:${pin.status==='Bound'?'#065f46':pin.status==='Quoted'?'#1e40af':'#5b21b6'}">${pin.status}</span>
+                </div>
+              </div>
+            </div>`, { closeButton: false, maxWidth: 220 });
+
+          marker.on('mouseover', function() { this.openPopup(); });
+        });
+
+        radarMap.invalidateSize();
       });
     }
 
