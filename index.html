@@ -3956,6 +3956,20 @@
         </div>`;
     }
 
+    function renderPlaceholder(title, icon) {
+      return `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--fg-muted)">
+          <i class="ph ph-${icon}" style="font-size:40px;opacity:.4"></i>
+          <span style="font-family:var(--font-display);font-size:24px;font-weight:400;color:var(--fg)">${title}</span>
+          <span style="font-size:14px">Coming soon</span>
+        </div>`;
+    }
+
+    function renderRenewals() { return renderPlaceholder('Renewals', 'arrows-clockwise'); }
+    function renderClaims()   { return renderPlaceholder('Claims', 'warning-circle'); }
+    function renderRadar()    { return renderPlaceholder('Radar', 'chart-line'); }
+    function renderSettings() { return renderPlaceholder('Settings', 'gear'); }
+
     function renderHome() {
       const inboxRows = [
         { ago: '1 Month Ago', from: 'Logan', action: 'mentioned you in', item: 'Application', content: 'List Content' },
@@ -6393,6 +6407,10 @@
       else if (State.page === 'applications')   main.innerHTML = renderApplications();
       else if (State.page === 'policies')       main.innerHTML = renderPolicies();
       else if (State.page === 'policy-detail')  main.innerHTML = renderPolicyDetail();
+      else if (State.page === 'renewals')       main.innerHTML = renderRenewals();
+      else if (State.page === 'claims')         main.innerHTML = renderClaims();
+      else if (State.page === 'radar')          main.innerHTML = renderRadar();
+      else if (State.page === 'settings')       main.innerHTML = renderSettings();
       else                                      main.innerHTML = renderGrowth();
       if (prevScroll > 0) {
         const dm = document.querySelector('.detail-main');
@@ -6639,9 +6657,7 @@
       $$('.nav-item[data-nav], .crumb-link[data-nav]').forEach(n => {
         n.onclick = () => {
           const t = n.dataset.nav;
-          if (t === 'home' || t === 'growth' || t === 'applications' || t === 'actuarial' || t === 'policies') {
-            State.page = t; State.currentId = null; State.mobileNavOpen = false; render();
-          }
+          State.page = t; State.currentId = null; State.mobileNavOpen = false; render();
         };
       });
 
