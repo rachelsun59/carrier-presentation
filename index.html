@@ -2626,10 +2626,13 @@
       </div>
 
       <div class="nav-list">
-        <button class="nav-item" data-nav="home">
-          <span class="nav-ico"><i class="ph ph-house"></i></span><span class="nav-label">Home</span>
+        <button class="nav-item active" data-nav="chat">
+          <span class="nav-ico"><i class="ph ph-note-pencil"></i></span><span class="nav-label">Chat</span>
         </button>
-        <button class="nav-item active" data-nav="growth">
+        <button class="nav-item" data-nav="inbox">
+          <span class="nav-ico"><i class="ph ph-tray"></i></span><span class="nav-label">Inbox</span>
+        </button>
+        <button class="nav-item" data-nav="growth">
           <span class="nav-ico"><i class="ph ph-trend-up"></i></span><span class="nav-label">Submissions</span>
         </button>
         <button class="nav-item" data-nav="applications">
@@ -2641,11 +2644,11 @@
         <button class="nav-item" data-nav="renewals">
           <span class="nav-ico"><i class="ph ph-calendar-dot"></i></span><span class="nav-label">Renewals</span>
         </button>
-        <button class="nav-item" data-nav="loss-runs">
-          <span class="nav-ico"><i class="ph ph-folder-simple"></i></span><span class="nav-label">Loss Runs</span>
+        <button class="nav-item" data-nav="claims">
+          <span class="nav-ico"><i class="ph ph-warning-circle"></i></span><span class="nav-label">Claims</span>
         </button>
-        <button class="nav-item" data-nav="dashboards">
-          <span class="nav-ico"><i class="ph ph-chart-line"></i></span><span class="nav-label">Dashboards</span>
+        <button class="nav-item" data-nav="radar">
+          <span class="nav-ico"><i class="ph ph-chart-line"></i></span><span class="nav-label">Radar</span>
         </button>
         <button class="nav-item" data-nav="actuarial">
           <span class="nav-ico"><i class="ph ph-calculator"></i></span><span class="nav-label">Actuarial Controls</span>
@@ -2706,7 +2709,7 @@
        https://www.figma.com/design/fxAc38tPwTQO8Q6U86XxWD (Underwriter page)
        ========================================================================= */
     const State = {
-      page: 'home',
+      page: 'chat',
       currentId: null,
       tab: 'loss-run',
       // Growth list — sort + filters + open popover
@@ -3907,6 +3910,51 @@
       `;
     }
 
+
+    function renderChat() {
+      const logoSvg = `<svg width="44" height="44" viewBox="-0.5 0 22.5 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="var(--primary)" d="M20.3147 11.8163C21.3507 10.9636 22.004 9.66362 21.9784 8.21175C21.9347 5.75241 19.9216 3.75834 17.4623 3.73555C16.8897 3.7308 16.3409 3.83146 15.8347 4.01852C15.6904 4.07169 15.5328 3.97864 15.5081 3.82671C15.1577 1.65698 13.2766 1.90735e-06 11.0082 1.90735e-06C8.73966 1.90735e-06 6.85955 1.65603 6.50821 3.82576C6.48352 3.97769 6.3259 4.07074 6.18156 4.01757C5.70299 3.84 5.18643 3.74125 4.64708 3.73555C2.12127 3.70991 0.0417412 5.76855 0.0417412 8.29436C0.0417412 9.7035 0.680792 10.9626 1.68542 11.7992C1.80317 11.8979 1.80222 12.0802 1.68352 12.178C0.638062 13.0269 -0.0228285 14.3307 -3.92261e-05 15.7883C0.0388925 18.259 2.06714 20.2626 4.53883 20.273C5.11331 20.2758 5.66406 20.1714 6.17112 19.9796C6.31735 19.9245 6.47782 20.0157 6.50251 20.1695C6.851 22.3411 8.73302 23.9991 11.0034 23.9991C13.2738 23.9991 15.1492 22.3449 15.5024 20.179C15.5271 20.0271 15.6847 19.934 15.829 19.9881C16.3361 20.1771 16.8849 20.2777 17.4585 20.273C19.9188 20.2512 21.9328 18.2561 21.9755 15.7958C22.0011 14.3449 21.3488 13.0459 20.3147 12.1942C20.196 12.0964 20.196 11.9131 20.3147 11.8153V11.8163Z"/></svg>`;
+
+      const chips = ['Policies','Submissions','Renewals','Loss Runs','Claims'];
+      const recent = [
+        'Summarize all active policies in the state of Florida',
+        'Review all existing claims that is related to slip and fall',
+      ];
+
+      return `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:48px 24px 64px">
+
+          <!-- Logo + headline -->
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:28px">
+            ${logoSvg}
+            <span style="font-family:var(--font-display);font-size:38px;font-weight:400;color:var(--fg);line-height:1">Ask Anything..</span>
+          </div>
+
+          <!-- Context chips -->
+          <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:20px">
+            ${chips.map(c => `<button style="padding:4px 12px;border:1px solid var(--border);border-radius:var(--r-full);background:var(--surface);font-size:13px;color:var(--fg-muted);cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background='var(--bg-accent)'" onmouseout="this.style.background='var(--surface)'">${c}</button>`).join('')}
+          </div>
+
+          <!-- Input area -->
+          <div style="width:100%;max-width:720px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface);overflow:hidden;margin-bottom:28px">
+            <textarea placeholder="How can I help you today?" style="width:100%;box-sizing:border-box;border:0;outline:none;background:transparent;font-size:14px;color:var(--fg);resize:none;min-height:72px;padding:14px 16px;font-family:inherit;line-height:1.5"></textarea>
+            <div style="display:flex;align-items:center;padding:8px 12px;border-top:1px solid var(--border-soft)">
+              <button class="btn" style="width:28px;height:28px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center">
+                <i class="ph ph-plus" style="font-size:14px"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div style="width:100%;max-width:720px">
+            <div style="font-size:12px;color:var(--fg-muted);margin-bottom:6px;letter-spacing:.02em">Recent Activity</div>
+            ${recent.map(item => `
+              <div style="padding:13px 0;border-bottom:1px solid var(--border-soft);font-size:14px;color:var(--fg);cursor:pointer" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--fg)'">
+                ${item}
+              </div>`).join('')}
+          </div>
+
+        </div>`;
+    }
 
     function renderHome() {
       // Today = error red; future ISO date = muted grey
@@ -6338,7 +6386,8 @@
         ? (document.querySelector('.detail-main') || {}).scrollTop || 0
         : 0;
       main.className = 'main' + (State.page === 'detail' ? ' detail-mode' : '');
-      if      (State.page === 'home')           main.innerHTML = renderHome();
+      if      (State.page === 'chat')           main.innerHTML = renderChat();
+      else if (State.page === 'home' || State.page === 'inbox') main.innerHTML = renderHome();
       else if (State.page === 'detail')         main.innerHTML = renderDetail();
       else if (State.page === 'applications')   main.innerHTML = renderApplications();
       else if (State.page === 'policies')       main.innerHTML = renderPolicies();
@@ -6350,7 +6399,7 @@
       }
       // Toast — show on Home only, slide in once per Home visit, auto-dismiss
       // after 10s.  showToast() guards against duplicate timers.
-      if (State.page === 'home') showToast();
+      if (State.page === 'home' || State.page === 'inbox') showToast();
       else hideToast(true);
       // Render the New Submission modal into a dedicated overlay container so
       // it sits above page content but participates in the same render cycle.
@@ -6368,10 +6417,13 @@
       $$('.nav-item').forEach(n => {
         const t = n.dataset.nav;
         n.classList.toggle('active',
-          (State.page === 'home' && t === 'home') ||
+          (State.page === 'chat' && t === 'chat') ||
+          ((State.page === 'home' || State.page === 'inbox') && t === 'inbox') ||
           (State.page === 'applications' && t === 'applications') ||
           ((State.page === 'policies' || State.page === 'policy-detail') && t === 'policies') ||
           (State.page === 'actuarial' && t === 'actuarial') ||
+          (State.page === 'claims' && t === 'claims') ||
+          (State.page === 'radar' && t === 'radar') ||
           ((State.page === 'growth' || State.page === 'detail') && t === 'growth'));
       });
 
