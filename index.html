@@ -2594,22 +2594,26 @@
       position: absolute;
       bottom: 10px;
       right: 10px;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 7px 12px;
-      background: var(--bg-accent);
-      border: 1px solid #cfcece;
-      border-radius: var(--r-base);
+      justify-content: center;
+      gap: 4px;
+      padding: 9px 13px;
+      background: #fbfbfb;
+      border: 1px solid #ebebeb;
+      border-radius: 999px;
       font-size: 14px;
-      color: var(--fg);
+      line-height: 15px;
+      color: #252424;
       cursor: pointer;
       font-family: inherit;
-      box-shadow: 0 2px 4px rgba(0,0,0,.06);
-      transition: box-shadow .15s;
+      filter: drop-shadow(0px 10px 5px rgba(13,12,12,0.10));
+      transition: filter .15s;
       z-index: 120;
+      white-space: nowrap;
     }
-    #agent-btn:hover { box-shadow: 0 4px 10px rgba(0,0,0,.12); }
+    #agent-btn i { font-size: 16px; }
+    #agent-btn:hover { filter: drop-shadow(0px 6px 8px rgba(13,12,12,0.16)); }
     #agent-btn.hidden { display: none; }
 
     #agent-panel {
@@ -2753,6 +2757,136 @@
       transition: color .12s;
     }
     #agent-panel .ap-icon-btn:hover { color: var(--fg); }
+
+    /* ── Agent messages area ─────────────────────────────────────── */
+    #ap-messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      gap: 10px;
+      scroll-behavior: smooth;
+    }
+    #ap-messages::-webkit-scrollbar { width: 4px; }
+    #ap-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    #ap-messages .ap-empty {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--fg-muted);
+    }
+    #ap-messages .ap-empty svg { opacity: .35; flex-shrink: 0; }
+    #ap-messages .ap-empty-label {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 400;
+      color: #b6b6b6;
+    }
+
+    .ap-msg {
+      max-width: 85%;
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    .ap-msg.user {
+      align-self: flex-end;
+      background: var(--primary);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .ap-msg.ai {
+      align-self: flex-start;
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      color: var(--fg);
+      border-bottom-left-radius: 4px;
+    }
+
+    .ap-typing {
+      align-self: flex-start;
+      display: flex;
+      gap: 4px;
+      padding: 10px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      border-bottom-left-radius: 4px;
+    }
+    .ap-typing span {
+      width: 6px; height: 6px;
+      background: var(--fg-muted);
+      border-radius: 50%;
+      animation: ap-bounce 1.2s infinite;
+    }
+    .ap-typing span:nth-child(2) { animation-delay: .2s; }
+    .ap-typing span:nth-child(3) { animation-delay: .4s; }
+    @keyframes ap-bounce {
+      0%,80%,100% { transform: translateY(0); opacity:.4; }
+      40% { transform: translateY(-5px); opacity:1; }
+    }
+
+    /* API-key prompt overlay (inside the panel) */
+    .ap-key-prompt {
+      position: absolute;
+      inset: 0;
+      background: rgba(251,251,251,.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 28px;
+      z-index: 10;
+      border-radius: 8px;
+    }
+    .ap-key-prompt p {
+      font-size: 13.5px;
+      color: var(--fg-muted);
+      text-align: center;
+      line-height: 1.5;
+      margin: 0;
+    }
+    .ap-key-prompt input {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13.5px;
+      font-family: inherit;
+      outline: none;
+      background: var(--surface);
+      color: var(--fg);
+    }
+    .ap-key-prompt input:focus { border-color: var(--primary); }
+    .ap-key-prompt button {
+      width: 100%;
+      padding: 9px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 13.5px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .ap-key-prompt button:hover { opacity: .9; }
+    .ap-key-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    #ap-send.ap-send-active {
+      color: var(--primary);
+    }
   </style>
 </head>
 <body>
@@ -2867,9 +3001,11 @@
         <button class="ap-hbtn" id="agent-close" title="Close"><i class="ph ph-x"></i></button>
       </div>
     </div>
-    <div class="ap-empty">
-      <svg width="21" height="23" viewBox="0 0 44 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40.6682 23.6335C42.7421 21.928 44.0499 19.328 43.9985 16.4242C43.9111 11.5053 39.8813 7.51697 34.958 7.47139C33.8118 7.4619 32.7131 7.66321 31.6999 8.03735C31.411 8.1437 31.0955 7.95758 31.0461 7.65371C30.3446 3.31408 26.579 0 22.0379 0C17.4967 0 13.733 3.31218 13.0297 7.65182C12.9802 7.95569 12.6647 8.14181 12.3758 8.03545C11.4177 7.6803 10.3837 7.48279 9.30397 7.47139C4.24767 7.42012 0.0847813 11.5375 0.0847813 16.5894C0.0847813 19.4078 1.36406 21.9261 3.37518 23.5993C3.61088 23.7968 3.60898 24.1614 3.37137 24.357C1.27852 26.0549 -0.0444774 28.6625 0.00114331 31.5777C0.0790787 36.5194 4.13932 40.5267 9.08727 40.5476C10.2373 40.5533 11.3398 40.3444 12.3549 39.9607C12.6476 39.8506 12.9688 40.0329 13.0183 40.3406C13.7159 44.684 17.4834 48 22.0284 48C26.5733 48 30.3275 44.6916 31.0346 40.3596C31.0841 40.0557 31.3996 39.8696 31.6885 39.9778C32.7036 40.3558 33.8023 40.5571 34.9504 40.5476C39.8756 40.5039 43.9073 36.5137 43.9928 31.5929C44.0442 28.691 42.7383 26.0929 40.6682 24.3893C40.4306 24.1937 40.4306 23.8272 40.6682 23.6316V23.6335Z" fill="#CF5C3F"/></svg>
-      <span class="ap-empty-label">Ask Anything..</span>
+    <div id="ap-messages">
+      <div class="ap-empty">
+        <svg width="21" height="23" viewBox="0 0 44 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40.6682 23.6335C42.7421 21.928 44.0499 19.328 43.9985 16.4242C43.9111 11.5053 39.8813 7.51697 34.958 7.47139C33.8118 7.4619 32.7131 7.66321 31.6999 8.03735C31.411 8.1437 31.0955 7.95758 31.0461 7.65371C30.3446 3.31408 26.579 0 22.0379 0C17.4967 0 13.733 3.31218 13.0297 7.65182C12.9802 7.95569 12.6647 8.14181 12.3758 8.03545C11.4177 7.6803 10.3837 7.48279 9.30397 7.47139C4.24767 7.42012 0.0847813 11.5375 0.0847813 16.5894C0.0847813 19.4078 1.36406 21.9261 3.37518 23.5993C3.61088 23.7968 3.60898 24.1614 3.37137 24.357C1.27852 26.0549 -0.0444774 28.6625 0.00114331 31.5777C0.0790787 36.5194 4.13932 40.5267 9.08727 40.5476C10.2373 40.5533 11.3398 40.3444 12.3549 39.9607C12.6476 39.8506 12.9688 40.0329 13.0183 40.3406C13.7159 44.684 17.4834 48 22.0284 48C26.5733 48 30.3275 44.6916 31.0346 40.3596C31.0841 40.0557 31.3996 39.8696 31.6885 39.9778C32.7036 40.3558 33.8023 40.5571 34.9504 40.5476C39.8756 40.5039 43.9073 36.5137 43.9928 31.5929C44.0442 28.691 42.7383 26.0929 40.6682 24.3893C40.4306 24.1937 40.4306 23.8272 40.6682 23.6316V23.6335Z" fill="#CF5C3F"/></svg>
+        <span class="ap-empty-label">Ask Anything..</span>
+      </div>
     </div>
     <div class="ap-footer">
       <div class="ap-chips">
@@ -2881,10 +3017,10 @@
       </div>
       <span class="ap-chip-primary" id="agent-page-tag">Submission: BDE Florida</span>
       <div class="ap-input-wrap">
-        <textarea class="ap-textarea" placeholder="How can I help you today?" rows="2"></textarea>
+        <textarea id="ap-textarea" class="ap-textarea" placeholder="How can I help you today?" rows="2"></textarea>
         <div class="ap-input-row">
           <button class="ap-icon-btn"><i class="ph ph-plus"></i></button>
-          <button class="ap-icon-btn"><i class="ph ph-arrow-up"></i></button>
+          <button id="ap-send" class="ap-icon-btn"><i class="ph ph-arrow-up"></i></button>
         </div>
       </div>
     </div>
@@ -6679,6 +6815,189 @@
       wireEvents();
     }
 
+    /* =========================================================================
+       Agent chat — Claude API integration
+       ========================================================================= */
+    let agentConversation = [];
+    let agentStreaming    = false;
+
+    function agentGetKey() {
+      return localStorage.getItem('ap_anthropic_key') || null;
+    }
+
+    function agentShowKeyPrompt(onSave) {
+      const panel = document.getElementById('agent-panel');
+      if (!panel) return;
+      // Remove any existing prompt
+      panel.querySelector('.ap-key-prompt')?.remove();
+      const div = document.createElement('div');
+      div.className = 'ap-key-prompt';
+      div.innerHTML = `
+        <span class="ap-key-label">Enter your API key</span>
+        <p>Paste your Anthropic API key to use the AI assistant. It's stored only in your browser.</p>
+        <input type="password" id="ap-key-input" placeholder="sk-ant-..." autocomplete="off" />
+        <button id="ap-key-save">Save & continue</button>`;
+      panel.appendChild(div);
+      const input = div.querySelector('#ap-key-input');
+      const save  = div.querySelector('#ap-key-save');
+      input.focus();
+      const doSave = () => {
+        const v = input.value.trim();
+        if (!v) { input.style.borderColor = 'var(--primary)'; return; }
+        localStorage.setItem('ap_anthropic_key', v);
+        div.remove();
+        onSave(v);
+      };
+      save.onclick = doSave;
+      input.onkeydown = (e) => { if (e.key === 'Enter') doSave(); };
+    }
+
+    function agentBuildSystemPrompt() {
+      const rec = (State.currentId && RECORDS[State.currentId]) ? RECORDS[State.currentId] : null;
+      let ctx = `You are an AI assistant embedded in Authentic Insurance's underwriting platform. You help underwriters quickly understand submissions, flag risks, and answer insurance-related questions. Be concise, direct, and professional. Format lists with bullet points when helpful.\n\nCurrent page: ${State.page}`;
+      if (rec) {
+        const s = rec;
+        ctx += `\n\nActive submission: ${s.name || ''}
+Status: ${s.status || ''}
+States: ${s.states || ''}
+Need by: ${s.needBy || ''}`;
+        if (s.stats) {
+          ctx += '\nKey figures:';
+          s.stats.forEach(st => { ctx += `\n  - ${st.label}: ${st.value}`; });
+        }
+        if (s.indication) {
+          const ind = s.indication;
+          ctx += `\nIndication: target premium $${(ind.target||0).toLocaleString()}, target LR ${ind.targetLossRatio||0}%, GL limit ${ind.glLimit||''}`;
+        }
+        if (s.claims && s.claims.length) {
+          const openCount   = s.claims.filter(c => c.st === 'OPEN').length;
+          const totalGross  = s.claims.reduce((a, c) => a + (c.gross || 0), 0);
+          ctx += `\nClaims: ${s.claims.length} total, ${openCount} open, total gross incurred $${totalGross.toLocaleString(undefined, {maximumFractionDigits:0})}`;
+          const notable = s.claims.filter(c => (c.gross || 0) > 50000);
+          if (notable.length) {
+            ctx += '\nNotable claims (>$50K gross):';
+            notable.forEach(c => { ctx += `\n  - ${c.date} ${c.loc}: ${c.ev} — gross $${(c.gross||0).toLocaleString(undefined,{maximumFractionDigits:0})} (${c.st})`; });
+          }
+        }
+        if (s.locations) ctx += `\nLocations: ${s.locations.length}`;
+        if (s.broker)    ctx += `\nBroker: ${s.broker}`;
+      }
+      return ctx;
+    }
+
+    function agentAppendMsg(role, text) {
+      const container = document.getElementById('ap-messages');
+      if (!container) return null;
+      // Remove empty state on first message
+      container.querySelector('.ap-empty')?.remove();
+      const div = document.createElement('div');
+      div.className = `ap-msg ${role}`;
+      div.textContent = text;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+      return div;
+    }
+
+    function agentShowTyping() {
+      const container = document.getElementById('ap-messages');
+      if (!container) return null;
+      const div = document.createElement('div');
+      div.className = 'ap-typing';
+      div.innerHTML = '<span></span><span></span><span></span>';
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+      return div;
+    }
+
+    async function sendAgentMessage() {
+      if (agentStreaming) return;
+      const ta  = document.getElementById('ap-textarea');
+      const btn = document.getElementById('ap-send');
+      if (!ta) return;
+      const text = ta.value.trim();
+      if (!text) return;
+
+      const apiKey = agentGetKey();
+      if (!apiKey) {
+        agentShowKeyPrompt((key) => sendAgentMessage());
+        return;
+      }
+
+      ta.value = '';
+      btn?.classList.remove('ap-send-active');
+      agentStreaming = true;
+      if (btn) btn.disabled = true;
+
+      agentConversation.push({ role: 'user', content: text });
+      agentAppendMsg('user', text);
+
+      const typingEl = agentShowTyping();
+
+      try {
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'x-api-key':                          apiKey,
+            'anthropic-version':                  '2023-06-01',
+            'content-type':                       'application/json',
+            'anthropic-dangerous-direct-browser-access': 'true',
+          },
+          body: JSON.stringify({
+            model:      'claude-opus-4-8',
+            max_tokens: 1024,
+            stream:     true,
+            system:     agentBuildSystemPrompt(),
+            messages:   agentConversation,
+          }),
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err?.error?.message || `API error ${resp.status}`);
+        }
+
+        typingEl?.remove();
+        const aiDiv = agentAppendMsg('ai', '');
+        let fullText = '';
+
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let buf = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+          const lines = buf.split('\n');
+          buf = lines.pop(); // keep incomplete line
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const data = line.slice(6).trim();
+            if (data === '[DONE]') break;
+            try {
+              const evt = JSON.parse(data);
+              if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+                fullText += evt.delta.text;
+                if (aiDiv) {
+                  aiDiv.textContent = fullText;
+                  const container = document.getElementById('ap-messages');
+                  if (container) container.scrollTop = container.scrollHeight;
+                }
+              }
+            } catch (_) { /* ignore parse errors */ }
+          }
+        }
+
+        agentConversation.push({ role: 'assistant', content: fullText });
+      } catch (err) {
+        typingEl?.remove();
+        agentAppendMsg('ai', `Sorry, something went wrong: ${err.message}`);
+      } finally {
+        agentStreaming = false;
+        if (btn) btn.disabled = false;
+      }
+    }
+
     function wireEvents() {
       // Agent chat button + panel
       const agentBtn   = document.getElementById('agent-btn');
@@ -6697,6 +7016,21 @@
         State.agentChatOpen = false;
         agentPanel?.classList.add('hidden');
       };
+      // Agent send button + Enter key
+      const apSend = document.getElementById('ap-send');
+      const apTA   = document.getElementById('ap-textarea');
+      if (apSend) apSend.onclick = () => sendAgentMessage();
+      if (apTA) {
+        apTA.oninput = () => {
+          apSend?.classList.toggle('ap-send-active', apTA.value.trim().length > 0);
+        };
+        apTA.onkeydown = (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendAgentMessage();
+          }
+        };
+      }
 
       // Make Decision (replaces Status Update) — both the title-row button
       // and the sticky-bar duplicate open the Underwriter Decision modal.
