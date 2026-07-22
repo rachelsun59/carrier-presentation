@@ -2887,6 +2887,52 @@
     #ap-send.ap-send-active {
       color: var(--primary);
     }
+
+    /* ── Full chat page message bubbles ─────────────────────────── */
+    #chat-messages { scroll-behavior: smooth; }
+    #chat-messages::-webkit-scrollbar { width: 4px; }
+    #chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .chat-msg {
+      max-width: 75%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.6;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    .chat-msg.user {
+      align-self: flex-end;
+      background: var(--primary);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .chat-msg.ai {
+      align-self: flex-start;
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      color: var(--fg);
+      border-bottom-left-radius: 4px;
+    }
+    .chat-typing {
+      align-self: flex-start;
+      display: flex;
+      gap: 4px;
+      padding: 12px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 14px;
+      border-bottom-left-radius: 4px;
+    }
+    .chat-typing span {
+      width: 6px; height: 6px;
+      background: var(--fg-muted);
+      border-radius: 50%;
+      animation: ap-bounce 1.2s infinite;
+    }
+    .chat-typing span:nth-child(2) { animation-delay: .2s; }
+    .chat-typing span:nth-child(3) { animation-delay: .4s; }
+    #chat-send.chat-send-active { color: var(--primary); }
   </style>
 </head>
 <body>
@@ -3015,7 +3061,6 @@
         <span class="ap-chip">Loss Runs</span>
         <span class="ap-chip">Claims</span>
       </div>
-      <span class="ap-chip-primary" id="agent-page-tag">Submission: BDE Florida</span>
       <div class="ap-input-wrap">
         <textarea id="ap-textarea" class="ap-textarea" placeholder="How can I help you today?" rows="2"></textarea>
         <div class="ap-input-row">
@@ -4256,42 +4301,59 @@
       const logoSvg = `<svg width="44" height="48" viewBox="0 0 44 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M40.6682 23.6335C42.7421 21.928 44.0499 19.328 43.9985 16.4242C43.9111 11.5053 39.8813 7.51697 34.958 7.47139C33.8118 7.4619 32.7131 7.66321 31.6999 8.03735C31.411 8.1437 31.0955 7.95758 31.0461 7.65371C30.3446 3.31408 26.579 0 22.0379 0C17.4967 0 13.733 3.31218 13.0297 7.65182C12.9802 7.95569 12.6647 8.14181 12.3758 8.03545C11.4177 7.6803 10.3837 7.48279 9.30397 7.47139C4.24767 7.42012 0.0847813 11.5375 0.0847813 16.5894C0.0847813 19.4078 1.36406 21.9261 3.37518 23.5993C3.61088 23.7968 3.60898 24.1614 3.37137 24.357C1.27852 26.0549 -0.0444774 28.6625 0.00114331 31.5777C0.0790787 36.5194 4.13932 40.5267 9.08727 40.5476C10.2373 40.5533 11.3398 40.3444 12.3549 39.9607C12.6476 39.8506 12.9688 40.0329 13.0183 40.3406C13.7159 44.684 17.4834 48 22.0284 48C26.5733 48 30.3275 44.6916 31.0346 40.3596C31.0841 40.0557 31.3996 39.8696 31.6885 39.9778C32.7036 40.3558 33.8023 40.5571 34.9504 40.5476C39.8756 40.5039 43.9073 36.5137 43.9928 31.5929C44.0442 28.691 42.7383 26.0929 40.6682 24.3893C40.4306 24.1937 40.4306 23.8272 40.6682 23.6316V23.6335ZM40.5998 16.5894C40.5998 19.7477 38.0374 22.3078 34.8763 22.3078C31.7152 22.3078 29.1528 19.7477 29.1528 16.5894C29.1528 15.5353 29.4379 14.5459 29.9379 13.6988C30.932 12.0066 32.772 10.8709 34.8782 10.8709C38.0393 10.8709 40.6017 13.431 40.6017 16.5894H40.5998ZM9.21083 10.869C11.2657 10.869 13.0677 11.9516 14.077 13.5754C14.0999 13.6153 14.1208 13.6551 14.1436 13.695H14.1474C14.6473 14.5421 14.9343 15.5315 14.9343 16.5894C14.9343 19.7477 12.372 22.3078 9.21083 22.3078C6.04969 22.3078 3.48733 19.7477 3.48733 16.5894C3.48733 13.431 6.04969 10.8709 9.21083 10.8709V10.869ZM22.0284 44.6024C18.8672 44.6024 16.3049 42.0423 16.3049 38.8839C16.3049 35.7256 18.8672 33.1655 22.0284 33.1655C24.1459 33.1655 25.9955 34.3145 26.9858 36.0218C26.9972 36.0427 27.0105 36.0617 27.0219 36.0826C27.4895 36.9107 27.7557 37.8659 27.7557 38.8839C27.7557 42.0423 25.1933 44.6024 22.0322 44.6024H22.0284ZM34.8687 37.15C32.7872 37.15 30.9643 36.0389 29.9626 34.379C28.3924 31.6252 25.4271 29.7659 22.0265 29.7659C18.6258 29.7659 15.6605 31.5721 14.0827 34.2936C13.0924 36.0009 11.2429 37.15 9.12529 37.15C5.96415 37.15 3.40179 34.5899 3.40179 31.4315C3.40179 28.2732 5.96415 25.7131 9.12529 25.7131V25.7074C9.1538 25.7074 9.18042 25.7074 9.20893 25.7074C14.25 25.7074 18.335 21.626 18.335 16.5894C18.335 14.9086 17.8788 13.3342 17.0861 11.982H17.088C16.5976 11.1368 16.3182 10.1568 16.3182 9.11229C16.3182 5.95394 18.8805 3.39384 22.0417 3.39384C25.2028 3.39384 27.7652 5.95394 27.7652 9.11229C27.7652 10.1644 27.48 11.1501 26.9839 11.9972H26.9858C26.1989 13.3475 25.7445 14.9143 25.7445 16.5894C25.7445 21.6222 29.8276 25.7036 34.8649 25.7074V25.7131C38.026 25.7131 40.5884 28.2732 40.5884 31.4315C40.5884 34.5899 38.026 37.15 34.8649 37.15H34.8687Z" fill="#CF5C3F"/></svg>`;
 
       const chips = ['Policies','Submissions','Renewals','Loss Runs','Claims'];
+
+      const inputBar = `
+        <div style="width:100%;max-width:720px;flex-shrink:0">
+          <div style="background:#fff;border:1px solid #ebebeb;border-radius:8px;box-shadow:0 8px 5px rgba(13,12,12,.04);display:flex;flex-direction:column;min-height:100px;padding:16px;gap:8px">
+            <textarea id="chat-textarea" placeholder="How can I help you today?" style="flex:1;border:0;outline:none;background:transparent;font-size:14px;color:var(--fg);resize:none;font-family:inherit;line-height:1.5;min-height:52px"></textarea>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <button style="background:none;border:0;cursor:pointer;color:var(--fg-muted);display:flex;align-items:center;font-size:16px;padding:2px;border-radius:4px"><i class="ph ph-plus"></i></button>
+              <button id="chat-send" style="background:none;border:0;cursor:pointer;color:var(--fg-muted);display:flex;align-items:center;font-size:16px;padding:2px;border-radius:4px;transition:color .12s"><i class="ph ph-arrow-up"></i></button>
+            </div>
+          </div>
+        </div>`;
+
+      if (chatConversation.length > 0) {
+        // Conversation view
+        const msgs = chatConversation.map(m => {
+          const cls = m.role === 'user' ? 'chat-msg user' : 'chat-msg ai';
+          const escaped = m.content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          return `<div class="${cls}">${escaped}</div>`;
+        }).join('');
+        return `
+          <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
+            <div id="chat-messages" style="flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:10px;align-items:stretch">
+              ${msgs}
+            </div>
+            <div style="padding:12px 24px 24px;display:flex;justify-content:center">
+              ${inputBar}
+            </div>
+          </div>`;
+      }
+
+      // Empty / landing view
       const recent = [
         'Summarize all active policies in the state of Florida',
         'Review all existing claims that is related to slip and fall',
       ];
-
       return `
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:48px 24px 64px">
 
-          <!-- Logo + headline -->
           <div style="display:flex;align-items:center;gap:14px;margin-bottom:28px">
             ${logoSvg}
             <span style="font-family:var(--font-display);font-size:38px;font-weight:400;color:var(--fg);line-height:1">Ask Anything..</span>
           </div>
 
-          <!-- Context chips -->
           <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:20px">
-            ${chips.map(c => `<button style="padding:4px 12px;border:1px solid var(--border);border-radius:var(--r-full);background:var(--surface);font-size:13px;color:var(--fg-muted);cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background='var(--bg-accent)'" onmouseout="this.style.background='var(--surface)'">${c}</button>`).join('')}
+            ${chips.map(c => `<button style="padding:4px 12px;border:1px solid #ebebeb;border-radius:999px;background:#fbfbfb;font-size:12px;color:#252424;cursor:pointer;font-family:inherit;height:24px;display:flex;align-items:center" onmouseover="this.style.background='var(--bg-accent)'" onmouseout="this.style.background='#fbfbfb'">${c}</button>`).join('')}
           </div>
 
-          <!-- Input area -->
-          <div style="width:100%;max-width:720px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface);overflow:hidden;margin-bottom:28px">
-            <textarea placeholder="How can I help you today?" style="width:100%;box-sizing:border-box;border:0;outline:none;background:transparent;font-size:14px;color:var(--fg);resize:none;min-height:72px;padding:14px 16px;font-family:inherit;line-height:1.5"></textarea>
-            <div style="display:flex;align-items:center;padding:8px 12px;border-top:1px solid var(--border-soft)">
-              <button class="btn" style="width:28px;height:28px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center">
-                <i class="ph ph-plus" style="font-size:14px"></i>
-              </button>
-            </div>
-          </div>
+          ${inputBar}
 
-          <!-- Recent Activity -->
-          <div style="width:100%;max-width:720px">
+          <div style="width:100%;max-width:720px;margin-top:28px">
             <div style="font-size:12px;color:var(--fg-muted);margin-bottom:6px;letter-spacing:.02em">Recent Activity</div>
             ${recent.map(item => `
-              <div style="padding:13px 0;border-bottom:1px solid var(--border-soft);font-size:14px;color:var(--fg);cursor:pointer" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--fg)'">
-                ${item}
-              </div>`).join('')}
+              <div style="padding:13px 0;border-bottom:1px solid var(--border-soft);font-size:14px;color:var(--fg);cursor:pointer" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--fg)'">${item}</div>`).join('')}
           </div>
 
         </div>`;
@@ -6774,23 +6836,6 @@
         State.agentChatOpen = false;
         agentPanel.classList.add('hidden');
       }
-      // Update context tag to reflect current page
-      const pageTagEl = document.getElementById('agent-page-tag');
-      if (pageTagEl) {
-        const PAGE_LABELS = {
-          inbox: 'Inbox', home: 'Inbox',
-          growth: 'Submissions', detail: 'Submissions',
-          applications: 'Applications',
-          policies: 'Policies', 'policy-detail': 'Policies',
-          renewals: 'Renewals',
-          claims: 'Claims',
-          radar: 'Radar',
-          settings: 'Settings',
-          actuarial: 'Actuarial Controls',
-        };
-        pageTagEl.textContent = PAGE_LABELS[State.page] || 'Submissions';
-      }
-
       // Mobile-nav class toggle on the shell
       document.querySelector('.shell')?.classList.toggle('is-nav-open', !!State.mobileNavOpen);
       // Sidebar collapsed state — class toggle is enough (no re-render needed)
@@ -6820,6 +6865,8 @@
        ========================================================================= */
     let agentConversation = [];
     let agentStreaming    = false;
+    let chatConversation  = [];
+    let chatStreaming      = false;
 
     function agentGetKey() {
       return localStorage.getItem('ap_anthropic_key') || null;
@@ -6998,6 +7045,141 @@ Need by: ${s.needBy || ''}`;
       }
     }
 
+    async function sendChatMessage() {
+      if (chatStreaming) return;
+      const ta  = document.getElementById('chat-textarea');
+      const btn = document.getElementById('chat-send');
+      if (!ta) return;
+      const text = ta.value.trim();
+      if (!text) return;
+
+      const apiKey = agentGetKey();
+      if (!apiKey) {
+        agentShowKeyPrompt(() => sendChatMessage());
+        return;
+      }
+
+      chatStreaming = true;
+      chatConversation.push({ role: 'user', content: text });
+
+      // If this is the first message, switch to conversation view
+      if (chatConversation.length === 1) {
+        render();   // re-renders chat page with #chat-messages container
+        // re-grab refs after re-render
+        const newTA  = document.getElementById('chat-textarea');
+        const newBtn = document.getElementById('chat-send');
+        if (newTA) newTA.value = '';
+        if (newBtn) newBtn.disabled = true;
+      } else {
+        ta.value = '';
+        if (btn) btn.disabled = true;
+      }
+
+      // Append user bubble
+      const msgContainer = document.getElementById('chat-messages');
+      if (msgContainer) {
+        const u = document.createElement('div');
+        u.className = 'chat-msg user';
+        u.textContent = text;
+        msgContainer.appendChild(u);
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+      }
+
+      // Typing indicator
+      let typingEl = null;
+      if (msgContainer) {
+        typingEl = document.createElement('div');
+        typingEl.className = 'chat-typing';
+        typingEl.innerHTML = '<span></span><span></span><span></span>';
+        msgContainer.appendChild(typingEl);
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+      }
+
+      try {
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'x-api-key':                          apiKey,
+            'anthropic-version':                  '2023-06-01',
+            'content-type':                       'application/json',
+            'anthropic-dangerous-direct-browser-access': 'true',
+          },
+          body: JSON.stringify({
+            model:      'claude-opus-4-8',
+            max_tokens: 1024,
+            stream:     true,
+            system:     agentBuildSystemPrompt(),
+            messages:   chatConversation,
+          }),
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err?.error?.message || `API error ${resp.status}`);
+        }
+
+        typingEl?.remove();
+        const container = document.getElementById('chat-messages');
+        const aiDiv = document.createElement('div');
+        aiDiv.className = 'chat-msg ai';
+        aiDiv.textContent = '';
+        container?.appendChild(aiDiv);
+        let fullText = '';
+
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let buf = '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+          const lines = buf.split('\n');
+          buf = lines.pop();
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const data = line.slice(6).trim();
+            if (data === '[DONE]') break;
+            try {
+              const evt = JSON.parse(data);
+              if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+                fullText += evt.delta.text;
+                aiDiv.textContent = fullText;
+                if (container) container.scrollTop = container.scrollHeight;
+              }
+            } catch (_) {}
+          }
+        }
+        chatConversation.push({ role: 'assistant', content: fullText });
+      } catch (err) {
+        typingEl?.remove();
+        const container = document.getElementById('chat-messages');
+        if (container) {
+          const errDiv = document.createElement('div');
+          errDiv.className = 'chat-msg ai';
+          errDiv.textContent = `Sorry, something went wrong: ${err.message}`;
+          container.appendChild(errDiv);
+        }
+      } finally {
+        chatStreaming = false;
+        const finalBtn = document.getElementById('chat-send');
+        if (finalBtn) finalBtn.disabled = false;
+        // re-wire after streaming finishes so Enter key works again
+        wireChatPage();
+      }
+    }
+
+    function wireChatPage() {
+      const ta  = document.getElementById('chat-textarea');
+      const btn = document.getElementById('chat-send');
+      if (btn) btn.onclick = () => sendChatMessage();
+      if (ta) {
+        ta.oninput = () => btn?.classList.toggle('chat-send-active', ta.value.trim().length > 0);
+        ta.onkeydown = (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
+        };
+      }
+    }
+
     function wireEvents() {
       // Agent chat button + panel
       const agentBtn   = document.getElementById('agent-btn');
@@ -7031,6 +7213,8 @@ Need by: ${s.needBy || ''}`;
           }
         };
       }
+      // Chat page
+      wireChatPage();
 
       // Make Decision (replaces Status Update) — both the title-row button
       // and the sticky-bar duplicate open the Underwriter Decision modal.
