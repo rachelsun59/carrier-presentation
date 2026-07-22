@@ -30,6 +30,8 @@
 }
 </style>
   <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- In-browser document parsers for the New Submission flow:
        PapaParse → CSV, SheetJS → XLSX/XLS, PDF.js → PDF text extraction.
        Served from ./vendor/ so the prototype works offline. -->
@@ -2933,6 +2935,120 @@
     .chat-typing span:nth-child(2) { animation-delay: .2s; }
     .chat-typing span:nth-child(3) { animation-delay: .4s; }
     #chat-send.chat-send-active { color: var(--primary); }
+
+    /* ── Radar page ──────────────────────────────────────────────── */
+    .main.radar-mode { padding: 0; position: relative; overflow: hidden; }
+    .radar-wrap { position: relative; width: 100%; height: 100%; }
+    #radar-map { width: 100%; height: 100%; }
+    #radar-map .leaflet-tile-pane { filter: grayscale(1) brightness(1.05); }
+    #radar-map .leaflet-control-zoom { border: 1px solid #ebebeb !important; border-radius: 6px !important; overflow: hidden; }
+    #radar-map .leaflet-control-zoom a { color: #252424 !important; border-bottom-color: #ebebeb !important; }
+
+    .radar-filter {
+      position: absolute;
+      top: 8px; left: 8px;
+      width: 380px;
+      height: calc(100% - 16px);
+      background: #fff;
+      border: 1px solid #ebebeb;
+      border-radius: 8px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 8px rgba(0,0,0,.04), 0 12px 28px rgba(255,255,255,.05);
+      padding: 8px;
+      gap: 12px;
+      overflow: hidden;
+    }
+    .radar-filter.hidden { display: none !important; }
+
+    .radar-filter-header {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 0; flex-shrink: 0;
+    }
+    .radar-filter-header span { font: 500 16px/22px var(--font); color: #252424; flex: 1; }
+    .radar-filter-close {
+      background: none; border: 0; cursor: pointer;
+      color: #868585; padding: 4px; border-radius: 4px;
+      display: flex; align-items: center; transition: background .12s;
+    }
+    .radar-filter-close:hover { background: var(--bg-soft); color: #252424; }
+
+    .radar-tabs {
+      background: #ebebeb; border-radius: 999px;
+      padding: 2px; display: flex; flex-shrink: 0;
+    }
+    .radar-tab {
+      flex: 1; padding: 4px 8px; border: 0; border-radius: 999px;
+      font: 400 14px/22px var(--font); color: #868585;
+      background: none; cursor: pointer; text-align: center;
+      transition: background .12s, color .12s, font-weight .12s;
+    }
+    .radar-tab.active { background: #fbfbfb; color: #3d3d3d; font-weight: 500; }
+
+    .radar-fields {
+      flex: 1; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .radar-fields::-webkit-scrollbar { width: 3px; }
+    .radar-fields::-webkit-scrollbar-thumb { background: #ebebeb; border-radius: 4px; }
+
+    .radar-field { display: flex; flex-direction: column; gap: 4px; }
+    .radar-label { font: 500 14px/15px var(--font); color: #252424; }
+
+    .radar-input {
+      background: #fff; border: 1px solid #ebebeb; border-radius: 4px;
+      padding: 8px; font: 400 14px/15px var(--font); color: #252424;
+      width: 100%; box-sizing: border-box; outline: none;
+    }
+    .radar-input::placeholder { color: #868585; }
+    .radar-input:focus { border-color: var(--tertiary); }
+
+    .radar-select {
+      background: #fff; border: 1px solid #ebebeb; border-radius: 4px;
+      padding: 8px; display: flex; align-items: center; gap: 8px; cursor: pointer;
+    }
+    .radar-select span { font: 400 14px/15px var(--font); color: #868585; flex: 1; }
+
+    .radar-check-group { display: flex; flex-direction: column; }
+    .radar-check-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 0; cursor: pointer;
+    }
+    .radar-checkbox {
+      width: 16px; height: 16px; border: 1.5px solid #ebebeb;
+      border-radius: 4px; background: #fff; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .12s, border-color .12s;
+    }
+    .radar-checkbox.checked { background: var(--primary); border-color: var(--primary); }
+    .radar-checkbox.checked::after {
+      content: '';
+      display: block; width: 9px; height: 6px;
+      border-left: 2px solid #fff; border-bottom: 2px solid #fff;
+      transform: translateY(-1px) rotate(-45deg);
+    }
+    .radar-check-label { font: 500 14px/15px var(--font); color: #252424; }
+
+    .radar-comment {
+      display: flex; align-items: center; gap: 4px;
+      padding: 8px 0 0; flex-shrink: 0;
+      border-top: 1px solid var(--border-soft);
+    }
+    .radar-comment input {
+      flex: 1; background: #fff; border: 1px solid #ebebeb;
+      border-radius: 4px; padding: 8px;
+      font: 400 14px/15px var(--font); color: #252424; outline: none;
+    }
+    .radar-comment input::placeholder { color: #868585; }
+    .radar-comment input:focus { border-color: var(--tertiary); }
+    .radar-icon-btn {
+      background: none; border: 1px solid #ebebeb; border-radius: 4px;
+      padding: 8px; cursor: pointer; color: #868585;
+      display: flex; align-items: center; font-size: 16px;
+      transition: color .12s, border-color .12s; flex-shrink: 0;
+    }
+    .radar-icon-btn:hover { color: #252424; border-color: #cfcece; }
   </style>
 </head>
 <body>
@@ -4370,7 +4486,69 @@
 
     function renderRenewals() { return renderPlaceholder('Renewals', 'arrows-clockwise'); }
     function renderClaims()   { return renderPlaceholder('Claims', 'warning-circle'); }
-    function renderRadar()    { return renderPlaceholder('Radar', 'chart-line'); }
+    function renderRadar() {
+      const products = ['General Liability','Healthcare Providers Liability','Liquor Liability','Property','Professional Liability','Umbrella'];
+      return `
+        <div class="radar-wrap">
+          <div id="radar-map"></div>
+          <div class="radar-filter">
+            <div class="radar-filter-header">
+              <i class="ph ph-funnel" style="font-size:16px;color:#868585;flex-shrink:0"></i>
+              <span>Filter</span>
+              <button class="radar-filter-close" title="Close"><i class="ph ph-x" style="font-size:16px"></i></button>
+            </div>
+            <div class="radar-tabs">
+              <button class="radar-tab active" data-tab="pins">Pins</button>
+              <button class="radar-tab" data-tab="heatmap">Heat map</button>
+              <button class="radar-tab" data-tab="clusters">Clusters</button>
+            </div>
+            <div class="radar-fields">
+              <div class="radar-field">
+                <label class="radar-label">Builds</label>
+                <div class="radar-select">
+                  <span>All Tenants</span>
+                  <i class="ph ph-caret-down" style="font-size:16px;color:#868585;flex-shrink:0"></i>
+                </div>
+              </div>
+              <div class="radar-field">
+                <label class="radar-label">Zipcode</label>
+                <input class="radar-input" placeholder="Search by zipcode"/>
+              </div>
+              <div class="radar-field">
+                <label class="radar-label">Products</label>
+                <div class="radar-check-group">
+                  ${products.map(p => `
+                    <label class="radar-check-row">
+                      <div class="radar-checkbox checked"></div>
+                      <span class="radar-check-label">${p}</span>
+                    </label>`).join('')}
+                </div>
+              </div>
+              <div class="radar-field">
+                <label class="radar-label">Premium</label>
+                <input class="radar-input" placeholder="Minimum"/>
+                <input class="radar-input" style="margin-top:4px" placeholder="Max"/>
+              </div>
+              <div class="radar-field">
+                <label class="radar-label">Policy Status</label>
+                <div class="radar-select">
+                  <span>All Status</span>
+                  <i class="ph ph-caret-down" style="font-size:16px;color:#868585;flex-shrink:0"></i>
+                </div>
+              </div>
+              <div class="radar-field">
+                <label class="radar-label">Policy Number</label>
+                <input class="radar-input" placeholder="Search by policy number"/>
+              </div>
+            </div>
+            <div class="radar-comment">
+              <input placeholder="Leave a comment..."/>
+              <button class="radar-icon-btn" title="Attach"><i class="ph ph-paperclip"></i></button>
+              <button class="radar-icon-btn" title="Send"><i class="ph ph-telegram-logo"></i></button>
+            </div>
+          </div>
+        </div>`;
+    }
     function renderSettings() { return renderPlaceholder('Settings', 'gear'); }
 
     function renderHome() {
@@ -6803,7 +6981,8 @@
       const prevScroll = State.page === 'detail'
         ? (document.querySelector('.detail-main') || {}).scrollTop || 0
         : 0;
-      main.className = 'main' + (State.page === 'detail' ? ' detail-mode' : '');
+      main.className = 'main' + (State.page === 'detail' ? ' detail-mode' : '') + (State.page === 'radar' ? ' radar-mode' : '');
+      if (radarMap && State.page !== 'radar') { radarMap.remove(); radarMap = null; }
       if      (State.page === 'chat')           main.innerHTML = renderChat();
       else if (State.page === 'home' || State.page === 'inbox') main.innerHTML = renderHome();
       else if (State.page === 'detail')         main.innerHTML = renderDetail();
@@ -6867,6 +7046,34 @@
     let agentStreaming    = false;
     let chatConversation  = [];
     let chatStreaming      = false;
+    let radarMap          = null;
+
+    function initRadarMap() {
+      if (typeof L === 'undefined') return;
+      const mapEl = document.getElementById('radar-map');
+      if (!mapEl) return;
+      if (radarMap) { radarMap.remove(); radarMap = null; }
+
+      radarMap = L.map('radar-map', {
+        zoomControl: true,
+        attributionControl: false,
+      }).setView([27.95, -82.35], 9);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+      }).addTo(radarMap);
+
+      // 7 Florida-area pins (matching Figma positions)
+      [
+        [28.15, -82.45], [27.92, -82.15], [27.55, -81.85],
+        [28.50, -81.50], [27.35, -82.50], [26.95, -82.08], [27.75, -82.72],
+      ].forEach(([lat, lng]) => {
+        L.circleMarker([lat, lng], {
+          radius: 5, fillColor: '#cf5c3f',
+          color: '#fff', weight: 1.5, fillOpacity: 1,
+        }).addTo(radarMap);
+      });
+    }
 
     function agentGetKey() {
       return localStorage.getItem('ap_anthropic_key') || null;
@@ -7215,6 +7422,22 @@ Need by: ${s.needBy || ''}`;
       }
       // Chat page
       wireChatPage();
+
+      // Radar page
+      if (State.page === 'radar') {
+        initRadarMap();
+        document.querySelectorAll('.radar-tab').forEach(tab => {
+          tab.onclick = () => {
+            document.querySelectorAll('.radar-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+          };
+        });
+        const rfClose = document.querySelector('.radar-filter-close');
+        if (rfClose) rfClose.onclick = () => document.querySelector('.radar-filter')?.classList.toggle('hidden');
+        document.querySelectorAll('.radar-checkbox').forEach(cb => {
+          cb.onclick = (e) => { e.preventDefault(); cb.classList.toggle('checked'); };
+        });
+      }
 
       // Make Decision (replaces Status Update) — both the title-row button
       // and the sticky-bar duplicate open the Underwriter Decision modal.
