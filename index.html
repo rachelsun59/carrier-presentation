@@ -2685,27 +2685,37 @@
 
     /* ── Agent chat button + panel ─────────────────────────────── */
     #agent-btn {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 4px;
-      padding: 9px 13px;
-      background: #fbfbfb;
-      border: 1px solid #ebebeb;
-      border-radius: 999px;
-      font-size: 14px;
-      line-height: 15px;
-      color: #252424;
+      gap: var(--sp-2);
+      padding: var(--sp-2);
+      border-radius: var(--r-md);
+      border: 0;
+      background: transparent;
+      color: var(--fg);
+      font-size: var(--fs-sm);
+      line-height: 16px;
+      font-weight: 500;
       cursor: pointer;
       font-family: inherit;
-      z-index: 120;
-      white-space: nowrap;
+      width: 100%;
+      text-align: left;
+      transition: background var(--transition-base);
+      margin-bottom: 4px;
     }
-    #agent-btn i { font-size: 16px; }
+    #agent-btn:hover { background: var(--bg-accent); }
     #agent-btn.hidden { display: none; }
+
+    /* Policy detail timeline */
+    .pd-timeline { display: flex; flex-direction: column; }
+    .pd-tl-item { display: flex; gap: 8px; align-items: flex-start; }
+    .pd-tl-left { display: flex; flex-direction: column; align-items: center; padding-top: 8px; flex-shrink: 0; width: 20px; }
+    .pd-tl-content { flex: 1; min-width: 0; padding: 8px 0; }
+    .pd-etable-row { display: flex; align-items: center; border-bottom: 1px solid var(--border); padding: 8px; }
+    .pd-etable-row:last-child { border-bottom: 0; }
+    .pd-etable-cell { flex: 1; min-width: 0; font-size: 14px; color: var(--fg); }
+    .pd-etable-btn { background: none; border: 0; cursor: pointer; padding: 4px; color: var(--fg-muted); font-size: 16px; display: flex; align-items: center; border-radius: 4px; flex-shrink: 0; }
+    .pd-etable-btn:hover { background: var(--bg-accent); }
 
     #agent-panel {
       position: fixed;
@@ -3328,6 +3338,9 @@
       </div>
 
       <div class="nav-foot">
+        <button id="agent-btn" class="hidden">
+          <span class="nav-ico"><i class="ph ph-star-four" style="color:var(--tertiary)"></i></span><span class="nav-label">Agent</span>
+        </button>
         <button class="nav-item">
           <span class="nav-ico"><i class="ph ph-building"></i></span><span class="nav-label">All Organizations</span>
         </button>
@@ -3354,12 +3367,6 @@
 
         <main class="main" id="main"></main>
       </div>
-
-      <!-- ── Agent chat floating button (outside surface, in gray gutter) ── -->
-      <button id="agent-btn" class="hidden">
-        <i class="ph ph-star-four" style="font-size:15px"></i>
-        Agent
-      </button>
 
       <!-- ── Agent chat panel ─────────────────────────────────────── -->
       <div id="agent-panel" class="hidden">
@@ -5871,210 +5878,184 @@
 
     function renderPolicyDetail() {
       const policy = POLICY_ROWS.find(r => r.policyNo === State.policyId) || POLICY_ROWS[0];
-      const statusKind = policy.status === 'Active' ? 'success' : 'info';
       const carrier = (policy.build === 'Mindbody' || policy.build === 'PushPress') ? 'Everspan' : 'Greenwood';
+      const premStr = '$' + policy.premium.toLocaleString('en-US');
+      const pendStr = '$' + Math.round(policy.premium * 0.93).toLocaleString('en-US');
 
-      // Coverages breakdown: GL + LL + Umbrella(External) matching Figma
-      const covLines = [];
-      if (policy.product.includes('GL')) covLines.push({ name:'General Liability',       amt: Math.round(policy.premium * 0.855), external:false });
-      if (policy.product.includes('LL')) covLines.push({ name:'Liquor Liability',         amt: Math.round(policy.premium * 0.014), external:false });
-      if (policy.product.includes('PL')) covLines.push({ name:'Professional Liability',   amt: Math.round(policy.premium * 0.038), external:false });
-      covLines.push(                                   { name:'Umbrella',                 amt: Math.round(policy.premium * 0.093), external:true  });
-      const covRows = covLines.map(c => `
-        <tr>
-          <td style="padding:12px 16px;border-bottom:1px solid var(--border-soft);font-size:14px;color:var(--fg)">
-            ${c.name}${c.external ? ' <span class="pill info no-dot" style="font-size:11px;padding:2px 7px;margin-left:6px">External</span>' : ''}
-          </td>
-          <td style="padding:12px 16px;border-bottom:1px solid var(--border-soft);font-size:14px;color:var(--fg);text-align:right">
-            $${c.amt.toLocaleString('en-US', {minimumFractionDigits:2})}
-          </td>
-        </tr>`).join('');
-
-      // Activities timeline
-      const acts = [
-        { type:'user', av:'BO', avCls:'blue',   name:'Bobby',        verb:'generated',           item:'New Endorsement Packet',       time:'Just now',
-          detail:[] },
-        { type:'user', av:'HC', avCls:'orange', name:'Hunt Carroll', verb:'made an endorsement', item:'',                             time:'Just now',
-          detail:['added','added','added','added','added','deleted'].map(v => ({ verb:v, label:'location address' })) },
-        { type:'user', av:'BV', avCls:'blue',   name:'Bobby Vo',     verb:'generated',           item:'New Certificate of Insurance', time:'3 mins ago',  detail:[] },
-        { type:'user', av:'BV', avCls:'blue',   name:'Bobby Vo',     verb:'generated',           item:'New Certificate of Insurance', time:'3 mins ago',  detail:[] },
-        { type:'sys',  statusC:'var(--info)',   verb:'Policy status updated',    item:'Bound',        time:'15 mins ago' },
-        { type:'user', av:'BV', avCls:'blue',   name:'Bobby Vo',     verb:'uploaded',            item:'New Documents',                time:'15 mins ago', detail:[] },
-        { type:'sys',  statusC:'var(--ok)',     verb:'Policy status updated to', item:'Active',       time:'15 mins ago' },
-        { type:'sys',  statusC:'var(--warn)',   verb:'Policy status updated',    item:'Pending bind', time:'15 mins ago' },
+      // Coverage lines
+      const covLines = [
+        { name:'General Liability',  amt:'$' + Math.round(policy.premium*0.855).toLocaleString('en-US',{minimumFractionDigits:2}), external:false },
+        { name:'Liquor Liability',   amt:'$' + Math.round(policy.premium*0.014).toLocaleString('en-US',{minimumFractionDigits:2}), external:false },
+        { name:'Property Liability', amt:'$' + Math.round(policy.premium*0.093).toLocaleString('en-US'), external:true },
       ];
-      const actItems = acts.map(a => {
-        if (a.type === 'sys') {
-          return `
-            <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0">
-              <div style="width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;position:relative;z-index:1">
-                <i class="ph ph-check-circle" style="font-size:11px;color:var(--fg-muted)"></i>
-              </div>
-              <div style="flex:1;min-width:0;font-size:13px;color:var(--fg-muted);line-height:1.5">
-                ${a.verb}
-                <span style="color:${a.statusC};font-weight:600;margin-left:4px">● ${a.item}</span>
-                <span style="font-size:12px;margin-left:6px">${a.time}</span>
-              </div>
-            </div>`;
-        }
-        const detailRows = (a.detail||[]).map(d =>
-          `<div style="display:flex;align-items:center;gap:8px;padding:1px 0;font-size:12px">
-            <span style="color:var(--fg-muted);min-width:42px">${d.verb}</span>
-            <span style="color:var(--fg);font-weight:500">${d.label}</span>
-          </div>`).join('');
-        const detailBlock = detailRows ? `
-          <div style="margin-top:5px;padding-left:10px;border-left:2px solid var(--border-soft)">
-            ${detailRows}
-          </div>` : '';
-        return `
-          <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0">
-            <div class="avatar sm ${a.avCls}" style="flex-shrink:0;position:relative;z-index:1">${a.av}</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;line-height:1.5">
-                <span style="font-weight:600;color:var(--fg)">${a.name}</span>
-                <span style="color:var(--fg-muted);font-weight:400"> ${a.verb} </span>
-                ${a.item ? `<span style="font-weight:600;color:var(--fg)">${a.item}</span>` : ''}
-                <span style="font-size:12px;color:var(--fg-muted);font-weight:400;margin-left:4px">${a.time}</span>
-              </div>
-              ${detailBlock}
-            </div>
-          </div>`;
-      }).join('');
+      const covRows = covLines.map(c => `
+        <div class="pd-etable-row">
+          <div class="pd-etable-cell">
+            ${c.name}${c.external ? ' <span style="background:#ebf2fb;color:#2e69ae;border-radius:999px;padding:4px 8px;font-size:12px;line-height:14px;display:inline-flex;align-items:center">External</span>' : ''}
+          </div>
+          <div style="width:160px;font-size:14px;color:var(--fg)">${c.amt}</div>
+          <div style="width:100px;display:flex;justify-content:flex-end">
+            <button style="border:1px solid var(--border);background:none;font-size:14px;color:var(--fg);padding:4px 8px;border-radius:4px;cursor:pointer;font-family:inherit">View Limits</button>
+          </div>
+        </div>`).join('');
+
+      // Additional Insured rows
+      const aiRows = [
+        'PRISA SUMMERLIN FL LLC C/O THE JONES AGENCY INC 224 W 35TH ST STE 500 PMB 137 NEW YORK, NY 10001',
+        "MARCO'S FRANCHISING LLC 5252 MONROE ST, 2ND FLOOR, TOLEDO, OH 43623",
+        'THE PRUDENTIAL INSURANCE COMPANY OF AMERICA C/O SOUTHEAST CENTERS LLC, 9745 SOUTH DIXIE HIGHWAY, SUITE 200, PINECREST, FL 33156',
+      ].map(name => `
+        <div class="pd-etable-row">
+          <div class="pd-etable-cell">${name}</div>
+          <button class="pd-etable-btn"><i class="ph ph-trash"></i></button>
+        </div>`).join('');
+
+      // Timeline helpers
+      const tlLine = `<div style="flex:1;width:1px;background:#cfcece;min-height:12px;margin-top:2px"></div>`;
+      const tlAv = (initials, bg='#f2e7e7', tc='#640b0b') =>
+        `<div style="width:17px;height:17px;border-radius:10px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;color:${tc};flex-shrink:0">${initials}</div>`;
+      const tlIcon = `<i class="ph ph-check-circle" style="font-size:16px;color:var(--fg-muted);width:17px;height:17px;display:flex;align-items:center;justify-content:center"></i>`;
+
+      const tlUser = (initials, name, verb, item, time, extraVerb='', details=[]) => {
+        const detailHtml = details.length ? `<div style="margin-top:4px">${details.map(d=>`<div style="display:flex;gap:8px;font-size:12px;font-weight:500;line-height:14px"><span style="color:var(--fg-muted)">${d.v}</span><span style="color:var(--fg)">${d.i}</span></div>`).join('')}</div>` : '';
+        return `<div class="pd-tl-item"><div class="pd-tl-left">${tlAv(initials)}${tlLine}</div><div class="pd-tl-content"><div style="display:flex;align-items:baseline;gap:4px;flex-wrap:wrap"><span style="font-size:14px;font-weight:500;color:var(--fg);line-height:15px">${name}</span><span style="font-size:12px;font-weight:500;color:var(--fg-muted)">${verb}</span>${item?`<span style="font-size:12px;font-weight:500;color:var(--fg)">${item}</span>`:''} ${extraVerb?`<span style="font-size:12px;font-weight:500;color:var(--fg-muted)">${extraVerb}</span>`:''}<span style="font-size:10px;color:var(--fg-muted);line-height:13px">${time}</span></div>${detailHtml}</div></div>`;
+      };
+
+      const tlSys = (verb, badge, badgeColor, dotColor, badgeBg, time, isLink=false) => {
+        const badgeEl = isLink
+          ? `<a href="#" style="color:#4b7174;text-decoration:underline;font-size:12px;font-weight:500">${badge}</a>`
+          : `<span style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:4px 8px;border-radius:999px;${badgeBg?`background:${badgeBg};`:''}font-size:12px;color:${badgeColor}"><span style="width:6px;height:6px;border-radius:50%;background:${dotColor};flex-shrink:0"></span>${badge}</span>`;
+        return `<div class="pd-tl-item"><div class="pd-tl-left"><div style="width:17px;height:17px;display:flex;align-items:center;justify-content:center">${tlIcon}</div>${tlLine}</div><div class="pd-tl-content"><div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"><span style="font-size:12px;font-weight:500;color:var(--fg-muted)">${verb}</span>${badgeEl}<span style="font-size:10px;color:var(--fg-muted)">${time}</span></div></div></div>`;
+      };
+
+      const timeline = [
+        tlUser('BO','Bobby','generated','New Endorsement Packet','Just now'),
+        tlUser('Hc','Hunt Carroll','added','5 locations,','Just now','updated optional coverage increased price',
+          [{v:'added',i:'location address'},{v:'added',i:'location address'},{v:'added',i:'location address'},{v:'added',i:'location address'},{v:'added',i:'location address'},{v:'deleted',i:'location address'}]),
+        tlUser('BO','Bobby Vo','generated','New Certificate of Insurance','3 mins ago'),
+        tlUser('BO','Bobby Vo','generated','New Certificate of Insurance','3 mins ago'),
+        tlSys('Policy status updated','Bound','#2e69ae','#2e69ae','#ebf2fb','15 mins ago'),
+        tlUser('BO','Bobby Vo','uploaded','New Documents','15 mins ago'),
+        tlSys('Policy status updated to','Active','#277e4f','#277e4f',null,'15 mins ago'),
+        tlSys('Policy status updated','Pending bind','#c47a10','#c47a10',null,'15 mins ago'),
+        tlSys('Policy created from','Application#','#4b7174',null,null,'3 days ago',true),
+      ].join('');
+
+      const detailRow = (k,v) => `<div style="display:flex;gap:4px;align-items:flex-start"><div style="width:140px;min-width:140px;text-align:right;font-size:12px;font-weight:500;color:var(--fg-muted);line-height:14px;padding-top:1px">${k}</div><div style="flex:1;font-size:14px;color:var(--fg);line-height:15px">${v}</div></div>`;
+      const sep = `<span style="width:1px;height:16px;background:var(--border);flex-shrink:0"></span>`;
+      const avTag = (initials, bg='#f2e7e7', tc='#640b0b') =>
+        `<span style="display:inline-flex;align-items:center;gap:4px;background:#ebebeb;border-radius:999px;padding:4px 8px 4px 4px"><span style="width:24px;height:24px;border-radius:12px;background:${bg};display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:${tc}">${initials}</span><span style="font-size:12px">${initials==='KM'?'Kevin Ma':'Bobby Vo'}</span></span>`;
 
       return `
-        <!-- Info banner -->
-        <div style="background:var(--info-bg);border:1px solid #afccef;border-radius:4px;padding:8px 16px;margin:12px 24px 0;display:flex;align-items:center;justify-content:space-between">
-          <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--info)">
-            <i class="ph ph-info" style="font-size:16px;flex-shrink:0"></i>
-            There is a pending endorsement
-          </div>
-          <button style="background:none;border:0;font-size:14px;color:var(--fg);cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap">
+        <!-- Info Banner -->
+        <div style="background:#ebf2fb;border:1px solid #afccef;border-radius:4px;padding:8px 12px;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+          <i class="ph ph-info" style="font-size:16px;color:#2e69ae;flex-shrink:0"></i>
+          <span style="flex:1;font-size:14px;color:#2e69ae">There is a pending endorsement</span>
+          <button style="background:none;border:0;font-size:14px;color:var(--fg);cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;font-family:inherit">
             View endorsement <i class="ph ph-arrow-right" style="font-size:14px"></i>
           </button>
         </div>
 
-        <div style="padding:16px 24px 0">
-          <!-- Breadcrumb + status + actions -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-            <div class="breadcrumb" style="margin-bottom:0">
-              <button class="crumb-link" id="back-to-policies">Policies</button>
-              <i class="ph ph-caret-right" style="font-size:10px"></i>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:13px;color:var(--fg-muted);display:flex;align-items:center;gap:6px">
-                Status: <span class="pill ${statusKind}">${policy.status}</span>
-              </span>
-              <button class="btn" style="padding:7px 9px"><i class="ph ph-chat-centered-dots" style="font-size:15px"></i></button>
-              <button class="btn btn-primary">Actions</button>
-            </div>
+        <!-- Breadcrumb + Actions -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:2px">
+            <button id="back-to-policies" style="background:none;border:0;font-size:12px;color:var(--fg-muted);cursor:pointer;padding:2px 4px;border-radius:2px;font-family:inherit">Policies</button>
+            <i class="ph ph-caret-right" style="font-size:10px;color:var(--fg-muted)"></i>
           </div>
-
-          <!-- Title -->
-          <h1 style="font-family:var(--font-display);font-size:28px;font-weight:400;color:var(--fg);margin:0 0 8px;line-height:1.15">${policy.name}</h1>
-
-          <!-- Sub meta row -->
-          <div class="meta-row" style="font-size:13px;margin-bottom:18px">
-            <span class="meta-pair">${policy.policyNo}</span>
-            <span class="meta-vsep"></span>
-            <span class="meta-pair">${policy.build}</span>
-            <span class="meta-vsep"></span>
-            <span class="meta-pair" style="gap:5px">
-              <span class="meta-k">Broker:</span>
-              <span class="avatar sm orange" style="font-size:9px">KM</span>
-              Kevin Ma
-            </span>
-            <span class="meta-vsep"></span>
-            <span class="meta-pair" style="gap:5px">
-              <span class="meta-k">Sales Rep:</span>
-              <span class="avatar sm blue" style="font-size:9px">BV</span>
-              Bobby Vo
-            </span>
-          </div>
-
-          <!-- Premium -->
-          <div style="margin-bottom:22px">
-            <div style="font-size:11px;color:var(--fg-muted);margin-bottom:2px">Total Premium</div>
-            <div style="font-size:32px;font-weight:700;color:var(--fg);line-height:1.1">$${policy.premium.toLocaleString('en-US')}</div>
-            <div style="font-size:12px;color:var(--fg-muted);margin-top:4px">Pending endorsement: $${Math.round(policy.premium * 0.93).toLocaleString('en-US')}</div>
-          </div>
-
-          <!-- Tabs -->
-          <div class="tabs">
-            <button class="tab active">Overview</button>
-            <button class="tab">Exposures</button>
-            <button class="tab">Coverage</button>
-            <button class="tab">Payment</button>
-            <button class="tab">Documents</button>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:14px;color:var(--fg-muted)">Status:</span>
+            <span class="pill success">Active</span>
+            <button class="btn" style="padding:7px"><i class="ph ph-chat-centered-dots" style="font-size:15px"></i></button>
+            <button class="btn btn-primary">Actions</button>
           </div>
         </div>
 
-        <!-- Tab content -->
-        <div style="padding:24px 24px 48px;max-width:920px">
+        <!-- Title -->
+        <h1 style="font-family:var(--font-display);font-size:24px;font-weight:400;color:var(--fg);margin:0 0 8px;line-height:26px">${policy.name}</h1>
 
-          <!-- Policy Information -->
-          <section style="margin-bottom:28px">
-            <h3 style="font-size:14px;font-weight:600;color:var(--fg);margin:0 0 14px">Policy Information</h3>
-            <div style="display:grid;grid-template-columns:200px 1fr;row-gap:16px;font-size:14px">
-              <span style="color:var(--fg-muted)">Business Type</span>
-              <span>${policy.classCode}</span>
-              <span style="color:var(--fg-muted)">Carrier</span>
-              <span>${carrier}</span>
-              <span style="color:var(--fg-muted)">Policy Start Date</span>
-              <span>${policy.effDate}</span>
+        <!-- Meta row -->
+        <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--fg);flex-wrap:wrap;margin-bottom:16px">
+          <span>${policy.policyNo}</span>
+          ${sep}
+          <span>${policy.build}</span>
+          ${sep}
+          <span style="color:var(--fg-muted)">Broker:</span>
+          ${avTag('KM')}
+          ${sep}
+          <span style="color:var(--fg-muted)">Sales Rep:</span>
+          ${avTag('BV','#ebebeb','var(--fg)')}
+          ${sep}
+        </div>
+
+        <!-- Premium metric -->
+        <div style="border-left:1px solid #277e4f;padding:4px 0 4px 8px;margin-bottom:16px;display:flex;flex-direction:column;gap:2px">
+          <div style="font-size:10px;color:var(--fg-muted);line-height:13px">Total Premium</div>
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:400;color:#277e4f;line-height:26px">${premStr}</div>
+          <div style="font-size:12px;color:var(--fg);line-height:14px">Pending endorsement: ${pendStr}</div>
+        </div>
+
+        <!-- Tabs -->
+        <div style="display:flex;align-items:center;border-bottom:1px solid var(--border);margin:0 -24px;padding:0 24px">
+          <button style="padding:8px;font-size:16px;line-height:22px;background:none;border:0;border-bottom:2px solid var(--tertiary);cursor:pointer;color:#3d3d3d;font-weight:500;font-family:inherit;margin-bottom:-1px">Overview</button>
+          ${['Exposures','Coverage','Payment','Documents'].map(t=>`<button style="padding:8px;font-size:16px;line-height:22px;background:none;border:0;border-bottom:2px solid transparent;cursor:pointer;color:var(--fg-muted);font-family:inherit;margin-bottom:-1px">${t}</button>`).join('')}
+        </div>
+
+        <!-- Body -->
+        <div style="padding-top:16px">
+
+          <!-- Two-column summary -->
+          <div style="display:flex;gap:16px;align-items:flex-start;padding:8px 0">
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:16px;font-weight:500;color:var(--fg);line-height:22px">Policy Information</div>
+              ${detailRow('Business Type', policy.classCode)}
+              ${detailRow('Carrier', carrier)}
+              ${detailRow('Policy Start Date', policy.effDate)}
             </div>
-          </section>
-
-          <hr style="border:0;border-top:1px solid var(--border-soft);margin:0 0 28px">
-
-          <!-- Primary Insured -->
-          <section style="margin-bottom:28px">
-            <h3 style="font-size:14px;font-weight:600;color:var(--fg);margin:0 0 14px">Primary Insured</h3>
-            <div style="display:grid;grid-template-columns:200px 1fr;row-gap:16px;font-size:14px">
-              <span style="color:var(--fg-muted)">Name</span>
-              <span>Wes Baker</span>
-              <span style="color:var(--fg-muted)">Email</span>
-              <a href="mailto:wes.baker@rtpecialty.com" style="color:var(--primary);text-decoration:none">wes.baker@rtpecialty.com</a>
-              <span style="color:var(--fg-muted)">Number</span>
-              <span>(954) 732-7168</span>
-              <span style="color:var(--fg-muted)">Mailing Address</span>
-              <span>11701 Bee Caves Rd, 110, Austin, TX 78738, US</span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:16px;font-weight:500;color:var(--fg);line-height:22px">Primary Insured</div>
+              ${detailRow('Name', 'Wes Baker')}
+              ${detailRow('Email', '<a href="mailto:wes.baker@rtpecialty.com" style="color:#4b7174;text-decoration:underline">wes.baker@rtpecialty.com</a>')}
+              ${detailRow('Number', '(954) 732-7168')}
+              ${detailRow('Mailing Address', '11701 Bee Caves Rd, 110, Austin, TX 78738, US')}
             </div>
-          </section>
+          </div>
 
-          <hr style="border:0;border-top:1px solid var(--border-soft);margin:0 0 28px">
+          <div style="height:0;border-top:1px solid var(--border);margin:16px 0"></div>
+
+          <!-- Additional Insured -->
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:0">
+            <div style="font-size:16px;font-weight:500;color:var(--fg);line-height:22px">Additional Insured</div>
+            <div style="background:white;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+              <div style="display:flex;align-items:center;background:var(--bg);padding:8px;border-bottom:1px solid var(--border)">
+                <div style="flex:1;font-size:14px;font-weight:500;color:var(--fg-muted)">Name</div>
+                <div style="width:32px"></div>
+              </div>
+              ${aiRows}
+            </div>
+          </div>
+
+          <div style="height:0;border-top:1px solid var(--border);margin:16px 0"></div>
 
           <!-- Coverages -->
-          <section style="margin-bottom:28px">
-            <h3 style="font-size:14px;font-weight:600;color:var(--fg);margin:0 0 14px">Coverages</h3>
-            <div class="tbl-wrap">
-              <table class="gtable">
-                <thead>
-                  <tr>
-                    <th><div class="th-inner"><span class="th-label">Coverage</span></div></th>
-                    <th style="text-align:right">
-                      <div class="th-inner" style="justify-content:flex-end">
-                        <span class="th-label">Premium</span>
-                        <i class="ph ph-info" style="font-size:11px;color:var(--fg-muted)"></i>
-                        <span style="font-weight:400;font-size:12px;color:var(--fg-muted)">Taxes and fees are not included</span>
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>${covRows}</tbody>
-              </table>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:16px;font-weight:500;color:var(--fg);line-height:22px">Coverages</div>
+            <div style="background:white;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+              <div style="display:flex;align-items:center;background:var(--bg);padding:8px;border-bottom:1px solid var(--border)">
+                <div style="flex:1;font-size:14px;font-weight:500;color:var(--fg-muted)">Coverage</div>
+                <div style="width:160px;font-size:14px;font-weight:500;color:var(--fg-muted);display:flex;align-items:center;gap:4px">Premium <i class="ph ph-info" style="font-size:13px"></i></div>
+                <div style="width:100px;font-size:11px;color:var(--fg-muted);text-align:right">Taxes &amp; fees not included</div>
+              </div>
+              ${covRows}
             </div>
-          </section>
+          </div>
 
-          <hr style="border:0;border-top:1px solid var(--border-soft);margin:0 0 28px">
+          <div style="height:0;border-top:1px solid var(--border);margin:16px 0"></div>
 
           <!-- Activities -->
-          <section>
-            <h3 style="font-size:14px;font-weight:600;color:var(--fg);margin:0 0 8px">Activities</h3>
-            <div style="position:relative">
-              <div style="position:absolute;left:9px;top:20px;bottom:20px;width:1px;background:var(--border-soft)"></div>
-              ${actItems}
-            </div>
-          </section>
+          <div style="display:flex;flex-direction:column;gap:0;padding-bottom:32px">
+            <div style="font-size:16px;font-weight:500;color:var(--fg);line-height:22px;margin-bottom:4px">Activities</div>
+            <div class="pd-timeline">${timeline}</div>
+          </div>
 
         </div>`;
     }
