@@ -6337,55 +6337,57 @@
         `<span style="display:inline-flex;align-items:center;gap:4px;background:#ebebeb;border-radius:999px;padding:4px 8px 4px 4px"><span style="width:24px;height:24px;border-radius:12px;background:${bg};display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:${tc}">${initials}</span><span style="font-size:12px">${initials==='KM'?'Kevin Ma':'Bobby Vo'}</span></span>`;
 
       return `
-        ${['overview','payments'].includes(State.policyTab) ? `
-        <!-- Info Banner -->
-        <div style="background:#ebf2fb;border:1px solid #afccef;border-radius:4px;padding:8px 12px;margin-bottom:16px;display:flex;align-items:center;gap:8px">
-          <i class="ph ph-info" style="font-size:16px;color:#2e69ae;flex-shrink:0"></i>
-          <span style="flex:1;font-size:14px;color:#2e69ae">There is a pending endorsement</span>
-          <button style="background:none;border:0;font-size:14px;color:var(--fg);cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;font-family:inherit">
-            View endorsement <i class="ph ph-arrow-right" style="font-size:14px"></i>
-          </button>
-        </div>` : ''}
+        <!-- ── Policy Header (Figma 111:14898) ── -->
 
-        <!-- Breadcrumb + Actions -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="display:flex;align-items:center;gap:2px">
-            <button id="back-to-policies" style="background:none;border:0;font-size:12px;color:var(--fg-muted);cursor:pointer;padding:2px 4px;border-radius:2px;font-family:inherit">Policies</button>
-            <i class="ph ph-caret-right" style="font-size:10px;color:var(--fg-muted)"></i>
+        <!-- Row 1: PageHeader -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding-bottom:8px">
+          <!-- Left: breadcrumb + title + meta -->
+          <div style="display:flex;flex-direction:column;gap:8px;flex:1;min-width:0">
+            <!-- Breadcrumb -->
+            <div style="display:flex;align-items:center;gap:2px">
+              <button id="back-to-policies" style="background:none;border:0;font-size:12px;color:var(--fg-muted);cursor:pointer;padding:2px 0;font-family:inherit">Policies</button>
+              <i class="ph ph-caret-right" style="font-size:10px;color:var(--fg-muted)"></i>
+            </div>
+            <!-- Title -->
+            <div style="font-family:var(--font-display);font-size:24px;font-weight:400;color:var(--fg);line-height:26px;white-space:nowrap">${policy.name}</div>
+            <!-- Meta row -->
+            <div style="display:flex;align-items:center;gap:16px;font-size:14px;color:var(--fg);flex-wrap:wrap">
+              <span>${policy.policyNo}</span>
+              <span style="width:1px;height:24px;background:var(--border);flex-shrink:0"></span>
+              <span>${policy.build}</span>
+              <span style="width:1px;height:24px;background:var(--border);flex-shrink:0"></span>
+              <div style="display:flex;align-items:center;gap:4px">
+                <span style="color:var(--fg-muted)">Broker:</span>
+                ${avTag('KM')}
+              </div>
+              <span style="width:1px;height:24px;background:var(--border);flex-shrink:0"></span>
+              <div style="display:flex;align-items:center;gap:4px">
+                <span style="color:var(--fg-muted)">Sales Rep:</span>
+                ${avTag('BV','#ebebeb','var(--fg)')}
+              </div>
+              <span style="width:1px;height:24px;background:var(--border);flex-shrink:0"></span>
+            </div>
           </div>
-          <div style="display:flex;align-items:center;gap:8px">
+          <!-- Right: status + chat + actions -->
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;padding-top:4px">
             <span style="font-size:14px;color:var(--fg-muted)">Status:</span>
-            <span class="pill success">Active</span>
-            <button class="btn" style="padding:7px"><i class="ph ph-chat-centered-dots" style="font-size:15px"></i></button>
-            <button class="btn btn-primary">Actions</button>
+            <span style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:4px 8px;border-radius:999px;font-size:12px;color:#277e4f">
+              <span style="width:6px;height:6px;border-radius:50%;background:#277e4f;flex-shrink:0"></span>Active
+            </span>
+            <button style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:4px;border:1px solid #4b7174;background:#eef3f4;cursor:pointer">
+              <i class="ph ph-chat-centered-dots" style="font-size:16px;color:#4b7174"></i>
+            </button>
+            <button class="btn btn-primary" style="padding:8px 12px">Actions</button>
           </div>
         </div>
 
-        <!-- Title -->
-        <h1 style="font-family:var(--font-display);font-size:24px;font-weight:400;color:var(--fg);margin:0 0 8px;line-height:26px">${policy.name}</h1>
-
-        <!-- Meta row -->
-        <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--fg);flex-wrap:wrap;margin-bottom:16px">
-          <span>${policy.policyNo}</span>
-          ${sep}
-          <span>${policy.build}</span>
-          ${sep}
-          <span style="color:var(--fg-muted)">Broker:</span>
-          ${avTag('KM')}
-          ${sep}
-          <span style="color:var(--fg-muted)">Sales Rep:</span>
-          ${avTag('BV','#ebebeb','var(--fg)')}
-          ${sep}
-        </div>
-
-        <!-- Premium metric -->
-        <div style="border-left:1px solid #277e4f;padding:4px 0 4px 8px;margin-bottom:16px;display:flex;flex-direction:column;gap:2px">
+        <!-- Row 2: Total Premium metric -->
+        <div style="border-left:1px solid #277e4f;padding:4px 0 4px 5px;margin-bottom:0;display:flex;flex-direction:column;gap:2px">
           <div style="font-size:10px;color:var(--fg-muted);line-height:13px">Total Premium</div>
           <div style="font-family:var(--font-display);font-size:24px;font-weight:400;color:#277e4f;line-height:26px">${premStr}</div>
-          <div style="font-size:12px;color:var(--fg);line-height:14px">Pending endorsement: ${pendStr}</div>
         </div>
 
-        <!-- Tabs -->
+        <!-- Row 3: Tabs -->
         <div style="display:flex;align-items:center;border-bottom:1px solid var(--border);margin:0 -24px;padding:0 24px">
           ${[['overview','Overview'],['exposures','Exposures'],['coverage','Coverage'],['payments','Payments'],['documents','Documents']].map(([k,lbl])=>`
             <button class="pd-tab-btn ${State.policyTab===k?'active':''}" data-pol-tab="${k}">${lbl}</button>`).join('')}
@@ -6608,6 +6610,14 @@
         </div>`).join('');
 
       return `
+        <!-- Pending endorsement banner -->
+        <div style="background:#ebf2fb;border:1px solid #afccef;border-radius:4px;padding:8px 12px;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+          <i class="ph ph-info" style="font-size:16px;color:#2e69ae;flex-shrink:0"></i>
+          <span style="flex:1;font-size:14px;color:#2e69ae">There is a pending endorsement</span>
+          <button style="background:none;border:0;font-size:14px;color:var(--fg);cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;font-family:inherit">
+            View endorsement <i class="ph ph-arrow-right" style="font-size:14px"></i>
+          </button>
+        </div>
         <div class="pd-pay-section">
           <div class="pd-pay-section-title">Transactions</div>
           <div class="pd-pay-tbl">
