@@ -4420,7 +4420,7 @@
       const hasSov   = sovF.length > 0;
       const hasExp   = expF.length > 0 || !!pt;
       const hasAdd   = addF.length > 0;
-      const tgtDetected = (pt && !!pt.targetPremium) || addF.some(f => f.targetPremiumDetected);
+      const tgtDetected = !!(s.targetPremium) || (pt && !!pt.targetPremium) || addF.some(f => f.targetPremiumDetected);
       const anyFiles    = hasLoss || hasSov || hasExp || hasAdd;
       const canCreate   = hasLoss && hasSov && hasExp && tgtDetected;
 
@@ -4495,6 +4495,11 @@
               </div>
             </div>
             ${docListHTML}
+            <div class="ns-field" style="margin-bottom:0">
+              <i class="ph ph-currency-dollar ns-ico"></i>
+              <input id="ns-target-premium" type="text" placeholder="Target Premium"
+                value="${s.targetPremium || (pt && pt.targetPremium ? pt.targetPremium : '')}"/>
+            </div>
             <div class="ns-foot">
               <button class="text-btn" id="ns-cancel">Cancel</button>
               <button class="btn btn-primary" id="ns-create" ${canCreate ? '' : 'disabled'}>Create</button>
@@ -4511,6 +4516,7 @@
         docs: { lossRuns: [], sov: [], expiringPremium: [], additional: [] },
         fields: { tenant: '', businessName: '', effDate: '', needBy: '', targetPremium: '', notes: '' },
         parsedTemplate: null,
+        targetPremium: '',
       };
       render();
     }
@@ -10090,6 +10096,25 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
         };
       }
 
+      // ── Target premium input — re-render on change to update Create gate ─
+      const tpInput = $('#ns-target-premium');
+      if (tpInput) {
+        tpInput.oninput = () => {
+          State.newSub.targetPremium = tpInput.value.trim();
+          // Update Create button enabled state without full re-render
+          const nsC = $('#ns-create');
+          if (nsC) {
+            const pt    = State.newSub.parsedTemplate;
+            const addF  = nsSlotFiles('additional');
+            const det   = !!(State.newSub.targetPremium) || (pt && !!pt.targetPremium) || addF.some(f => f.targetPremiumDetected);
+            const ok    = nsSlotFiles('lossRuns').length > 0 || !!pt;
+            const sov   = nsSlotFiles('sov').length > 0;
+            const exp   = nsSlotFiles('expiringPremium').length > 0 || !!pt;
+            nsC.disabled = !(ok && sov && exp && det);
+          }
+        };
+      }
+
       // ── Remove entire slot (trash button) ────────────────────────────────
       $$('[data-remove-slot]').forEach(b => b.onclick = (e) => {
         e.stopPropagation();
@@ -10106,7 +10131,7 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
         const pt   = State.newSub.parsedTemplate;
         const docs = State.newSub.docs;
         const name = (pt && pt.accountName) || (docs.lossRuns[0] && docs.lossRuns[0].name.replace(/\.\w+$/, '')) || 'New Submission';
-        const premium = (pt && pt.targetPremium) || (docs.additional.find(f => f.targetPremiumDetected) ? 'Detected' : '');
+        const premium = State.newSub.targetPremium || (pt && pt.targetPremium) || '';
         GROWTH_ROWS.unshift({
           type:'Sub', product:'GL',
           name,
