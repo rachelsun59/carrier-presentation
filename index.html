@@ -2914,6 +2914,44 @@
     .pd-etable-cell { flex: 1; min-width: 0; font-size: 14px; color: var(--fg); }
     .pd-etable-btn { background: none; border: 0; cursor: pointer; padding: 4px; color: var(--fg-muted); font-size: 16px; display: flex; align-items: center; border-radius: 4px; flex-shrink: 0; }
     .pd-etable-btn:hover { background: var(--bg-accent); }
+    /* Policy detail dynamic tabs */
+    .pd-tab-btn { padding: 8px; font-size: 16px; line-height: 22px; background: none; border: 0; border-bottom: 2px solid transparent; cursor: pointer; color: var(--fg-muted); font-family: inherit; margin-bottom: -1px; white-space: nowrap; }
+    .pd-tab-btn.active { border-bottom-color: var(--tertiary,#cf5c3f); color: #3d3d3d; font-weight: 500; }
+    /* Exposures tab */
+    .pd-exp-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .pd-exp-group { display: flex; align-items: center; gap: 8px; padding: 8px 0 12px; }
+    .pd-exp-chip { display: inline-flex; align-items: center; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--fg); padding: 2px 8px; background: #ebebeb; }
+    .pd-exp-code { font-size: 12px; color: #2e69ae; font-weight: 500; }
+    .pd-cov-badge { display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 10px; font-weight: 700; padding: 2px 4px; min-width: 20px; }
+    .pd-cov-GL { background: #ebf2fb; color: #2e69ae; }
+    .pd-cov-PL { background: #eaf5ef; color: #277e4f; }
+    .pd-cov-LL { background: #fff3e0; color: #c47a10; }
+    /* Coverage tab */
+    .pd-cov-layout { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: white; }
+    .pd-cov-sidenav { background: white; border-right: 1px solid var(--border); width: 240px; flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; padding: 8px; }
+    .pd-cov-nav-item { display: flex; flex-direction: column; gap: 4px; padding: 8px; border-radius: 4px; cursor: pointer; min-height: 40px; justify-content: center; }
+    .pd-cov-nav-item.active { background: #ebebeb; }
+    .pd-cov-nav-title { font-size: 14px; font-weight: 500; color: var(--fg); line-height: 15px; }
+    .pd-cov-nav-sub { font-size: 12px; color: var(--fg-muted); line-height: 14px; }
+    .pd-cov-form { flex: 1; min-width: 0; padding: 24px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; }
+    .pd-cov-field { display: flex; gap: 8px; align-items: center; background: white; border: 1px solid #cfcece; border-radius: 4px; padding: 4px 10px; }
+    .pd-cov-field-content { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+    .pd-cov-field-label { font-size: 12px; color: var(--fg-muted); line-height: 14px; }
+    .pd-cov-field-value { font-size: 14px; color: var(--fg); line-height: 15px; }
+    /* Payments tab */
+    .pd-pay-section { margin-bottom: 16px; }
+    .pd-pay-section-title { font-size: 16px; font-weight: 500; color: var(--fg); line-height: 22px; margin-bottom: 8px; }
+    .pd-pay-tbl { width: 100%; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: white; }
+    .pd-pay-col { font-size: 14px; color: var(--fg-muted); font-weight: 500; padding: 8px; flex-shrink: 0; }
+    .pd-pay-cell { font-size: 14px; color: var(--fg); padding: 8px; flex-shrink: 0; }
+    .pd-pay-row { display: flex; align-items: center; border-bottom: 1px solid var(--border); }
+    .pd-pay-row:last-child { border-bottom: 0; }
+    .pd-pay-pill { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 2px 8px; font-size: 12px; }
+    /* Documents tab */
+    .pd-doc-tbl { width: 100%; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: white; }
+    .pd-doc-row { display: flex; align-items: center; border-bottom: 1px solid var(--border); padding: 8px; font-size: 14px; color: var(--fg); }
+    .pd-doc-row:last-child { border-bottom: 0; }
+    .pd-doc-badge { display: inline-flex; align-items: center; border-radius: 4px; font-size: 12px; padding: 2px 6px; white-space: nowrap; }
 
     #agent-panel {
       position: fixed;
@@ -3697,6 +3735,7 @@
       queueDone: new Set(),
       policyId: null,
       policyTab: 'overview',
+      policyCovSection: 'account',
       agentChatOpen: false,
       claimsTab:     'total',
       claimsAccount: null,
@@ -6298,6 +6337,7 @@
         `<span style="display:inline-flex;align-items:center;gap:4px;background:#ebebeb;border-radius:999px;padding:4px 8px 4px 4px"><span style="width:24px;height:24px;border-radius:12px;background:${bg};display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:${tc}">${initials}</span><span style="font-size:12px">${initials==='KM'?'Kevin Ma':'Bobby Vo'}</span></span>`;
 
       return `
+        ${['overview','payments'].includes(State.policyTab) ? `
         <!-- Info Banner -->
         <div style="background:#ebf2fb;border:1px solid #afccef;border-radius:4px;padding:8px 12px;margin-bottom:16px;display:flex;align-items:center;gap:8px">
           <i class="ph ph-info" style="font-size:16px;color:#2e69ae;flex-shrink:0"></i>
@@ -6305,7 +6345,7 @@
           <button style="background:none;border:0;font-size:14px;color:var(--fg);cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;font-family:inherit">
             View endorsement <i class="ph ph-arrow-right" style="font-size:14px"></i>
           </button>
-        </div>
+        </div>` : ''}
 
         <!-- Breadcrumb + Actions -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
@@ -6347,13 +6387,13 @@
 
         <!-- Tabs -->
         <div style="display:flex;align-items:center;border-bottom:1px solid var(--border);margin:0 -24px;padding:0 24px">
-          <button style="padding:8px;font-size:16px;line-height:22px;background:none;border:0;border-bottom:2px solid var(--tertiary);cursor:pointer;color:#3d3d3d;font-weight:500;font-family:inherit;margin-bottom:-1px">Overview</button>
-          ${['Exposures','Coverage','Payment','Documents'].map(t=>`<button style="padding:8px;font-size:16px;line-height:22px;background:none;border:0;border-bottom:2px solid transparent;cursor:pointer;color:var(--fg-muted);font-family:inherit;margin-bottom:-1px">${t}</button>`).join('')}
+          ${[['overview','Overview'],['exposures','Exposures'],['coverage','Coverage'],['payments','Payments'],['documents','Documents']].map(([k,lbl])=>`
+            <button class="pd-tab-btn ${State.policyTab===k?'active':''}" data-pol-tab="${k}">${lbl}</button>`).join('')}
         </div>
 
-        <!-- Body -->
+        <!-- Tab Body -->
         <div style="padding-top:16px">
-
+        ${State.policyTab === 'overview' ? `
           <!-- Two-column summary -->
           <div style="display:flex;gap:16px;align-items:flex-start;padding:8px 0">
             <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
@@ -6370,9 +6410,7 @@
               ${detailRow('Mailing Address', '11701 Bee Caves Rd, 110, Austin, TX 78738, US')}
             </div>
           </div>
-
           <div style="height:0;border-top:1px solid var(--border);margin:16px 0"></div>
-
           <!-- Additional Insured -->
           <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:0">
             <div style="font-size:16px;font-weight:500;color:var(--fg);line-height:22px">Additional Insured</div>
@@ -6384,9 +6422,7 @@
               ${aiRows}
             </div>
           </div>
-
           <div style="height:0;border-top:1px solid var(--border);margin:16px 0"></div>
-
           <!-- Coverages -->
           <div style="display:flex;flex-direction:column;gap:8px">
             <div style="font-size:16px;font-weight:500;color:var(--fg);line-height:22px">Coverages</div>
@@ -6399,15 +6435,254 @@
               ${covRows}
             </div>
           </div>
-
           <div style="height:0;border-top:1px solid var(--border);margin:16px 0"></div>
-
           <!-- Activities -->
           <div style="display:flex;flex-direction:column;gap:0;padding-bottom:32px">
             <div style="font-size:16px;font-weight:500;color:var(--fg);line-height:22px;margin-bottom:4px">Activities</div>
             <div class="pd-timeline">${timeline}</div>
           </div>
+        ` : State.policyTab === 'exposures' ? renderPolicyExposuresTab(policy)
+          : State.policyTab === 'coverage'  ? renderPolicyCoverageTab(policy)
+          : State.policyTab === 'payments'  ? renderPolicyPaymentsTab(policy)
+          : State.policyTab === 'documents' ? renderPolicyDocumentsTab(policy)
+          : ''}
+        </div>`;
+    }
 
+    // ── Policy Exposures Tab ────────────────────────────────────────────────
+    function renderPolicyExposuresTab(policy) {
+      const badge = (t) => `<span class="pd-cov-badge pd-cov-${t}">${t}</span>`;
+      const rowData = [
+        [true,false],[true,true],[true,true],[true,true],[true,false],
+        [true,true],[true,true],[true,false],[true,true],[true,false],
+        [true,true],[true,false],[true,true],[true,true],[true,true],[true,true],
+      ];
+      const rows = rowData.map((cov, i) => `
+        <div class="pd-pay-row">
+          <div class="pd-pay-cell" style="width:40px;color:var(--fg-muted)">${i+1}</div>
+          <div class="pd-pay-cell" style="flex:1">3401 5th Ave. N, St. Petersburg, FL 33713, US</div>
+          <div class="pd-pay-cell" style="width:120px">$2,102,629</div>
+          <div class="pd-pay-cell" style="width:60px">3,112</div>
+          <div class="pd-pay-cell" style="width:80px">35</div>
+          <div class="pd-pay-cell" style="width:100px;display:flex;gap:4px">
+            ${badge('GL')}${badge('PL')}${cov[1]?badge('LL'):''}
+          </div>
+          <div class="pd-pay-cell" style="width:180px">Restaurant – Dine in</div>
+          <div class="pd-pay-cell" style="width:100px">Greenwood</div>
+        </div>`).join('');
+      return `
+        <div class="pd-exp-hdr">
+          <div style="font-size:16px;font-weight:500;color:var(--fg)">Exposures</div>
+          <div style="display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden">
+            <button style="padding:6px 12px;font-size:13px;background:#ebebeb;border:0;border-right:1px solid var(--border);cursor:pointer;font-family:inherit;color:var(--fg)">By States</button>
+            <button style="padding:6px 12px;font-size:13px;background:white;border:0;cursor:pointer;font-family:inherit;color:var(--fg-muted)">By Class Code</button>
+          </div>
+        </div>
+        <div class="pd-exp-group">
+          <span style="font-size:14px;font-weight:500;color:var(--fg)">New York</span>
+          <span class="pd-exp-chip">15</span>
+          <span class="pd-exp-code">LARARO 6.4B0</span>
+        </div>
+        <div class="pd-pay-tbl">
+          <div class="pd-pay-row" style="background:var(--bg)">
+            <div class="pd-pay-col" style="width:40px">#</div>
+            <div class="pd-pay-col" style="flex:1">Location</div>
+            <div class="pd-pay-col" style="width:120px">Annual Sales</div>
+            <div class="pd-pay-col" style="width:60px">Sqft</div>
+            <div class="pd-pay-col" style="width:80px">Employees</div>
+            <div class="pd-pay-col" style="width:100px">Coverage</div>
+            <div class="pd-pay-col" style="width:180px">Class Code</div>
+            <div class="pd-pay-col" style="width:100px">Carrier</div>
+          </div>
+          ${rows}
+        </div>`;
+    }
+
+    // ── Policy Coverage Tab ─────────────────────────────────────────────────
+    function renderPolicyCoverageTab(policy) {
+      const sec = State.policyCovSection || 'account';
+      const sections = [
+        { key: 'account', title: 'Account Information', sub: null },
+        { key: 'gl',      title: 'General Liability',  sub: 'Everspan/Greenwood' },
+        { key: 'pl',      title: 'Property Liability', sub: 'Everspan/Greenwood' },
+      ];
+      const navHTML = sections.map(s => `
+        <div class="pd-cov-nav-item ${sec===s.key?'active':''}" data-cov-section="${s.key}">
+          <span class="pd-cov-nav-title">${s.title}</span>
+          ${s.sub ? `<span class="pd-cov-nav-sub">${s.sub}</span>` : ''}
+        </div>`).join('');
+
+      const field = (icon, label, value) => `
+        <div class="pd-cov-field">
+          <i class="ph ph-${icon}" style="font-size:16px;color:var(--fg-muted);flex-shrink:0"></i>
+          <div class="pd-cov-field-content">
+            <span class="pd-cov-field-label">${label}</span>
+            <span class="pd-cov-field-value">${value}</span>
+          </div>
+        </div>`;
+
+      let formContent = '';
+      if (sec === 'account') {
+        formContent = `
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:400;color:var(--fg);line-height:26px">Account Information</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${field('user','Name','Wes Baker')}
+            ${field('phone','Phone number','(917)-854-8811')}
+            ${field('map-pin','Mailing Address','1032 E Brandon Blvd, Brandon, FL 33511, US')}
+            ${field('map-pin','Unit #','Suite 44')}
+            ${field('buildings','Business name','BDE Florida, LLC')}
+            ${field('briefcase','Business Type','Restaurant - Fast Food or Quick Service')}
+          </div>`;
+      } else if (sec === 'gl') {
+        formContent = `
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:400;color:var(--fg);line-height:26px">General Liability</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${field('shield-check','Carrier','Everspan')}
+            ${field('currency-dollar','Each Occurrence Limit','$1,000,000')}
+            ${field('currency-dollar','General Aggregate','$2,000,000')}
+            ${field('currency-dollar','Products/Completed Ops','$2,000,000')}
+            ${field('currency-dollar','Personal & Adv Injury','$1,000,000')}
+            ${field('currency-dollar','Damage to Rented Premises','$300,000')}
+            ${field('calendar-dot','Policy Period','7/1/2026 – 7/1/2027')}
+          </div>`;
+      } else {
+        formContent = `
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:400;color:var(--fg);line-height:26px">Property Liability</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${field('shield-check','Carrier','Greenwood')}
+            ${field('currency-dollar','Building Limit','$500,000')}
+            ${field('currency-dollar','BPP Limit','$250,000')}
+            ${field('currency-dollar','Deductible','$5,000')}
+            ${field('calendar-dot','Policy Period','7/1/2026 – 7/1/2027')}
+          </div>`;
+      }
+
+      return `
+        <div class="pd-cov-layout" style="min-height:400px">
+          <div class="pd-cov-sidenav">${navHTML}</div>
+          <div class="pd-cov-form">${formContent}</div>
+        </div>`;
+    }
+
+    // ── Policy Payments Tab ─────────────────────────────────────────────────
+    function renderPolicyPaymentsTab(policy) {
+      const statusPill = (label, color, dot) =>
+        `<span class="pd-pay-pill" style="color:${color}"><span style="width:6px;height:6px;border-radius:50%;background:${dot};flex-shrink:0"></span>${label}</span>`;
+      const duePill = (txt) =>
+        `<span style="background:#fef0f0;color:var(--err);border-radius:4px;padding:2px 6px;font-size:12px">${txt}</span>`;
+      const paidPill = () =>
+        `<span style="background:#eaf5ef;color:#277e4f;border-radius:999px;padding:2px 8px;font-size:12px">Paid</span>`;
+
+      const txRows = [
+        ['Today at 11:32AM','7/1/2026','Draft Endorsement','$248,023.60',duePill('Due 7/23/2026'),statusPill('Pending','#2e69ae','#2e69ae')],
+        ['Today at 11:32AM','7/1/2026','Endorsement','N/A','Not Required',statusPill('Bound','#2e69ae','#2e69ae')],
+        ['2026/06/21 at 9:32AM','7/1/2026','Cancellation','<span style="color:var(--err)">-$3,968.87</span>','Not Required',statusPill('Bound','#2e69ae','#2e69ae')],
+        ['2026/05/21 at 9:32AM','7/1/2026','Endorsement','<span style="color:#277e4f">+$30,295</span>',paidPill(),statusPill('Bound','#2e69ae','#2e69ae')],
+        ['2026/05/01 at 9:32AM','7/1/2026','Endorsement','<span style="color:var(--err)">-$27,012</span>',paidPill(),statusPill('Bound','#2e69ae','#2e69ae')],
+        ['2026/05/01 at 9:32AM','7/1/2026','New Policy Purchased','$938,945',paidPill(),statusPill('Bound','#2e69ae','#2e69ae')],
+        ['2025/05/01 at 9:32AM','7/1/2025','New Policy Bound','$549,202.06',paidPill(),statusPill('Bound','#2e69ae','#2e69ae')],
+      ].map(([initiated,effDate,type,prem,taxes,status]) => `
+        <div class="pd-pay-row">
+          <div class="pd-pay-cell" style="flex:1;min-width:160px">${initiated}</div>
+          <div class="pd-pay-cell" style="width:100px">${effDate}</div>
+          <div class="pd-pay-cell" style="flex:1">${type}</div>
+          <div class="pd-pay-cell" style="width:110px">${prem}</div>
+          <div class="pd-pay-cell" style="width:160px">${taxes}</div>
+          <div class="pd-pay-cell" style="width:100px">${status}</div>
+          <div class="pd-pay-cell" style="width:32px;color:var(--fg-muted)">···</div>
+        </div>`).join('');
+
+      const invRows = [
+        ['b6387dd0-ac73-4121-8983-77d48d5d555c','7/1/2026','Renewal','$248,023.60'],
+        ['b6387dd0-ac73-4121-8983-77d48d5d555c','7/1/2026','Endorsement','$649,202.06'],
+        ['b6387dd0-ac73-4121-8983-77d48d5d555c','7/1/2026','Cancellation','-$3,968.87'],
+        ['b6387dd0-ac73-4121-8983-77d48d5d555c','7/1/2026','New Policy Purchase','$30,295'],
+      ].map(([inv,due,type,total]) => `
+        <div class="pd-pay-row">
+          <div class="pd-pay-cell" style="flex:1;font-size:12px;color:#4b7174">${inv}</div>
+          <div class="pd-pay-cell" style="width:100px">${due}</div>
+          <div class="pd-pay-cell" style="flex:1">${type}</div>
+          <div class="pd-pay-cell" style="width:110px">${total}</div>
+          <div class="pd-pay-cell" style="width:100px">${paidPill()}</div>
+          <div class="pd-pay-cell" style="width:32px;color:var(--fg-muted)">···</div>
+        </div>`).join('');
+
+      return `
+        <div class="pd-pay-section">
+          <div class="pd-pay-section-title">Transactions</div>
+          <div class="pd-pay-tbl">
+            <div class="pd-pay-row" style="background:var(--bg)">
+              <div class="pd-pay-col" style="flex:1;min-width:160px">Initiated</div>
+              <div class="pd-pay-col" style="width:100px">Effective Date</div>
+              <div class="pd-pay-col" style="flex:1">Type</div>
+              <div class="pd-pay-col" style="width:110px">Premium +/- <i class="ph ph-info" style="font-size:12px"></i></div>
+              <div class="pd-pay-col" style="width:160px;font-size:11px">Taxes and fees are not included</div>
+              <div class="pd-pay-col" style="width:100px">Policy Status</div>
+              <div style="width:32px"></div>
+            </div>
+            ${txRows}
+          </div>
+        </div>
+        <div class="pd-pay-section">
+          <div class="pd-pay-section-title">Invoices</div>
+          <div class="pd-pay-tbl">
+            <div class="pd-pay-row" style="background:var(--bg)">
+              <div class="pd-pay-col" style="flex:1">Invoice Number</div>
+              <div class="pd-pay-col" style="width:100px">Due Date</div>
+              <div class="pd-pay-col" style="flex:1">Type</div>
+              <div class="pd-pay-col" style="width:110px">Total Due <i class="ph ph-info" style="font-size:12px"></i></div>
+              <div class="pd-pay-col" style="width:100px;font-size:11px">Taxes and fees are included</div>
+              <div style="width:32px"></div>
+            </div>
+            ${invRows}
+          </div>
+        </div>`;
+    }
+
+    // ── Policy Documents Tab ────────────────────────────────────────────────
+    function renderPolicyDocumentsTab(policy) {
+      const badge = (label, bg, color) =>
+        `<span class="pd-doc-badge" style="background:${bg};color:${color}">${label}</span>`;
+      const docs = [
+        [badge('COI','#eaf5ef','#277e4f'),'COI#','Today at 11:32AM'],
+        [badge('COI','#eaf5ef','#277e4f'),'COI#','Today at 9:00am'],
+        [badge('COI','#eaf5ef','#277e4f'),'COI#','Today at 10:00am'],
+        [badge('Policy Packet','#ebf2fb','#2e69ae'),'Policy Packet','Today at 10:00am'],
+        [badge('Policy Packet','#ebf2fb','#2e69ae'),'Policy Packet 2','2026/06/21 at 9:32AM'],
+        [badge('Endorsement','#fff3e0','#c47a10'),'#Endorsementid','2026/06/21 at 9:32AM'],
+        [badge('Endorsement','#fff3e0','#c47a10'),'#Endorsementid','2026/06/21 at 9:32AM'],
+        [badge('Endorsement','#fff3e0','#c47a10'),'#Endorsementid','2026/06/21 at 9:32AM'],
+        [badge('Cancellation','#fef0f0','var(--err)'),'#Cancellationid','2026/06/21 at 9:32AM'],
+        ['Other','Uploaded Document name','2026/06/21 at 9:32AM'],
+        ['Other','Uploaded Document name','2026/06/21 at 9:32AM'],
+        ['Other','Uploaded Document name','2026/06/21 at 9:32AM'],
+        ['Other','Uploaded Document name','2026/06/21 at 9:32AM'],
+        ['Other','Uploaded Document name','2026/06/21 at 9:32AM'],
+      ];
+      const rows = docs.map(([type,id,created]) => `
+        <div class="pd-doc-row">
+          <div style="width:140px;flex-shrink:0">${type}</div>
+          <div style="flex:1;min-width:0">${id}</div>
+          <div style="flex:1;color:var(--fg-muted)">${created}</div>
+          <button style="background:none;border:0;cursor:pointer;padding:4px;color:var(--fg-muted);font-size:16px;display:flex;align-items:center;border-radius:4px">
+            <i class="ph ph-download-simple"></i>
+          </button>
+        </div>`).join('');
+      return `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="font-size:16px;font-weight:500;color:var(--fg)">Documents</div>
+          <button style="display:flex;align-items:center;gap:6px;background:none;border:1px solid var(--border);border-radius:4px;padding:6px 12px;font-size:14px;color:var(--fg);cursor:pointer;font-family:inherit">
+            <i class="ph ph-upload-simple" style="font-size:14px"></i> Upload
+          </button>
+        </div>
+        <div class="pd-doc-tbl">
+          <div class="pd-doc-row" style="background:var(--bg)">
+            <div style="width:140px;flex-shrink:0;font-size:14px;font-weight:500;color:var(--fg-muted)">Type</div>
+            <div style="flex:1;font-size:14px;font-weight:500;color:var(--fg-muted)">Document ID</div>
+            <div style="flex:1;font-size:14px;font-weight:500;color:var(--fg-muted)">Created on</div>
+            <div style="width:32px"></div>
+          </div>
+          ${rows}
         </div>`;
     }
 
@@ -10396,6 +10671,7 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
         el.onclick = () => {
           State.policyId = el.dataset.policyId;
           State.policyTab = 'overview';
+          State.policyCovSection = 'account';
           State.page = 'policy-detail';
           render();
         };
@@ -10403,6 +10679,15 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
 
       const backToPolicies = $('#back-to-policies');
       if (backToPolicies) backToPolicies.onclick = () => { State.page = 'policies'; render(); };
+
+      // Policy detail tabs
+      $$('[data-pol-tab]').forEach(btn => {
+        btn.onclick = () => { State.policyTab = btn.dataset.polTab; render(); };
+      });
+      // Coverage section side-nav
+      $$('[data-cov-section]').forEach(btn => {
+        btn.onclick = () => { State.policyCovSection = btn.dataset.covSection; render(); };
+      });
 
       // ---- BDE LossRun editable cells ----
       // Edits flow into BDE.claims; the re-render preserves focus, selection,
