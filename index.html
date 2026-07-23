@@ -5170,7 +5170,7 @@
       return `
         <div class="claims-filter-row">
           <div class="claims-select"><span>Year:</span> 2026 <i class="ph ph-caret-down" style="font-size:12px;margin-left:2px"></i></div>
-          <div class="claims-select"><span>Line:</span> All Lines <i class="ph ph-caret-down" style="font-size:12px;margin-left:2px"></i></div>
+          <div class="claims-select"><span>Coverage:</span> All Coverage <i class="ph ph-caret-down" style="font-size:12px;margin-left:2px"></i></div>
           <div class="claims-select"><span>Build:</span> All Builds <i class="ph ph-caret-down" style="font-size:12px;margin-left:2px"></i></div>
           <div style="flex:1"></div>
           <button class="claims-btn"><i class="ph ph-download-simple" style="font-size:14px"></i> Export</button>
@@ -5339,6 +5339,7 @@
       const tab = State.claimsTab;
       return `
         <div class="claims-page">
+          <div style="font-family:var(--font-display);font-size:24px;line-height:26px;font-weight:400;color:#252424;flex-shrink:0">Claims</div>
           <div class="claims-tab-bar">
             <button class="claims-tab-btn ${tab==='total'?'active':''}" data-ctab="total">Total Portfolio</button>
             <button class="claims-tab-btn ${tab==='account'?'active':''}" data-ctab="account">Builds</button>
