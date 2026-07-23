@@ -1021,6 +1021,26 @@
       background: #ebebeb !important; color: #b6b6b6 !important;
       border-color: #ebebeb !important; cursor: default; opacity: 1;
     }
+    /* Step progress timeline (Figma 400:63630) */
+    .ns-timeline { display: flex; width: 100%; flex-shrink: 0; }
+    .ns-tl-step { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; padding-right: 2px; }
+    .ns-tl-track { display: flex; align-items: center; gap: 2px; }
+    .ns-tl-dot { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; }
+    .ns-tl-dot.done  { background: #eaf5ef; }
+    .ns-tl-dot.done i  { font-size: 14px; color: var(--ok,#277e4f); }
+    .ns-tl-dot.active { background: var(--border,#ebebeb); }
+    .ns-tl-dot.active i { font-size: 12px; color: var(--fg-muted,#868585); }
+    .ns-tl-line { flex: 1; height: 1px; }
+    .ns-tl-line.done    { background: var(--ok,#277e4f); }
+    .ns-tl-line.pending { background: var(--border,#ebebeb); }
+    .ns-tl-text { display: flex; flex-direction: column; gap: 3px; }
+    .ns-tl-sub  { font-size: 12px; line-height: 14px; color: var(--fg-muted,#868585); }
+    .ns-tl-sub.dim  { color: #b6b6b6; }
+    .ns-tl-name { font-size: 14px; font-weight: 500; line-height: 15px; color: var(--fg,#252424); }
+    .ns-tl-name.dim { color: #b6b6b6; }
+    /* Step 2 footer: Back on left, Cancel+Create on right */
+    .ns-foot.ns-foot-s2 { justify-content: space-between; }
     /* Success state (shared) */
     .ns-card .ns-success {
       display: flex; flex-direction: column; align-items: center;
@@ -4410,71 +4430,130 @@
           </div>`;
       }
 
-      // ── Derive state ───────────────────────────────────────────────────────
-      const pt       = s.parsedTemplate;
-      const lossF    = nsSlotFiles('lossRuns');
-      const sovF     = nsSlotFiles('sov');
-      const expF     = nsSlotFiles('expiringPremium');
-      const addF     = nsSlotFiles('additional');
-      const hasLoss  = lossF.length > 0 || !!pt;
-      const hasSov   = sovF.length > 0;
-      const hasExp   = expF.length > 0 || !!pt;
-      const hasAdd   = addF.length > 0;
-      const tgtDetected = !!(s.targetPremium) || (pt && !!pt.targetPremium) || addF.some(f => f.targetPremiumDetected);
-      const anyFiles    = hasLoss || hasSov || hasExp || hasAdd;
-      const canCreate   = hasLoss && hasSov && hasExp && tgtDetected;
-
-      // ── Slot display rows ─────────────────────────────────────────────────
-      // Each slot: left = check icon + label, right = file icon + name + size + trash
-      function slotRow(key, label, has, files, ptFallbackName) {
-        const ico = has
-          ? `<i class="ph ph-check-circle-fill" style="font-size:20px;color:var(--ok,#277e4f)"></i>`
-          : `<i class="ph ph-circle" style="font-size:20px;color:var(--border,#ebebeb)"></i>`;
-        let rightHTML = '';
-        if (files.length > 0) {
-          const f = files[0];
-          rightHTML = `
-            <div class="ns-doc-right">
-              ${nsFileIconHTML(f.ext)}
-              <div class="ns-finfo"><span class="ns-finfo-name">${f.name}</span><span class="ns-finfo-size">${f.size}</span></div>
-              <button class="ns-doc-del" data-remove-slot="${key}" title="Remove"><i class="ph ph-trash" style="font-size:16px"></i></button>
-            </div>`;
-        } else if (ptFallbackName) {
-          rightHTML = `
-            <div class="ns-doc-right">
-              ${nsFileIconHTML('CSV')}
-              <div class="ns-finfo"><span class="ns-finfo-name">${ptFallbackName}</span><span class="ns-finfo-size"></span></div>
-            </div>`;
-        }
+      // ── Timeline HTML ─────────────────────────────────────────────────────
+      function tlStep(stepNum, label, state) {
+        // state: 'done' | 'active' | 'dim'
+        const dot = state === 'done'
+          ? `<div class="ns-tl-dot done"><i class="ph ph-check-circle-fill"></i></div>`
+          : `<div class="ns-tl-dot active"><i class="ph ph-circle"></i></div>`;
+        const lineClass = state === 'done' ? 'done' : 'pending';
+        const subClass  = state === 'dim' ? 'dim' : '';
+        const nameClass = state === 'dim' ? 'dim' : '';
         return `
-          <div class="ns-doc-row">
-            <div class="ns-doc-left">${ico}<span class="ns-doc-lbl">${label}</span></div>
-            ${rightHTML}
+          <div class="ns-tl-step">
+            <div class="ns-tl-track">
+              ${dot}
+              <div class="ns-tl-line ${lineClass}"></div>
+            </div>
+            <div class="ns-tl-text">
+              <span class="ns-tl-sub ${subClass}">Step ${stepNum}</span>
+              <span class="ns-tl-name ${nameClass}">${label}</span>
+            </div>
           </div>`;
       }
 
-      const ptFile = pt ? (pt.accountName ? `${pt.accountName}.csv` : 'indication_template.csv') : null;
-      const docRowsHTML = [
-        slotRow('lossRuns',       '5 Years of Loss Runs', hasLoss, lossF, pt ? ptFile : null),
-        slotRow('sov',            'SOV',                  hasSov,  sovF,  null),
-        slotRow('expiringPremium','Expiring Premium',      hasExp,  expF,  pt ? ptFile : null),
-        slotRow('additional',     tgtDetected ? 'Target Premium Detected' : 'Additional Documents', hasAdd || tgtDetected, addF, pt && tgtDetected ? ptFile : null),
-      ].join('');
+      // ── Step 1: Document Checklist ─────────────────────────────────────────
+      if (s.step === 1) {
+        const pt       = s.parsedTemplate;
+        const lossF    = nsSlotFiles('lossRuns');
+        const sovF     = nsSlotFiles('sov');
+        const expF     = nsSlotFiles('expiringPremium');
+        const addF     = nsSlotFiles('additional');
+        const hasLoss  = lossF.length > 0 || !!pt;
+        const hasSov   = sovF.length > 0;
+        const hasExp   = expF.length > 0 || !!pt;
+        const hasAdd   = addF.length > 0;
+        const tgtDetected = (pt && !!pt.targetPremium) || addF.some(f => f.targetPremiumDetected);
+        const anyFiles    = hasLoss || hasSov || hasExp || hasAdd;
+        const canNext     = hasLoss && hasSov && hasExp;
 
-      const warnHTML = anyFiles && !tgtDetected ? `
-        <div class="ns-doc-row">
-          <div class="ns-doc-left">
-            <i class="ph ph-warning" style="font-size:20px;color:var(--err,#a31e17)"></i>
-            <span class="ns-doc-lbl is-warn">Missing Target Premium</span>
-          </div>
-        </div>` : '';
+        function slotRow(key, label, has, files, ptFallbackName) {
+          const ico = has
+            ? `<i class="ph ph-check-circle-fill" style="font-size:20px;color:var(--ok,#277e4f)"></i>`
+            : `<i class="ph ph-circle" style="font-size:20px;color:var(--border,#ebebeb)"></i>`;
+          let rightHTML = '';
+          if (files.length > 0) {
+            const f = files[0];
+            rightHTML = `
+              <div class="ns-doc-right">
+                ${nsFileIconHTML(f.ext)}
+                <div class="ns-finfo"><span class="ns-finfo-name">${f.name}</span><span class="ns-finfo-size">${f.size}</span></div>
+                <button class="ns-doc-del" data-remove-slot="${key}" title="Remove"><i class="ph ph-trash" style="font-size:16px"></i></button>
+              </div>`;
+          } else if (ptFallbackName) {
+            rightHTML = `
+              <div class="ns-doc-right">
+                ${nsFileIconHTML('CSV')}
+                <div class="ns-finfo"><span class="ns-finfo-name">${ptFallbackName}</span><span class="ns-finfo-size"></span></div>
+              </div>`;
+          }
+          return `
+            <div class="ns-doc-row">
+              <div class="ns-doc-left">${ico}<span class="ns-doc-lbl">${label}</span></div>
+              ${rightHTML}
+            </div>`;
+        }
 
-      const docListHTML = anyFiles ? `
-        <div class="ns-doclist">
-          <div class="ns-doclist-hd">Required Documents</div>
-          ${docRowsHTML}
-          ${warnHTML}
-        </div>` : '';
+        const ptFile = pt ? (pt.accountName ? `${pt.accountName}.csv` : 'indication_template.csv') : null;
+        const docRowsHTML = [
+          slotRow('lossRuns',       '5 Years of Loss Runs',   hasLoss, lossF, pt ? ptFile : null),
+          slotRow('sov',            'SOV',                    hasSov,  sovF,  null),
+          slotRow('expiringPremium','Expiring Premium',        hasExp,  expF,  pt ? ptFile : null),
+          slotRow('additional', tgtDetected ? 'Target Premium Detected' : 'Additional Documents',
+                  hasAdd || tgtDetected, addF, pt && tgtDetected ? ptFile : null),
+        ].join('');
+
+        const docListHTML = anyFiles ? `
+          <div class="ns-doclist">
+            <div class="ns-doclist-hd">Required Documents</div>
+            ${docRowsHTML}
+          </div>` : '';
+
+        const timelineHTML = `
+          <div class="ns-timeline">
+            ${tlStep(1, 'Document Checklist', 'active')}
+            ${tlStep(2, 'Submission Details', 'dim')}
+          </div>`;
+
+        return `
+          <div class="modal-overlay" id="ns-overlay">
+            <div class="ns-card" onclick="event.stopPropagation()">
+              <div class="ns-head">
+                <div>
+                  <div class="ns-title">Create Submission</div>
+                  <div class="ns-subtitle">Start an insurance application for your lead.</div>
+                </div>
+                <button class="ns-close" id="ns-close" title="Close"><i class="ph ph-x" style="font-size:16px"></i></button>
+              </div>
+              ${timelineHTML}
+              <div class="ns-drop-zone" id="ns-drop-zone">
+                <input type="file" id="ns-file-input" multiple accept=".csv,.tsv,.xlsx,.xls,.pdf" style="display:none"/>
+                <div class="ns-drop-content">
+                  <i class="ph ph-upload-simple" style="font-size:20px;color:var(--fg-muted)"></i>
+                  <p class="ns-drop-text"><span class="ns-drop-link" id="ns-select-link">Select from device</span> or drag and drop</p>
+                  <p class="ns-drop-hint">Required documents: SOV, 5 years of Loss Runs, Expiring Premium</p>
+                </div>
+              </div>
+              ${docListHTML}
+              <div class="ns-foot">
+                <button class="text-btn" id="ns-cancel">Cancel</button>
+                <button class="btn btn-primary" id="ns-next" ${canNext ? '' : 'disabled'}>Next</button>
+              </div>
+            </div>
+          </div>`;
+      }
+
+      // ── Step 2: Submission Details ─────────────────────────────────────────
+      const f2 = s.fields;
+      const pt2 = s.parsedTemplate;
+      const notesMax = 120;
+      const notesLen = (f2.notes || '').length;
+
+      const timelineHTML2 = `
+        <div class="ns-timeline">
+          ${tlStep(1, 'Document Checklist', 'done')}
+          ${tlStep(2, 'Submission Details', 'active')}
+        </div>`;
 
       return `
         <div class="modal-overlay" id="ns-overlay">
@@ -4486,23 +4565,58 @@
               </div>
               <button class="ns-close" id="ns-close" title="Close"><i class="ph ph-x" style="font-size:16px"></i></button>
             </div>
-            <div class="ns-drop-zone" id="ns-drop-zone">
-              <input type="file" id="ns-file-input" multiple accept=".csv,.tsv,.xlsx,.xls,.pdf" style="display:none"/>
-              <div class="ns-drop-content">
-                <i class="ph ph-upload-simple" style="font-size:20px;color:var(--fg-muted)"></i>
-                <p class="ns-drop-text"><span class="ns-drop-link" id="ns-select-link">Select from device</span> or drag and drop</p>
-                <p class="ns-drop-hint">Require documents: SOV, 5 years of Loss runs, Expiring Premium, Target Premium</p>
+            ${timelineHTML2}
+            <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto">
+              <div class="ns-field" style="margin-bottom:0">
+                <i class="ph ph-cube ns-ico"></i>
+                <select id="ns2-build" style="flex:1;border:0;outline:none;background:transparent;font-size:14px;color:var(--fg)">
+                  <option value="" disabled ${!f2.build ? 'selected' : ''} style="color:var(--fg-muted)">Build</option>
+                  <option value="new" ${f2.build==='new'?'selected':''}>New</option>
+                  <option value="renewal" ${f2.build==='renewal'?'selected':''}>Renewal</option>
+                  <option value="endorsement" ${f2.build==='endorsement'?'selected':''}>Endorsement</option>
+                </select>
+                <i class="ph ph-caret-down ns-ico"></i>
+              </div>
+              <div class="ns-field" style="margin-bottom:0">
+                <i class="ph ph-building ns-ico"></i>
+                <input id="ns2-biz" type="text" placeholder="Business name"
+                  value="${f2.businessName || (pt2 && pt2.accountName ? pt2.accountName : '')}" style="flex:1;border:0;outline:none;background:transparent;font-size:14px"/>
+              </div>
+              <div class="ns-field" style="margin-bottom:0">
+                <i class="ph ph-note ns-ico"></i>
+                <input id="ns2-appid" type="text" placeholder="Application ID"
+                  value="${f2.appId || (pt2 && pt2.appId ? pt2.appId : '')}" style="flex:1;border:0;outline:none;background:transparent;font-size:14px"/>
+              </div>
+              <div class="ns-field" style="margin-bottom:0">
+                <i class="ph ph-calendar-dot ns-ico"></i>
+                <input id="ns2-effdate" type="text" placeholder="Target Effective Date"
+                  value="${f2.effDate || ''}" style="flex:1;border:0;outline:none;background:transparent;font-size:14px"/>
+              </div>
+              <div class="ns-field" style="margin-bottom:0">
+                <i class="ph ph-calendar-star ns-ico"></i>
+                <input id="ns2-needby" type="text" placeholder="Due Date"
+                  value="${f2.needBy || ''}" style="flex:1;border:0;outline:none;background:transparent;font-size:14px"/>
+              </div>
+              <div class="ns-field" style="margin-bottom:0">
+                <i class="ph ph-crosshair ns-ico"></i>
+                <input id="ns2-premium" type="text" placeholder="Target Premium"
+                  value="${f2.targetPremium || (pt2 && pt2.targetPremium ? pt2.targetPremium : '')}" style="flex:1;border:0;outline:none;background:transparent;font-size:14px"/>
+                <i class="ph ph-caret-down ns-ico"></i>
+              </div>
+              <div class="ns-textarea" style="margin-bottom:0">
+                <textarea id="ns2-notes" placeholder="Add Notes" maxlength="${notesMax}"
+                  style="font-family:inherit">${f2.notes || ''}</textarea>
+                <span class="ns-counter" id="ns2-counter">${notesMax - notesLen}</span>
               </div>
             </div>
-            ${docListHTML}
-            <div class="ns-field" style="margin-bottom:0">
-              <i class="ph ph-currency-dollar ns-ico"></i>
-              <input id="ns-target-premium" type="text" placeholder="Target Premium"
-                value="${s.targetPremium || (pt && pt.targetPremium ? pt.targetPremium : '')}"/>
-            </div>
-            <div class="ns-foot">
-              <button class="text-btn" id="ns-cancel">Cancel</button>
-              <button class="btn btn-primary" id="ns-create" ${canCreate ? '' : 'disabled'}>Create</button>
+            <div class="ns-foot ns-foot-s2">
+              <button class="text-btn" id="ns-back" style="display:flex;align-items:center;gap:4px">
+                <i class="ph ph-arrow-left" style="font-size:16px"></i> Back
+              </button>
+              <div style="display:flex;align-items:center;gap:4px">
+                <button class="text-btn" id="ns-cancel">Cancel</button>
+                <button class="btn btn-primary" id="ns-create">Create</button>
+              </div>
             </div>
           </div>
         </div>`;
@@ -4514,9 +4628,8 @@
       State.newSub = {
         open: true, step: 1,
         docs: { lossRuns: [], sov: [], expiringPremium: [], additional: [] },
-        fields: { tenant: '', businessName: '', effDate: '', needBy: '', targetPremium: '', notes: '' },
+        fields: { build: '', businessName: '', appId: '', effDate: '', needBy: '', targetPremium: '', notes: '' },
         parsedTemplate: null,
-        targetPremium: '',
       };
       render();
     }
@@ -10096,25 +10209,6 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
         };
       }
 
-      // ── Target premium input — re-render on change to update Create gate ─
-      const tpInput = $('#ns-target-premium');
-      if (tpInput) {
-        tpInput.oninput = () => {
-          State.newSub.targetPremium = tpInput.value.trim();
-          // Update Create button enabled state without full re-render
-          const nsC = $('#ns-create');
-          if (nsC) {
-            const pt    = State.newSub.parsedTemplate;
-            const addF  = nsSlotFiles('additional');
-            const det   = !!(State.newSub.targetPremium) || (pt && !!pt.targetPremium) || addF.some(f => f.targetPremiumDetected);
-            const ok    = nsSlotFiles('lossRuns').length > 0 || !!pt;
-            const sov   = nsSlotFiles('sov').length > 0;
-            const exp   = nsSlotFiles('expiringPremium').length > 0 || !!pt;
-            nsC.disabled = !(ok && sov && exp && det);
-          }
-        };
-      }
-
       // ── Remove entire slot (trash button) ────────────────────────────────
       $$('[data-remove-slot]').forEach(b => b.onclick = (e) => {
         e.stopPropagation();
@@ -10124,14 +10218,46 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
         render();
       });
 
-      // ── Create ────────────────────────────────────────────────────────────
+      // ── Next (Step 1 → 2) ────────────────────────────────────────────────
+      const nsNext = $('#ns-next');
+      if (nsNext && !nsNext.disabled) nsNext.onclick = (e) => {
+        e.stopPropagation();
+        State.newSub.step = 2;
+        render();
+      };
+
+      // ── Back (Step 2 → 1) ────────────────────────────────────────────────
+      const nsBack = $('#ns-back');
+      if (nsBack) nsBack.onclick = (e) => { e.stopPropagation(); State.newSub.step = 1; render(); };
+
+      // ── Step 2 field live-sync ────────────────────────────────────────────
+      const ns2Snap = (id, key) => {
+        const el = $('#' + id);
+        if (el) el.oninput = () => { State.newSub.fields[key] = el.value; };
+      };
+      ns2Snap('ns2-biz',     'businessName');
+      ns2Snap('ns2-appid',   'appId');
+      ns2Snap('ns2-effdate', 'effDate');
+      ns2Snap('ns2-needby',  'needBy');
+      ns2Snap('ns2-premium', 'targetPremium');
+      const ns2Build = $('#ns2-build');
+      if (ns2Build) ns2Build.onchange = () => { State.newSub.fields.build = ns2Build.value; };
+      const ns2Notes = $('#ns2-notes');
+      const ns2Ctr   = $('#ns2-counter');
+      if (ns2Notes) ns2Notes.oninput = () => {
+        State.newSub.fields.notes = ns2Notes.value;
+        if (ns2Ctr) ns2Ctr.textContent = 120 - ns2Notes.value.length;
+      };
+
+      // ── Create (Step 2) ──────────────────────────────────────────────────
       const nsCreate = $('#ns-create');
-      if (nsCreate && !nsCreate.disabled) nsCreate.onclick = (e) => {
+      if (nsCreate) nsCreate.onclick = (e) => {
         e.stopPropagation();
         const pt   = State.newSub.parsedTemplate;
         const docs = State.newSub.docs;
-        const name = (pt && pt.accountName) || (docs.lossRuns[0] && docs.lossRuns[0].name.replace(/\.\w+$/, '')) || 'New Submission';
-        const premium = State.newSub.targetPremium || (pt && pt.targetPremium) || '';
+        const f2   = State.newSub.fields;
+        const name = f2.businessName || (pt && pt.accountName) || (docs.lossRuns[0] && docs.lossRuns[0].name.replace(/\.\w+$/, '')) || 'New Submission';
+        const premium = f2.targetPremium || (pt && pt.targetPremium) || '';
         GROWTH_ROWS.unshift({
           type:'Sub', product:'GL',
           name,
@@ -10140,8 +10266,11 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
           owner:'Hunt Carroll', ownerAv:'orange',
           premium: Number(String(premium).replace(/[^0-9.]/g, '')) || 0,
           broker:'—',
-          eff: '—', recv: new Date().toISOString().slice(0,10), needBy: 'Today',
-          ...(pt ? { glLimit: pt.glLimit, appId: pt.appId, prospSales: pt.prospSales } : {}),
+          eff: f2.effDate || '—',
+          recv: new Date().toISOString().slice(0,10),
+          needBy: f2.needBy || 'Today',
+          ...(pt ? { glLimit: pt.glLimit, appId: f2.appId || pt.appId, prospSales: pt.prospSales } : {}),
+          ...(f2.appId ? { appId: f2.appId } : {}),
         });
         State.newSub.step = 'done';
         render();
