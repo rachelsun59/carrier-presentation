@@ -5189,7 +5189,7 @@
           <div class="claims-kpi"><div class="claims-kpi-val">$5.47M</div><div class="claims-kpi-label">Total Incurred</div><div class="claims-kpi-sub">YTD 2026</div></div>
           <div class="claims-kpi"><div class="claims-kpi-val">336 / 786</div><div class="claims-kpi-label">Open / Closed Claims</div><div class="claims-kpi-sub">YTD 2026</div></div>
           <div class="claims-kpi"><div class="claims-kpi-val">$14.2M</div><div class="claims-kpi-label">Total IBNR</div><div class="claims-kpi-sub">Estimated</div></div>
-          <div class="claims-kpi"><div class="claims-kpi-val" style="color:#cf5c3f">57.1%</div><div class="claims-kpi-label">Portfolio Loss Ratio</div><div class="claims-kpi-sub">Target: 60.0%</div></div>
+          <div class="claims-kpi"><div class="claims-kpi-val" style="color:#2e7d32">57.1%</div><div class="claims-kpi-label">Portfolio Loss Ratio</div><div class="claims-kpi-sub">Target: 60.0%</div></div>
         </div>
         <div class="claims-charts-row">
           <div class="claims-chart-panel">
@@ -5292,7 +5292,7 @@
             <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.incurred}</div><div class="claims-kpi-label">Total Incurred</div><div class="claims-kpi-sub">YTD 2026</div></div>
             <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.open} / ${d.kpi.closed}</div><div class="claims-kpi-label">Open / Closed</div><div class="claims-kpi-sub">Claims YTD</div></div>
             <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.ibnr}</div><div class="claims-kpi-label">Estimated IBNR</div><div class="claims-kpi-sub">As of Jun 2026</div></div>
-            <div class="claims-kpi"><div class="claims-kpi-val" style="color:#cf5c3f">${d.kpi.lr}</div><div class="claims-kpi-label">Loss Ratio</div><div class="claims-kpi-sub">Target: 60.0%</div></div>
+            <div class="claims-kpi"><div class="claims-kpi-val" style="color:${parseFloat(d.kpi.lr)<60?'#2e7d32':'#cf5c3f'}">${d.kpi.lr}</div><div class="claims-kpi-label">Loss Ratio</div><div class="claims-kpi-sub">Target: 60.0%</div></div>
           </div>
           <div class="claims-charts-row">
             <div class="claims-chart-panel">
