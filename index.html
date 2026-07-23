@@ -3033,18 +3033,18 @@
     }
     .radar-check-label { font: 500 14px/15px var(--font); color: #252424; }
 
-    .radar-comment {
-      display: flex; align-items: center; gap: 4px;
-      padding: 8px 0 0; flex-shrink: 0;
-      border-top: 1px solid var(--border-soft);
+    .radar-dropdown-menu {
+      position: absolute; top: calc(100% + 2px); left: 0; right: 0;
+      background: #fff; border: 1px solid #ebebeb; border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      z-index: 10; overflow: hidden;
     }
-    .radar-comment input {
-      flex: 1; background: #fff; border: 1px solid #ebebeb;
-      border-radius: 4px; padding: 8px;
-      font: 400 14px/15px var(--font); color: #252424; outline: none;
+    .radar-dropdown-item {
+      padding: 8px 10px; font: 400 14px/15px var(--font); color: #252424;
+      cursor: pointer; transition: background .1s;
     }
-    .radar-comment input::placeholder { color: #868585; }
-    .radar-comment input:focus { border-color: var(--tertiary); }
+    .radar-dropdown-item:hover { background: var(--bg-soft); }
+    .radar-dropdown-item.selected { font-weight: 500; color: var(--primary); }
     .radar-icon-btn {
       background: none; border: 1px solid #ebebeb; border-radius: 4px;
       padding: 8px; cursor: pointer; color: #868585;
@@ -4515,7 +4515,7 @@
               </div>
               <div class="radar-field">
                 <label class="radar-label">Zipcode</label>
-                <input class="radar-input" placeholder="Search by zipcode"/>
+                <input id="radar-zip" class="radar-input" placeholder="Search by zipcode"/>
               </div>
               <div class="radar-field">
                 <label class="radar-label">Products</label>
@@ -4532,22 +4532,23 @@
                 <input class="radar-input" placeholder="Minimum"/>
                 <input class="radar-input" style="margin-top:4px" placeholder="Max"/>
               </div>
-              <div class="radar-field">
+              <div class="radar-field" style="position:relative">
                 <label class="radar-label">Policy Status</label>
-                <div class="radar-select">
-                  <span>All Status</span>
+                <div class="radar-select" id="radar-status-btn" style="cursor:pointer;user-select:none">
+                  <span id="radar-status-val" data-value="">All Status</span>
                   <i class="ph ph-caret-down" style="font-size:16px;color:#868585;flex-shrink:0"></i>
+                </div>
+                <div id="radar-status-menu" class="radar-dropdown-menu" style="display:none">
+                  <div class="radar-dropdown-item" data-val="">All Status</div>
+                  <div class="radar-dropdown-item" data-val="Active">Active</div>
+                  <div class="radar-dropdown-item" data-val="Quoted">Quoted</div>
+                  <div class="radar-dropdown-item" data-val="Bound">Bound</div>
                 </div>
               </div>
               <div class="radar-field">
                 <label class="radar-label">Policy Number</label>
-                <input class="radar-input" placeholder="Search by policy number"/>
+                <input id="radar-policy" class="radar-input" placeholder="Search by policy number"/>
               </div>
-            </div>
-            <div class="radar-comment">
-              <input placeholder="Leave a comment..."/>
-              <button class="radar-icon-btn" title="Attach"><i class="ph ph-paperclip"></i></button>
-              <button class="radar-icon-btn" title="Send"><i class="ph ph-telegram-logo"></i></button>
             </div>
           </div>
         </div>`;
@@ -7052,57 +7053,89 @@
     let radarMap          = null;
 
     const RADAR_PINS = [
-      { lat: 28.15, lng: -82.45, name: 'BDE Florida, LLC',        product: 'General Liability',   premium: '$290,000', status: 'Active' },
-      { lat: 27.92, lng: -82.15, name: 'Hibachi Holdings LLC',     product: 'General Liability',   premium: '$184,500', status: 'Active' },
-      { lat: 27.55, lng: -81.85, name: 'Pulse Fitness Co.',        product: 'GL + Umbrella',       premium: '$212,500', status: 'Quoted' },
-      { lat: 28.50, lng: -81.50, name: 'Iron & Oak Crossfit',      product: 'General Liability',   premium: '$68,000',  status: 'Bound'  },
-      { lat: 27.35, lng: -82.50, name: 'Bellwether Bistro',        product: 'Liquor Liability',    premium: '$75,500',  status: 'Quoted' },
-      { lat: 26.95, lng: -82.08, name: 'Sunrise Yoga Studio LLC',  product: 'Professional Liab.', premium: '$75,500',  status: 'Bound'  },
-      { lat: 27.75, lng: -82.72, name: 'Borg Restaurant Group',    product: 'General Liability',   premium: '$184,500', status: 'Active' },
+      { lat: 28.15, lng: -82.45, name: 'BDE Florida, LLC',       products: ['General Liability'],             premium: '$290,000', status: 'Active', zip: '33602', policy: 'POL-2024-001' },
+      { lat: 27.92, lng: -82.15, name: 'Hibachi Holdings LLC',   products: ['General Liability'],             premium: '$184,500', status: 'Active', zip: '33647', policy: 'POL-2024-002' },
+      { lat: 27.55, lng: -81.85, name: 'Pulse Fitness Co.',      products: ['General Liability','Umbrella'],  premium: '$212,500', status: 'Quoted', zip: '33830', policy: 'POL-2024-003' },
+      { lat: 28.50, lng: -81.50, name: 'Iron & Oak Crossfit',    products: ['General Liability'],             premium: '$68,000',  status: 'Bound',  zip: '32803', policy: 'POL-2024-004' },
+      { lat: 27.35, lng: -82.50, name: 'Bellwether Bistro',      products: ['Liquor Liability'],              premium: '$75,500',  status: 'Quoted', zip: '34230', policy: 'POL-2024-005' },
+      { lat: 26.95, lng: -82.08, name: 'Sunrise Yoga Studio LLC',products: ['Professional Liability'],        premium: '$75,500',  status: 'Bound',  zip: '33980', policy: 'POL-2024-006' },
+      { lat: 27.75, lng: -82.72, name: 'Borg Restaurant Group',  products: ['General Liability','Property'],  premium: '$184,500', status: 'Active', zip: '33759', policy: 'POL-2024-007' },
     ];
+
+    let radarMarkers = [];
+
+    function radarPinPopup(pin) {
+      const statusColor = pin.status === 'Bound'  ? { bg:'#d1fae5', fg:'#065f46' }
+                        : pin.status === 'Quoted' ? { bg:'#dbeafe', fg:'#1e40af' }
+                        :                           { bg:'#ede9fe', fg:'#5b21b6' };
+      return `<div style="font-family:'DM Sans',sans-serif;min-width:190px">
+        <div style="font-weight:600;font-size:13px;color:#252424;margin-bottom:6px">${pin.name}</div>
+        <div style="font-size:12px;color:#868585;line-height:1.8">
+          <div>${pin.products.join(', ')}</div>
+          <div style="font-weight:500;color:#252424">${pin.premium}</div>
+          <div style="font-size:11px;color:#a0a0a0">${pin.policy} · ${pin.zip}</div>
+        </div>
+        <div style="margin-top:6px">
+          <span style="padding:2px 8px;border-radius:999px;font-size:11px;background:${statusColor.bg};color:${statusColor.fg}">${pin.status}</span>
+        </div>
+      </div>`;
+    }
+
+    function radarAddMarker(pin) {
+      if (!radarMap) return;
+      const m = L.circleMarker([pin.lat, pin.lng], {
+        radius: 6, fillColor: '#cf5c3f', color: '#fff', weight: 2, fillOpacity: 1,
+      }).addTo(radarMap);
+      m.bindPopup(radarPinPopup(pin), { closeButton: false, maxWidth: 240 });
+      m.on('mouseover', function() { this.openPopup(); });
+      m.on('click',     function() { this.openPopup(); });
+      radarMarkers.push(m);
+    }
+
+    function filterRadarPins() {
+      if (!radarMap) return;
+      radarMarkers.forEach(m => radarMap.removeLayer(m));
+      radarMarkers = [];
+
+      const zipVal    = (document.getElementById('radar-zip')?.value    || '').trim().toLowerCase();
+      const policyVal = (document.getElementById('radar-policy')?.value || '').trim().toLowerCase();
+      const statusVal = document.getElementById('radar-status-val')?.dataset.value || '';
+
+      const checkedProducts = new Set();
+      document.querySelectorAll('.radar-check-row').forEach(row => {
+        if (row.querySelector('.radar-checkbox')?.classList.contains('checked'))
+          checkedProducts.add(row.querySelector('.radar-check-label')?.textContent.trim());
+      });
+
+      RADAR_PINS.forEach(pin => {
+        if (zipVal    && !pin.zip.includes(zipVal))                                       return;
+        if (policyVal && !pin.policy.toLowerCase().includes(policyVal)
+                      && !pin.name.toLowerCase().includes(policyVal))                     return;
+        if (statusVal && pin.status !== statusVal)                                        return;
+        if (checkedProducts.size > 0 &&
+            !pin.products.some(p => checkedProducts.has(p)))                              return;
+        radarAddMarker(pin);
+      });
+    }
 
     function initRadarMap() {
       if (typeof L === 'undefined') return;
       if (radarMap) { radarMap.remove(); radarMap = null; }
+      radarMarkers = [];
 
-      // Defer so the container has computed dimensions after CSS layout
       requestAnimationFrame(() => {
         const mapEl = document.getElementById('radar-map');
-        if (!mapEl) return; // user navigated away
+        if (!mapEl) return;
 
-        radarMap = L.map('radar-map', {
-          zoomControl: true,
-          attributionControl: true,
-        }).setView([27.95, -82.35], 9);
+        radarMap = L.map('radar-map', { zoomControl: true, attributionControl: true })
+          .setView([27.95, -82.35], 9);
 
-        // CartoDB Positron — clean light/grayscale tiles, no API key needed
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
           attribution: '© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 20,
+          subdomains: 'abcd', maxZoom: 20,
         }).addTo(radarMap);
 
-        RADAR_PINS.forEach(pin => {
-          const marker = L.circleMarker([pin.lat, pin.lng], {
-            radius: 6, fillColor: '#cf5c3f',
-            color: '#fff', weight: 2, fillOpacity: 1,
-          }).addTo(radarMap);
-
-          marker.bindPopup(`
-            <div style="font-family:'DM Sans',sans-serif;min-width:180px">
-              <div style="font-weight:600;font-size:13px;color:#252424;margin-bottom:6px">${pin.name}</div>
-              <div style="font-size:12px;color:#868585;line-height:1.6">
-                <div>${pin.product}</div>
-                <div style="font-weight:500;color:#252424">${pin.premium}</div>
-                <div style="margin-top:4px">
-                  <span style="padding:2px 8px;border-radius:999px;font-size:11px;background:${pin.status==='Bound'?'#d1fae5':pin.status==='Quoted'?'#dbeafe':'#ede9fe'};color:${pin.status==='Bound'?'#065f46':pin.status==='Quoted'?'#1e40af':'#5b21b6'}">${pin.status}</span>
-                </div>
-              </div>
-            </div>`, { closeButton: false, maxWidth: 220 });
-
-          marker.on('mouseover', function() { this.openPopup(); });
-        });
-
+        RADAR_PINS.forEach(radarAddMarker);
         radarMap.invalidateSize();
       });
     }
@@ -7458,17 +7491,55 @@ Need by: ${s.needBy || ''}`;
       // Radar page
       if (State.page === 'radar') {
         initRadarMap();
+
+        // Tab switching
         document.querySelectorAll('.radar-tab').forEach(tab => {
           tab.onclick = () => {
             document.querySelectorAll('.radar-tab').forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
           };
         });
-        const rfClose = document.querySelector('.radar-filter-close');
-        if (rfClose) rfClose.onclick = () => document.querySelector('.radar-filter')?.classList.toggle('hidden');
+
+        // Filter close
+        document.querySelector('.radar-filter-close')?.addEventListener('click', () =>
+          document.querySelector('.radar-filter')?.classList.toggle('hidden'));
+
+        // Text inputs — live filter on each keystroke
+        document.getElementById('radar-zip')?.addEventListener('input', filterRadarPins);
+        document.getElementById('radar-policy')?.addEventListener('input', filterRadarPins);
+
+        // Checkboxes — toggle + filter
         document.querySelectorAll('.radar-checkbox').forEach(cb => {
-          cb.onclick = (e) => { e.preventDefault(); cb.classList.toggle('checked'); };
+          cb.addEventListener('click', (e) => {
+            e.preventDefault();
+            cb.classList.toggle('checked');
+            filterRadarPins();
+          });
         });
+
+        // Status dropdown
+        const statusBtn  = document.getElementById('radar-status-btn');
+        const statusMenu = document.getElementById('radar-status-menu');
+        const statusVal  = document.getElementById('radar-status-val');
+        if (statusBtn && statusMenu) {
+          statusBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            statusMenu.style.display = statusMenu.style.display === 'none' ? 'block' : 'none';
+          });
+          statusMenu.querySelectorAll('.radar-dropdown-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const val = item.dataset.val;
+              statusVal.textContent = item.textContent;
+              statusVal.dataset.value = val;
+              statusMenu.querySelectorAll('.radar-dropdown-item').forEach(i => i.classList.remove('selected'));
+              item.classList.add('selected');
+              statusMenu.style.display = 'none';
+              filterRadarPins();
+            });
+          });
+          document.addEventListener('click', () => { if (statusMenu) statusMenu.style.display = 'none'; });
+        }
       }
 
       // Make Decision (replaces Status Update) — both the title-row button
