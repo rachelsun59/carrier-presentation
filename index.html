@@ -403,6 +403,56 @@
       overflow-x: hidden;
     }
     .main.detail-mode { padding: 0; overflow: hidden; }
+    .main.home-mode { padding: 0; }
+
+    /* Home page layout */
+    .home-page {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      box-sizing: border-box;
+    }
+    .home-center {
+      width: 800px;
+      max-width: 100%;
+    }
+    .home-tag { background: var(--bg); border: 1px solid var(--border); border-radius: 999px; padding: 4px 8px; font-size: 12px; color: var(--fg); white-space: nowrap; cursor: pointer; line-height: 14px; }
+    .home-tag:hover { border-color: var(--fg-muted); }
+    .home-input-box {
+      background: #fff; border: 1px solid var(--border); border-radius: 8px;
+      padding: 16px; height: 120px; display: flex; flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 8px 10px rgba(13,12,12,0.04);
+      cursor: text;
+    }
+    .home-input-box textarea {
+      flex: 1; border: none; outline: none; background: transparent;
+      font-size: 14px; color: var(--fg-muted); font-family: inherit;
+      resize: none; width: 100%; line-height: 15px;
+    }
+    .home-input-box textarea::placeholder { color: var(--fg-muted); }
+    .home-activity-row {
+      border-bottom: 1px solid var(--border); padding: 8px;
+      font-size: 14px; color: var(--fg); cursor: pointer; line-height: 15px;
+    }
+    .home-activity-row:hover { background: var(--bg-soft); }
+    .home-metric {
+      flex: 1; border-left: 1px solid var(--border);
+      padding: 4px 4px 4px 5px; display: flex; flex-direction: column; gap: 2px;
+    }
+    .home-metric .hm-label { font-size: 10px; color: var(--fg-muted); line-height: 13px; }
+    .home-metric .hm-value { font-family: var(--font-display); font-size: 24px; font-weight: 400; color: var(--fg); line-height: 26px; white-space: nowrap; }
+    .home-metric .hm-sub { font-size: 12px; color: var(--fg); line-height: 14px; }
+    .home-list { flex: 1; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .home-list-hdr { background: var(--bg); border-bottom: 1px solid var(--border); padding: 8px 8px; min-height: 52px; display: flex; align-items: center; }
+    .home-list-hdr span { font-size: 16px; font-weight: 500; color: var(--fg); font-family: var(--font); }
+    .home-list-row { border-bottom: 1px solid var(--border); padding: 8px; font-size: 14px; color: var(--fg); cursor: pointer; }
+    .home-list-row:hover { background: var(--bg-soft); }
+    .home-list-row:last-child { border-bottom: none; }
+    /* Hide topbar on home page */
+    .surface.home-surface .topbar { display: none; }
 
     /* Display heading — DS uses Season-Serif at weight 400 (its only weight). */
     .h1 {
@@ -3212,11 +3262,8 @@
       </div>
 
       <div class="nav-list">
-        <button class="nav-item active" data-nav="chat">
-          <span class="nav-ico"><i class="ph ph-note-pencil"></i></span><span class="nav-label">Chat</span>
-        </button>
-        <button class="nav-item" data-nav="inbox">
-          <span class="nav-ico"><i class="ph ph-tray"></i></span><span class="nav-label">Inbox</span>
+        <button class="nav-item active" data-nav="home">
+          <span class="nav-ico"><i class="ph ph-house-simple"></i></span><span class="nav-label">Home</span>
         </button>
         <button class="nav-item" data-nav="growth">
           <span class="nav-ico"><i class="ph ph-trend-up"></i></span><span class="nav-label">Submissions</span>
@@ -3335,7 +3382,7 @@
        https://www.figma.com/design/fxAc38tPwTQO8Q6U86XxWD (Underwriter page)
        ========================================================================= */
     const State = {
-      page: 'chat',
+      page: 'home',
       currentId: null,
       tab: 'loss-run',
       // Growth list — sort + filters + open popover
@@ -5457,71 +5504,79 @@
     function renderSettings() { return renderPlaceholder('Settings', 'gear'); }
 
     function renderHome() {
-      const inboxRows = [
-        { ago: '1 Month Ago', from: 'Logan', action: 'mentioned you in', item: 'Application', content: 'List Content' },
-        { ago: '1 Month Ago', from: 'Logan', action: 'mentioned you in', item: 'Application', content: 'List Content' },
-        { ago: '1 Month Ago', from: 'Logan', action: 'mentioned you in', item: 'Application', content: 'List Content' },
-        { ago: '1 Month Ago', from: 'Logan', action: 'mentioned you in', item: 'Application', content: 'List Content' },
-        { ago: '1 Month Ago', from: 'Logan', action: 'mentioned you in', item: 'Application', content: 'List Content' },
+      const tags = ['Policies','Submissions','Renewals','Loss Runs','Claims'];
+      const metrics = [
+        { label:'Bound Premium',     value:'$28,458,050', sub:'YTD'          },
+        { label:'Upcoming renewals', value:'293',         sub:'Next 30 Days' },
+        { label:'Expired Policies',  value:'72',          sub:'Past 30 Days' },
+        { label:'Unbound Quotes',    value:'2,470',       sub:'Q3 2026'      },
       ];
+      const listItems = ['Commercial Risk','Gym &amp; Fitness','Restaurant','Vape Shops'];
 
-      const appetiteItems = ['Commercial Risk', 'Gym &amp; Fitness', 'Restaurant', 'Vape Shops'];
-
-      const rows = inboxRows.map(r => `
-        <div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border-soft)">
-          <span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:500;padding:3px 8px;border-radius:var(--r-full);white-space:nowrap;flex-shrink:0">${r.ago}</span>
-          <span style="flex:1;font-size:14px;color:var(--fg);min-width:0">
-            <strong>${r.from}</strong> ${r.action} <strong>${r.item}</strong>
-            <span style="color:var(--fg-muted);margin-left:6px">${r.content}</span>
-          </span>
-          <i class="ph ph-check" style="font-size:15px;color:var(--fg-muted);flex-shrink:0"></i>
-        </div>
-      `).join('');
-
-      const appetite = appetiteItems.map(a => `
-        <div style="padding:10px 0;border-bottom:1px solid var(--border-soft);font-size:14px;color:var(--fg);cursor:pointer" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--fg)'">${a}</div>
-      `).join('');
+      const logoMark = `<svg width="44" height="48" viewBox="-0.5 0 22.5 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+        <path fill="var(--primary)" d="M20.3147 11.8163C21.3507 10.9636 22.004 9.66362 21.9784 8.21175C21.9347 5.75241 19.9216 3.75834 17.4623 3.73555C16.8897 3.7308 16.3409 3.83146 15.8347 4.01852C15.6904 4.07169 15.5328 3.97864 15.5081 3.82671C15.1577 1.65698 13.2766 1.90735e-06 11.0082 1.90735e-06C8.73966 1.90735e-06 6.85955 1.65603 6.50821 3.82576C6.48352 3.97769 6.3259 4.07074 6.18156 4.01757C5.70299 3.84 5.18643 3.74125 4.64708 3.73555C2.12127 3.70991 0.0417412 5.76855 0.0417412 8.29436C0.0417412 9.7035 0.680792 10.9626 1.68542 11.7992C1.80317 11.8979 1.80222 12.0802 1.68352 12.178C0.638062 13.0269 -0.0228285 14.3307 -3.92261e-05 15.7883C0.0388925 18.259 2.06714 20.2626 4.53883 20.273C5.11331 20.2758 5.66406 20.1714 6.17112 19.9796C6.31735 19.9245 6.47782 20.0157 6.50251 20.1695C6.851 22.3411 8.73302 23.9991 11.0034 23.9991C13.2738 23.9991 15.1492 22.3449 15.5024 20.179C15.5271 20.0271 15.6847 19.934 15.829 19.9881C16.3361 20.1771 16.8849 20.2777 17.4585 20.273C19.9188 20.2512 21.9328 18.2561 21.9755 15.7958C22.0011 14.3449 21.3488 13.0459 20.3147 12.1942C20.196 12.0964 20.196 11.9131 20.3147 11.8153V11.8163Z M20.2806 8.29436C20.2806 9.87347 19.0006 11.1535 17.4214 11.1535C15.8423 11.1535 14.5623 9.87347 14.5623 8.29436C14.5623 7.76736 14.7048 7.27264 14.9545 6.84914C15.4511 6.00309 16.3703 5.43525 17.4224 5.43525C19.0015 5.43525 20.2815 6.71525 20.2815 8.29436H20.2806Z M4.60055 5.4343C5.62702 5.4343 6.5272 5.97555 7.03142 6.78742C7.04281 6.80736 7.05326 6.8273 7.06465 6.84724H7.06655C7.31628 7.27074 7.45966 7.76546 7.45966 8.29436C7.45966 9.87347 6.17966 11.1535 4.60055 11.1535C3.02145 11.1535 1.74144 9.87347 1.74144 8.29436C1.74144 6.71525 3.02145 5.43525 4.60055 5.43525V5.4343Z M11.0034 22.3003C9.42429 22.3003 8.14429 21.0203 8.14429 19.4412C8.14429 17.8621 9.42429 16.5821 11.0034 16.5821C12.0612 16.5821 12.9851 17.1566 13.4798 18.0102C13.7315 18.4546 13.8644 18.9322 13.8644 19.4412C13.8644 21.0203 12.5844 22.3003 11.0053 22.3003H11.0034Z M17.4176 18.5742C16.3779 18.5742 15.4673 18.0188 14.9668 17.1888C14.1825 15.812 12.7012 14.8824 11.0025 14.8824C9.3037 14.8824 7.82239 15.7854 7.03426 17.1461C6.53955 17.9998 5.61563 18.5742 4.55782 18.5742C2.97871 18.5742 1.69871 17.2942 1.69871 15.7151C1.69871 14.136 2.97871 12.856 4.55782 12.856V12.8532C4.57207 12.8532 4.58536 12.8532 4.59961 12.8532C7.11783 12.8532 9.15842 10.8126 9.15842 8.29436C9.15842 7.45401 8.93052 6.66683 8.53456 5.99074H8.53551C8.29052 5.56819 8.15094 5.07822 8.15094 4.55597C8.15094 2.97686 9.43094 1.69686 11.01 1.69686C12.5892 1.69686 13.8692 2.97686 13.8692 4.55597C13.8692 5.08202 13.7267 5.57484 13.4789 5.99834H13.4798C13.0867 6.67347 12.8598 7.45686 12.8598 8.29436C12.8598 10.8107 14.8994 12.8513 17.4157 12.8532V12.856C18.9949 12.856 20.2749 14.136 20.2749 15.7151C20.2749 17.2942 18.9949 18.5742 17.4157 18.5742H17.4176Z"/>
+      </svg>`;
 
       return `
-        <div style="display:flex;margin:calc(-1 * var(--sp-5));min-height:calc(100% + 2 * var(--sp-5))">
+        <div class="home-page">
+          <div class="home-center">
 
-          <!-- Main content -->
-          <div style="flex:1;min-width:0;padding:28px 32px;overflow-y:auto">
-
-            <h1 style="font-family:var(--font-display);font-size:38px;font-weight:400;color:var(--fg);margin:0 0 24px;line-height:1.1">Good morning, Hunt</h1>
-
-            <div class="metric-strip" style="margin-bottom:24px">
-              <div class="metric"><span class="label">Bound Premium</span><span class="value">$28,458,050</span><span class="sub">YTD</span></div>
-              <div class="metric"><span class="label">Upcoming renewals</span><span class="value">293</span><span class="sub">Next 30 Days</span></div>
-              <div class="metric"><span class="label">Expired Policies</span><span class="value">72</span><span class="sub">Past 30 Days</span></div>
-              <div class="metric"><span class="label">Unbound Quotes</span><span class="value">2,470</span><span class="sub">Q3 2026</span></div>
+            <!-- Greeting -->
+            <div style="display:flex;align-items:center;gap:16px;justify-content:center;margin-bottom:16px">
+              ${logoMark}
+              <span style="font-family:var(--font-display);font-size:48px;font-weight:400;color:var(--fg);line-height:68px;white-space:nowrap">Good morning, SK</span>
             </div>
 
-            <div>${rows}</div>
-
-          </div>
-
-          <!-- Right panel -->
-          <div style="width:268px;flex-shrink:0;border-left:1px solid var(--border-soft);padding:20px 18px;display:flex;flex-direction:column;gap:0;overflow-y:auto">
-
-            <!-- Balance -->
-            <div style="padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--border-soft)">
-              <div style="font-family:var(--font-display);font-size:28px;font-weight:400;color:var(--fg);line-height:1.1;margin-bottom:4px">$12,094.20</div>
-              <div style="font-size:13px;color:var(--fg-muted);margin-bottom:14px">Total Balance Due</div>
-              <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:8px">Review &amp; Pay</button>
-              <button style="width:100%;background:none;border:0;font-size:14px;color:var(--fg);cursor:pointer;text-align:center;padding:6px 0;font-family:inherit" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--fg)'">New Application</button>
+            <!-- Suggestion tags -->
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px">
+              ${tags.map(t => `<span class="home-tag">${t}</span>`).join('')}
             </div>
 
-            <!-- Appetite Guide -->
-            <div style="padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--border-soft)">
-              <div style="font-size:13px;font-weight:600;color:var(--fg);margin-bottom:2px">Appetite Guide</div>
-              ${appetite}
+            <!-- Chat input -->
+            <div class="home-input-box" id="home-input-box">
+              <textarea id="home-chat-input" placeholder="How can I help you today?" rows="2"></textarea>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <button style="background:none;border:none;cursor:pointer;padding:0;color:var(--fg);display:flex;align-items:center;justify-content:center;width:16px;height:16px">
+                  <i class="ph ph-plus" style="font-size:14px"></i>
+                </button>
+                <button id="home-chat-send" style="background:none;border:none;cursor:pointer;padding:0;color:var(--fg);display:flex;align-items:center;justify-content:center;width:16px;height:16px">
+                  <i class="ph ph-arrow-up" style="font-size:14px"></i>
+                </button>
+              </div>
             </div>
 
-            <!-- New at Authentic -->
-            <div>
-              <div style="font-size:13px;font-weight:600;color:var(--fg);margin-bottom:2px">New at Authentic</div>
-              ${appetite}
+            <!-- Recent Activity -->
+            <div style="margin-top:0">
+              <div style="font-size:14px;color:var(--fg-muted);padding:8px;text-align:center;line-height:15px">Recent Activity</div>
+              <div class="home-activity-row">Summarize all active policies in the state of Florida</div>
+              <div class="home-activity-row">Review all existing claims that is related to slip and fall</div>
+              <div class="home-activity-row" style="display:flex;align-items:center;justify-content:space-between">
+                <span>Bobby mentioned you in <a href="#" data-nav="growth" style="color:#4b7174;text-decoration:underline">Submission: BDE Florida</a></span>
+                <i class="ph ph-check" style="font-size:14px;color:var(--fg-muted);flex-shrink:0;margin-left:8px"></i>
+              </div>
+            </div>
+
+            <!-- Metrics -->
+            <div style="display:flex;padding:16px">
+              ${metrics.map(m => `
+                <div class="home-metric">
+                  <div class="hm-label">${m.label}</div>
+                  <div class="hm-value">${m.value}</div>
+                  <div class="hm-sub">${m.sub}</div>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Two lists -->
+            <div style="display:flex;gap:16px;padding:0 16px 16px">
+              <div class="home-list">
+                <div class="home-list-hdr"><span>Appetite Guide</span></div>
+                ${listItems.map(a => `<div class="home-list-row">${a}</div>`).join('')}
+              </div>
+              <div class="home-list">
+                <div class="home-list-hdr"><span>New at Authentic</span></div>
+                ${listItems.map(a => `<div class="home-list-row">${a}</div>`).join('')}
+              </div>
             </div>
 
           </div>
@@ -7886,10 +7941,13 @@
       const prevScroll = State.page === 'detail'
         ? (document.querySelector('.detail-main') || {}).scrollTop || 0
         : 0;
-      main.className = 'main' + (State.page === 'detail' ? ' detail-mode' : '') + (State.page === 'radar' ? ' radar-mode' : '');
+      const isHome = State.page === 'home' || State.page === 'inbox';
+      main.className = 'main' + (State.page === 'detail' ? ' detail-mode' : '') + (State.page === 'radar' ? ' radar-mode' : '') + (isHome ? ' home-mode' : '');
+      const surface = document.querySelector('.surface');
+      if (surface) surface.classList.toggle('home-surface', isHome);
       if (radarMap && State.page !== 'radar') { radarMap.remove(); radarMap = null; }
       if      (State.page === 'chat')           main.innerHTML = renderChat();
-      else if (State.page === 'home' || State.page === 'inbox') main.innerHTML = renderHome();
+      else if (isHome)                          main.innerHTML = renderHome();
       else if (State.page === 'detail')         main.innerHTML = renderDetail();
       else if (State.page === 'applications')   main.innerHTML = renderApplications();
       else if (State.page === 'policies')       main.innerHTML = renderPolicies();
@@ -7915,8 +7973,9 @@
       // Agent chat button — hidden on Chat page, visible everywhere else
       const agentBtn = document.getElementById('agent-btn');
       const agentPanel = document.getElementById('agent-panel');
-      if (agentBtn) agentBtn.classList.toggle('hidden', State.page === 'chat');
-      if (agentPanel && State.page === 'chat') {
+      const isOnChat = State.page === 'chat';
+      if (agentBtn) agentBtn.classList.toggle('hidden', isOnChat);
+      if (agentPanel && isOnChat) {
         State.agentChatOpen = false;
         agentPanel.classList.add('hidden');
       }
@@ -7931,8 +7990,8 @@
       $$('.nav-item').forEach(n => {
         const t = n.dataset.nav;
         n.classList.toggle('active',
+          ((State.page === 'home' || State.page === 'inbox') && t === 'home') ||
           (State.page === 'chat' && t === 'chat') ||
-          ((State.page === 'home' || State.page === 'inbox') && t === 'inbox') ||
           (State.page === 'applications' && t === 'applications') ||
           ((State.page === 'policies' || State.page === 'policy-detail') && t === 'policies') ||
           (State.page === 'actuarial' && t === 'actuarial') ||
@@ -9800,6 +9859,41 @@ Coverage lines available: General Liability, Healthcare Providers Liability, Liq
         n.onclick = () => {
           const t = n.dataset.nav;
           State.page = t; State.currentId = null; State.mobileNavOpen = false; render();
+        };
+      });
+
+      // Home page: chat input → navigate to chat and send
+      const homeInput = document.getElementById('home-chat-input');
+      const homeSend  = document.getElementById('home-chat-send');
+      const homeBox   = document.getElementById('home-input-box');
+      if (homeBox) homeBox.onclick = (e) => { if (e.target === homeBox) homeInput?.focus(); };
+      const doHomeChat = () => {
+        const txt = homeInput?.value?.trim();
+        if (!txt) return;
+        State.page = 'chat';
+        render();
+        // After render, inject the message into the chat input and send
+        setTimeout(() => {
+          const ta = document.getElementById('chat-textarea');
+          if (ta) { ta.value = txt; }
+          sendChatMessage();
+        }, 50);
+      };
+      if (homeSend) homeSend.onclick = doHomeChat;
+      if (homeInput) {
+        homeInput.onkeydown = (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doHomeChat(); }
+        };
+      }
+      // Home page: suggestion tags pre-fill the chat input
+      $$('.home-tag').forEach(tag => {
+        tag.onclick = () => { if (homeInput) homeInput.value = tag.textContent; homeInput?.focus(); };
+      });
+      // Home page: recent activity rows pre-fill the chat input
+      $$('.home-activity-row').forEach(row => {
+        row.onclick = (e) => {
+          if (e.target.tagName === 'A') return;
+          if (homeInput) { homeInput.value = row.textContent.trim(); homeInput.focus(); }
         };
       });
 
