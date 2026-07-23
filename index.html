@@ -9495,17 +9495,18 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
         ta.value = '';
         if (btn) btn.disabled = true;
         // Append user bubble (render() already handled it for the first message)
-        const msgContainer = document.getElementById('chat-messages');
-        if (msgContainer) {
+        const mc = document.getElementById('chat-messages');
+        if (mc) {
           const u = document.createElement('div');
           u.className = 'chat-msg user';
           u.textContent = text;
-          msgContainer.appendChild(u);
-          msgContainer.scrollTop = msgContainer.scrollHeight;
+          mc.appendChild(u);
+          mc.scrollTop = mc.scrollHeight;
         }
       }
 
       // Typing indicator
+      const msgContainer = document.getElementById('chat-messages');
       let typingEl = null;
       if (msgContainer) {
         typingEl = document.createElement('div');
