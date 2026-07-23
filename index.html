@@ -907,6 +907,126 @@
     .drop-zone .req { display: block; margin-top: var(--sp-2); font-size: 12px; color: var(--fg-muted); }
 
     /* Document checklist */
+    /* ── New Submission modal — Figma 169:44943 / 169:45110 / 169:45338 ─── */
+    .ns-card {
+      background: var(--bg, #fbfbfb);
+      border: 1px solid var(--border, #ebebeb);
+      border-radius: 8px;
+      padding: 24px;
+      width: 835px;
+      max-width: calc(100vw - 32px);
+      max-height: 92vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .ns-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .ns-title {
+      font-size: 20px;
+      font-weight: 400;
+      line-height: 28px;
+      color: var(--fg, #252424);
+    }
+    .ns-subtitle {
+      font-size: 14px;
+      color: var(--fg-muted, #868585);
+      margin-top: 4px;
+      line-height: 15px;
+    }
+    .ns-close {
+      background: none; border: 0; cursor: pointer;
+      padding: 4px; border-radius: 4px;
+      color: var(--fg-muted); display: flex; align-items: center; flex-shrink: 0;
+    }
+    .ns-close:hover { background: var(--bg-accent); }
+    /* Drop zone */
+    .ns-drop-zone {
+      background: var(--surface, #fff);
+      border: 1px solid var(--border, #ebebeb);
+      border-radius: 8px;
+      min-height: 280px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: border-color var(--transition-base), background var(--transition-base);
+      flex-shrink: 0;
+    }
+    .ns-drop-zone:hover, .ns-drop-zone.is-dragging {
+      border-color: var(--primary, #640b0b);
+      background: #fdf8f8;
+    }
+    .ns-drop-content {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 48px; text-align: center; pointer-events: none;
+    }
+    .ns-drop-text { font-size: 14px; font-weight: 500; color: var(--fg); pointer-events: all; }
+    .ns-drop-link { color: #2e69ae; text-decoration: underline; cursor: pointer; }
+    .ns-drop-hint { font-size: 14px; font-weight: 500; color: var(--fg-muted, #868585); }
+    /* Document list */
+    .ns-doclist {
+      background: var(--surface, #fff);
+      border: 1px solid var(--border, #ebebeb);
+      border-radius: 8px;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .ns-doclist-hd {
+      font-size: 12px; color: var(--fg);
+      padding: 8px 8px 8px 16px;
+      border-bottom: 1px solid var(--border, #ebebeb);
+      font-weight: 400;
+    }
+    .ns-doc-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 4px 8px; min-height: 40px;
+      border-bottom: 1px solid var(--border, #ebebeb);
+    }
+    .ns-doc-row:last-child { border-bottom: 0; }
+    .ns-doc-left { display: flex; align-items: center; gap: 8px; }
+    .ns-doc-lbl { font-size: 12px; color: var(--fg); }
+    .ns-doc-lbl.is-warn { color: var(--err, #a31e17); }
+    .ns-doc-right { display: flex; align-items: center; gap: 6px; }
+    /* File icon with ext badge (matching Figma Files Icons component) */
+    .ns-ficon {
+      position: relative; width: 24px; height: 24px;
+      flex-shrink: 0; display: flex; align-items: flex-end; justify-content: flex-start;
+    }
+    .ns-ficon .ph { font-size: 20px; color: var(--fg-muted); }
+    .ns-ficon-badge {
+      position: absolute; bottom: 0; left: 1px;
+      font-size: 5px; font-weight: 700; font-family: 'Poppins', sans-serif;
+      color: #fff; padding: 1px 2px; border-radius: 2px; line-height: 1;
+    }
+    .ns-finfo { display: flex; flex-direction: column; width: 96px; font-size: 12px; line-height: 14px; }
+    .ns-finfo-name { color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ns-finfo-size { color: var(--fg-muted); }
+    .ns-doc-del {
+      background: none; border: 0; cursor: pointer;
+      padding: 8px; border-radius: 8px;
+      color: var(--fg-muted); display: flex; align-items: center;
+    }
+    .ns-doc-del:hover { background: var(--bg-accent); color: var(--err); }
+    /* Footer */
+    .ns-foot {
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 4px; flex-shrink: 0; padding-top: 4px;
+    }
+    /* Create button disabled state (Figma: bg #ebebeb, text #b6b6b6) */
+    .ns-foot .btn-primary:disabled {
+      background: #ebebeb !important; color: #b6b6b6 !important;
+      border-color: #ebebeb !important; cursor: default; opacity: 1;
+    }
+    /* Success state (shared) */
+    .ns-card .ns-success {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 12px; padding: 48px 0; text-align: center;
+    }
+
     /* Bulk indication template upload zone */
     .ns-bulk-zone {
       border: 2px dashed var(--border);
@@ -4261,181 +4381,128 @@
       for (const f of files) await nsHandleFile(f, explicitSlot);
     }
 
+    // File icon helper — matches Figma "Files Icons" component (24px with ext badge)
+    function nsFileIconHTML(ext) {
+      const e = (ext || '').toUpperCase().slice(0, 4);
+      const bg = e === 'PDF' ? 'var(--primary,#640b0b)' : '#277e4f';
+      return `<span class="ns-ficon"><i class="ph ph-file" style="font-size:20px;color:var(--fg-muted)"></i><span class="ns-ficon-badge" style="background:${bg}">${e || 'DOC'}</span></span>`;
+    }
+
     function renderNewSubmission() {
       if (!State.newSub.open) return '';
       const s = State.newSub;
-      const allUp     = nsAllDocsUploaded();
-      const allValid  = nsAllValid();
-      // ---- Step indicator ----
-      // Step 1 is green-done only once every required check passes; if any
-      // doc has a failed required check the step shows the error variant.
-      const stepError = allUp && !allValid;
-      const stepperHTML = (s.step === 'done') ? '' : `
-        <div class="stepper">
-          <div class="step ${s.step === 2 ? 'is-done' : (stepError ? 'is-error' : 'is-active')}">
-            <span class="dot">${s.step === 2 ? '✓' : (stepError ? '✕' : '1')}</span>
-            <span class="labels"><span class="num">Step 1</span><span class="name">Document Checklist</span></span>
-          </div>
-          <span class="bar ${s.step === 2 ? 'is-done' : (stepError ? 'is-error' : '')}"></span>
-          <div class="step ${s.step === 2 ? 'is-active' : ''}">
-            <span class="dot">2</span>
-            <span class="labels"><span class="num">Step 2</span><span class="name">Submission Details</span></span>
-          </div>
-        </div>
-      `;
-      // ---- Body content per step ----
-      let bodyHTML = '';
-      if (s.step === 1) {
-        // Per-slot upload — each slot can hold MULTIPLE files.  Slot header
-        // shows the label + status icon + "Upload File" link to add more.
-        // Each uploaded file is listed below as its own sub-row with a trash
-        // button to remove just that file.  Additional Documents → "Target
-        // Premium Detected" if any file in the slot parses a target premium.
-        const docRows = NS_DOC_DEFS.map(d => {
-          const files       = nsSlotFiles(d.key);
-          const hasFiles    = files.length > 0;
-          const docPassed   = hasFiles && (d.checks.length === 0 ? true : nsDocPassed(d.key));
-          const hasDetected = d.key === 'additional' && files.some(f => f.targetPremiumDetected);
-          const displayLabel = hasDetected ? 'Target Premium Detected' : d.label;
-          const ico = !hasFiles ? 'ph-circle' : (docPassed ? 'ph-check-circle-fill' : 'ph-warning-fill');
-          const iconColor = !hasFiles ? 'var(--fg-muted)' : (docPassed ? 'var(--ok)' : 'var(--err)');
-          const fileRows = files.map((f, i) => `
-            <div class="doc-file-row">
-              <span class="file">
-                <span class="badge ${(f.ext || '').toLowerCase()}">${f.ext}</span>
-                <span class="meta"><span class="name">${f.name}</span><span class="size">${f.size}</span></span>
-              </span>
-              <button class="trash" data-remove-file="${d.key}:${i}" title="Remove file"><i class="ph ph-trash" style="font-size:16px"></i></button>
+
+      // ── Success state ─────────────────────────────────────────────────────
+      if (s.step === 'done') {
+        return `
+          <div class="modal-overlay" id="ns-overlay">
+            <div class="ns-card" onclick="event.stopPropagation()">
+              <div class="ns-head">
+                <div><div class="ns-title">Create Submission</div><div class="ns-subtitle">Start an insurance application for your lead.</div></div>
+                <button class="ns-close" id="ns-close" title="Close"><i class="ph ph-x" style="font-size:16px"></i></button>
+              </div>
+              <div class="ns-success">
+                <div class="check-ring"><i class="ph ph-check"></i></div>
+                <div class="title">Your submission has been submitted</div>
+                <div class="body-text">We have notified the Underwriting Team</div>
+              </div>
             </div>
-          `).join('');
-          return `
-            <div class="doc-slot ${docPassed ? '' : (hasFiles ? 'is-missing' : '')}">
-              <div class="doc-slot-head">
-                <i class="ph ${ico}" style="font-size:20px;color:${iconColor}"></i>
-                <span class="label" style="${hasFiles && !docPassed ? 'color:var(--err);font-weight:500' : ''}">${displayLabel}${files.length > 1 ? ` <span style="color:var(--fg-muted);font-weight:400">· ${files.length} files</span>` : ''}</span>
-                <a class="upload-link" data-upload-slot="${d.key}">${hasFiles ? 'Upload File' : 'Upload File'}</a>
-              </div>
-              ${hasFiles ? `<div class="doc-slot-files">${fileRows}</div>` : ''}
-            </div>
-          `;
-        }).join('');
-        const pt = s.parsedTemplate;
-        const bulkZoneHTML = `
-          <div id="ns-bulk-zone" class="ns-bulk-zone${pt ? ' is-parsed' : ''}">
-            ${pt ? `
-              <div class="ns-bulk-parsed">
-                <i class="ph ph-check-circle-fill" style="font-size:20px;color:var(--ok)"></i>
-                <div class="ns-bulk-parsed-info">
-                  <div class="ns-bulk-parsed-name">${pt.accountName || 'Indication Template'}</div>
-                  <div class="ns-bulk-parsed-meta">${pt.matrix.length} accident year${pt.matrix.length !== 1 ? 's' : ''} · ${pt.claims.length} claim${pt.claims.length !== 1 ? 's' : ''} · GL ${pt.glLimit || '—'}</div>
-                </div>
-                <button class="ns-bulk-remove" id="ns-bulk-remove" title="Remove"><i class="ph ph-x" style="font-size:14px"></i></button>
-              </div>
-            ` : `
-              <div class="ns-bulk-label">
-                <i class="ph ph-file-arrow-up" style="font-size:28px;color:var(--fg-muted)"></i>
-                <span class="ns-bulk-title">Upload Indication Template</span>
-                <span class="ns-bulk-hint">Drag &amp; drop or click · CSV · auto-fills all fields</span>
-              </div>
-            `}
-            <input type="file" id="ns-bulk-input" accept=".csv" style="display:none"/>
-          </div>
-          ${!pt ? `<div class="ns-bulk-divider"><span>or upload documents individually</span></div>` : ''}
-        `;
-        bodyHTML = `
-          ${bulkZoneHTML}
-          ${!pt ? `
-          <div class="doc-list">
-            <div class="doc-head">Required Documents</div>
-            ${docRows}
-          </div>
-          ${s.lastError ? `<div style="margin-top:var(--sp-3);padding:var(--sp-3) var(--sp-4);background:var(--err-bg, #fde7e7);border-radius:var(--r-md);font-size:13px;color:var(--err)">${s.lastError}</div>` : ''}
-          <input type="file" id="ns-slot-input" multiple accept=".csv,.tsv,.xlsx,.xls,.pdf" style="display:none"/>
-          ` : ''}
-        `;
-      } else if (s.step === 2) {
-        bodyHTML = `
-          <div class="ns-field"><i class="ph ph-buildings ns-ico"></i>
-            <select id="ns-tenant">
-              <option value="" ${!s.fields.tenant ? 'selected' : ''}>Tenant</option>
-              <option ${s.fields.tenant === 'Everspan' ? 'selected' : ''}>Everspan</option>
-              <option ${s.fields.tenant === 'Markel' ? 'selected' : ''}>Markel</option>
-              <option ${s.fields.tenant === 'Nationwide' ? 'selected' : ''}>Nationwide</option>
-            </select>
-          </div>
-          <div class="ns-field"><i class="ph ph-storefront ns-ico"></i>
-            <input id="ns-business" type="text" placeholder="Business name" value="${s.fields.businessName}"/>
-          </div>
-          <div class="ns-field"><i class="ph ph-calendar ns-ico"></i>
-            <input id="ns-eff" type="date" placeholder="Target Effective Date" value="${s.fields.effDate}"/>
-          </div>
-          <div class="ns-field"><i class="ph ph-clock ns-ico"></i>
-            <input id="ns-needby" type="date" placeholder="Need by" value="${s.fields.needBy}"/>
-          </div>
-          <div class="ns-field"><i class="ph ph-currency-dollar ns-ico"></i>
-            <input id="ns-premium" type="text" placeholder="Target Premium" value="${s.fields.targetPremium}"/>
-          </div>
-          <!-- Notes textarea — 120 char limit per Figma 78:28931 -->
-          <div class="ns-textarea">
-            <textarea id="ns-notes" placeholder="Add Notes" maxlength="120" rows="4">${(s.fields.notes || '').replace(/</g,'&lt;')}</textarea>
-            <span class="ns-counter">${(s.fields.notes || '').length} / 120</span>
-          </div>
-        `;
-      } else {
-        // done
-        bodyHTML = `
-          <div class="ns-success">
-            <div class="check-ring"><i class="ph ph-check"></i></div>
-            <div class="title">Your submission has been submitted</div>
-            <div class="body-text">We have notified the Underwriting Team</div>
-          </div>
-        `;
+          </div>`;
       }
-      // ---- Footer per step ----
-      let footHTML = '';
-      if (s.step === 1) {
-        // Next stays disabled until every required parse-check passes.  The
-        // Create button on step 2 is the actual submission gate but we surface
-        // the same enforcement here so the user can't slip past a bad doc.
-        footHTML = `
-          <div class="left"></div>
-          <div class="right">
-            <button class="text-btn" id="ns-cancel">Cancel</button>
-            <button class="btn btn-primary" id="ns-next" ${allValid ? '' : 'disabled'}>Next</button>
-          </div>
-        `;
-      } else if (s.step === 2) {
-        footHTML = `
-          <div class="left">
-            <button class="text-btn" id="ns-back"><i class="ph ph-arrow-left" style="font-size:14px"></i> Back</button>
-          </div>
-          <div class="right">
-            <button class="text-btn" id="ns-cancel">Cancel</button>
-            <button class="btn btn-primary" id="ns-create">Create</button>
-          </div>
-        `;
-      } else {
-        footHTML = '';
+
+      // ── Derive state ───────────────────────────────────────────────────────
+      const pt       = s.parsedTemplate;
+      const lossF    = nsSlotFiles('lossRuns');
+      const sovF     = nsSlotFiles('sov');
+      const expF     = nsSlotFiles('expiringPremium');
+      const addF     = nsSlotFiles('additional');
+      const hasLoss  = lossF.length > 0 || !!pt;
+      const hasSov   = sovF.length > 0;
+      const hasExp   = expF.length > 0 || !!pt;
+      const hasAdd   = addF.length > 0;
+      const tgtDetected = (pt && !!pt.targetPremium) || addF.some(f => f.targetPremiumDetected);
+      const anyFiles    = hasLoss || hasSov || hasExp || hasAdd;
+      const canCreate   = hasLoss && hasSov && hasExp && tgtDetected;
+
+      // ── Slot display rows ─────────────────────────────────────────────────
+      // Each slot: left = check icon + label, right = file icon + name + size + trash
+      function slotRow(key, label, has, files, ptFallbackName) {
+        const ico = has
+          ? `<i class="ph ph-check-circle-fill" style="font-size:20px;color:var(--ok,#277e4f)"></i>`
+          : `<i class="ph ph-circle" style="font-size:20px;color:var(--border,#ebebeb)"></i>`;
+        let rightHTML = '';
+        if (files.length > 0) {
+          const f = files[0];
+          rightHTML = `
+            <div class="ns-doc-right">
+              ${nsFileIconHTML(f.ext)}
+              <div class="ns-finfo"><span class="ns-finfo-name">${f.name}</span><span class="ns-finfo-size">${f.size}</span></div>
+              <button class="ns-doc-del" data-remove-slot="${key}" title="Remove"><i class="ph ph-trash" style="font-size:16px"></i></button>
+            </div>`;
+        } else if (ptFallbackName) {
+          rightHTML = `
+            <div class="ns-doc-right">
+              ${nsFileIconHTML('CSV')}
+              <div class="ns-finfo"><span class="ns-finfo-name">${ptFallbackName}</span><span class="ns-finfo-size"></span></div>
+            </div>`;
+        }
+        return `
+          <div class="ns-doc-row">
+            <div class="ns-doc-left">${ico}<span class="ns-doc-lbl">${label}</span></div>
+            ${rightHTML}
+          </div>`;
       }
+
+      const ptFile = pt ? (pt.accountName ? `${pt.accountName}.csv` : 'indication_template.csv') : null;
+      const docRowsHTML = [
+        slotRow('lossRuns',       '5 Years of Loss Runs', hasLoss, lossF, pt ? ptFile : null),
+        slotRow('sov',            'SOV',                  hasSov,  sovF,  null),
+        slotRow('expiringPremium','Expiring Premium',      hasExp,  expF,  pt ? ptFile : null),
+        slotRow('additional',     tgtDetected ? 'Target Premium Detected' : 'Additional Documents', hasAdd || tgtDetected, addF, pt && tgtDetected ? ptFile : null),
+      ].join('');
+
+      const warnHTML = anyFiles && !tgtDetected ? `
+        <div class="ns-doc-row">
+          <div class="ns-doc-left">
+            <i class="ph ph-warning" style="font-size:20px;color:var(--err,#a31e17)"></i>
+            <span class="ns-doc-lbl is-warn">Missing Target Premium</span>
+          </div>
+        </div>` : '';
+
+      const docListHTML = anyFiles ? `
+        <div class="ns-doclist">
+          <div class="ns-doclist-hd">Required Documents</div>
+          ${docRowsHTML}
+          ${warnHTML}
+        </div>` : '';
+
       return `
         <div class="modal-overlay" id="ns-overlay">
-          <div class="modal-card" onclick="event.stopPropagation()">
-            <div class="modal-head">
+          <div class="ns-card" onclick="event.stopPropagation()">
+            <div class="ns-head">
               <div>
-                <h2>Create Submission</h2>
-                <div class="sub">Start an insurance application for your lead.</div>
+                <div class="ns-title">Create Submission</div>
+                <div class="ns-subtitle">Start an insurance application for your lead.</div>
               </div>
-              <button class="modal-close" id="ns-close" title="Close"><i class="ph ph-x" style="font-size:18px"></i></button>
+              <button class="ns-close" id="ns-close" title="Close"><i class="ph ph-x" style="font-size:16px"></i></button>
             </div>
-            <div class="modal-body">
-              ${stepperHTML}
-              ${bodyHTML}
+            <div class="ns-drop-zone" id="ns-drop-zone">
+              <input type="file" id="ns-file-input" multiple accept=".csv,.tsv,.xlsx,.xls,.pdf" style="display:none"/>
+              <div class="ns-drop-content">
+                <i class="ph ph-upload-simple" style="font-size:20px;color:var(--fg-muted)"></i>
+                <p class="ns-drop-text"><span class="ns-drop-link" id="ns-select-link">Select from device</span> or drag and drop</p>
+                <p class="ns-drop-hint">Require documents: SOV, 5 years of Loss runs, Expiring Premium, Target Premium</p>
+              </div>
             </div>
-            ${footHTML ? `<div class="modal-foot">${footHTML}</div>` : ''}
+            ${docListHTML}
+            <div class="ns-foot">
+              <button class="text-btn" id="ns-cancel">Cancel</button>
+              <button class="btn btn-primary" id="ns-create" ${canCreate ? '' : 'disabled'}>Create</button>
+            </div>
           </div>
-        </div>
-      `;
+        </div>`;
     }
+
 
     // Reset modal state and open it
     function openNewSubmission() {
@@ -9981,9 +10048,8 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
       const collapseBtn = $('#sidebar-collapse');
       if (collapseBtn) collapseBtn.onclick = () => { State.sidebarCollapsed = !State.sidebarCollapsed; render(); };
 
-      // ---- New Submission modal events ----
-      // Open from any "New" button on Home / Growth.  Sidebar / page-level
-      // navigation continues to work since we only flip State.newSub.open.
+      // ── New Submission modal — Figma 169:44943 / 169:45110 / 169:45338 ────
+      // Open from any "New" button.
       $$('.btn-primary').forEach(b => {
         const text = (b.textContent || '').trim();
         if (text === 'New' && !b.dataset.nsWired) {
@@ -9991,117 +10057,69 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
           b.addEventListener('click', (e) => { e.stopPropagation(); openNewSubmission(); });
         }
       });
-      // Inside the modal — close, cancel, pick file, next, back, create, retry
+      // Overlay / close / cancel
       const overlay = $('#ns-overlay');
       if (overlay) overlay.onclick = () => closeNewSubmission();
-      const closeX = $('#ns-close');     if (closeX)     closeX.onclick = (e) => { e.stopPropagation(); closeNewSubmission(); };
-      const cancel = $('#ns-cancel');    if (cancel)     cancel.onclick = (e) => { e.stopPropagation(); closeNewSubmission(); };
-      // ---- Per-slot file upload wiring ----
-      // Each slot can hold multiple files; "Upload File" opens a slot-scoped
-      // picker (accept=multiple) and the trash on each file removes just
-      // that file from the slot's array.
-      const slotInput = $('#ns-slot-input');
-      $$('[data-remove-file]').forEach(b => b.onclick = (e) => {
-        e.stopPropagation();
-        const [slot, idxStr] = b.dataset.removeFile.split(':');
-        const i = Number(idxStr);
-        const arr = State.newSub.docs[slot];
-        if (Array.isArray(arr) && i >= 0 && i < arr.length) arr.splice(i, 1);
-        render();
-      });
-      $$('[data-upload-slot]').forEach(b => b.onclick = (e) => {
-        e.stopPropagation();
-        const slot = b.dataset.uploadSlot;
-        if (!slotInput) return;
-        slotInput.onchange = (ev) => {
-          State.newSub.lastError = null;
-          nsHandleFiles(ev.target.files, slot);
-          ev.target.value = '';
-        };
-        slotInput.click();
-      });
-      // ---- Bulk indication template upload ----
-      const bulkInput  = $('#ns-bulk-input');
-      const bulkZone   = $('#ns-bulk-zone');
-      const bulkRemove = $('#ns-bulk-remove');
-      if (bulkInput) {
-        bulkInput.onchange = async (ev) => {
-          const file = ev.target.files[0];
-          if (!file) return;
-          State.newSub.parsedTemplate = parseBulkTemplate(await file.text());
-          ev.target.value = '';
-          render();
-        };
-      }
-      if (bulkZone && !State.newSub.parsedTemplate) {
-        bulkZone.onclick = (e) => { e.stopPropagation(); bulkInput?.click(); };
-        bulkZone.ondragover  = (e) => { e.preventDefault(); bulkZone.classList.add('drag-over'); };
-        bulkZone.ondragleave = ()  => bulkZone.classList.remove('drag-over');
-        bulkZone.ondrop      = async (e) => {
-          e.preventDefault();
-          bulkZone.classList.remove('drag-over');
-          const file = e.dataTransfer?.files[0];
-          if (!file) return;
-          State.newSub.parsedTemplate = parseBulkTemplate(await file.text());
-          render();
-        };
-      }
-      if (bulkRemove) bulkRemove.onclick = (e) => { e.stopPropagation(); State.newSub.parsedTemplate = null; render(); };
+      const nsClose  = $('#ns-close');  if (nsClose)  nsClose .onclick = (e) => { e.stopPropagation(); closeNewSubmission(); };
+      const nsCancel = $('#ns-cancel'); if (nsCancel) nsCancel.onclick = (e) => { e.stopPropagation(); closeNewSubmission(); };
 
-      const next   = $('#ns-next');      if (next && !next.disabled) next.onclick = (e) => {
-        e.stopPropagation();
-        // Pre-fill Step 2 fields from parsed template before advancing
-        const pt = State.newSub.parsedTemplate;
-        if (pt) {
-          if (!State.newSub.fields.businessName && pt.accountName) State.newSub.fields.businessName = pt.accountName;
-          if (!State.newSub.fields.targetPremium && pt.targetPremium) State.newSub.fields.targetPremium = pt.targetPremium;
-        }
-        State.newSub.step = 2;
-        render();
-      };
-      const back   = $('#ns-back');      if (back)       back.onclick   = (e) => { e.stopPropagation(); State.newSub.step = 1; render(); };
-      const create = $('#ns-create');    if (create)     create.onclick = (e) => {
-        e.stopPropagation();
-        // Snapshot field values into a new GROWTH_ROWS entry, then flash success
-        const f = {
-          tenant:        ($('#ns-tenant')?.value || ''),
-          businessName:  ($('#ns-business')?.value || ''),
-          effDate:       ($('#ns-eff')?.value || ''),
-          needBy:        ($('#ns-needby')?.value || ''),
-          targetPremium: ($('#ns-premium')?.value || ''),
-          notes:         ($('#ns-notes')?.value || ''),
+      // ── Drop zone — single zone accepts all files and auto-categorizes ────
+      const dropZone  = $('#ns-drop-zone');
+      const fileInput = $('#ns-file-input');
+      const selectLnk = $('#ns-select-link');
+
+      if (fileInput) {
+        fileInput.onchange = async (ev) => {
+          await nsHandleFiles(ev.target.files);
+          ev.target.value = '';
         };
-        // Prepend the new submission so it appears at the top of Growth
-        const pt = State.newSub.parsedTemplate;
+      }
+      if (selectLnk) {
+        selectLnk.onclick = (e) => { e.stopPropagation(); fileInput?.click(); };
+      }
+      if (dropZone) {
+        dropZone.onclick = (e) => {
+          if (e.target === dropZone || e.target.closest('.ns-drop-content')) fileInput?.click();
+        };
+        dropZone.ondragover  = (e) => { e.preventDefault(); dropZone.classList.add('is-dragging'); };
+        dropZone.ondragleave = ()  => dropZone.classList.remove('is-dragging');
+        dropZone.ondrop      = async (e) => {
+          e.preventDefault();
+          dropZone.classList.remove('is-dragging');
+          await nsHandleFiles(e.dataTransfer?.files);
+        };
+      }
+
+      // ── Remove entire slot (trash button) ────────────────────────────────
+      $$('[data-remove-slot]').forEach(b => b.onclick = (e) => {
+        e.stopPropagation();
+        const slot = b.dataset.removeSlot;
+        State.newSub.docs[slot] = [];
+        if (slot === 'lossRuns' || slot === 'expiringPremium') State.newSub.parsedTemplate = null;
+        render();
+      });
+
+      // ── Create ────────────────────────────────────────────────────────────
+      const nsCreate = $('#ns-create');
+      if (nsCreate && !nsCreate.disabled) nsCreate.onclick = (e) => {
+        e.stopPropagation();
+        const pt   = State.newSub.parsedTemplate;
+        const docs = State.newSub.docs;
+        const name = (pt && pt.accountName) || (docs.lossRuns[0] && docs.lossRuns[0].name.replace(/\.\w+$/, '')) || 'New Submission';
+        const premium = (pt && pt.targetPremium) || (docs.additional.find(f => f.targetPremiumDetected) ? 'Detected' : '');
         GROWTH_ROWS.unshift({
           type:'Sub', product:'GL',
-          name: f.businessName || 'New Submission',
-          sub: f.notes ? f.notes.slice(0, 60) : (pt && pt.glLimit ? `GL ${pt.glLimit}` : 'Pending review'),
+          name,
+          sub: pt && pt.glLimit ? `GL ${pt.glLimit}` : 'Pending review',
           status:'Created', kind:'purple',
           owner:'Hunt Carroll', ownerAv:'orange',
-          premium: Number(String(f.targetPremium).replace(/[^0-9.]/g, '')) || 0,
+          premium: Number(String(premium).replace(/[^0-9.]/g, '')) || 0,
           broker:'—',
-          eff: f.effDate || '—', recv: new Date().toISOString().slice(0,10),
-          needBy: f.needBy || 'Today',
+          eff: '—', recv: new Date().toISOString().slice(0,10), needBy: 'Today',
           ...(pt ? { glLimit: pt.glLimit, appId: pt.appId, prospSales: pt.prospSales } : {}),
         });
         State.newSub.step = 'done';
         render();
-      };
-      // Persist form-field edits between renders
-      ['tenant','business','eff','needby','premium'].forEach(k => {
-        const el = $('#ns-' + k);
-        if (el) el.oninput = el.onchange = () => {
-          const map = { tenant:'tenant', business:'businessName', eff:'effDate', needby:'needBy', premium:'targetPremium' };
-          State.newSub.fields[map[k]] = el.value;
-        };
-      });
-      // Notes textarea — live update model + counter without losing caret
-      const notesEl = $('#ns-notes');
-      if (notesEl) notesEl.oninput = () => {
-        State.newSub.fields.notes = notesEl.value;
-        const counter = document.querySelector('.ns-counter');
-        if (counter) counter.textContent = `${notesEl.value.length} / 120`;
       };
 
 
