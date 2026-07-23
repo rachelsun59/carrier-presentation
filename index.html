@@ -403,52 +403,94 @@
       overflow-x: hidden;
     }
     .main.detail-mode { padding: 0; overflow: hidden; }
-    .main.home-mode { padding: 0; }
-
-    /* Home page layout */
+    /* Home page: make .main a flex column so .home-page can fill it */
+    .main.home-mode {
+      padding: 0;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
     .home-page {
-      min-height: 100%;
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 32px 24px;
+      padding: 48px 24px;
       box-sizing: border-box;
+      min-height: min-content;
     }
-    .home-center {
+    /* 800px content column — mirrors Figma's absolutely-centered column */
+    .home-col {
       width: 800px;
       max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
-    .home-tag { background: var(--bg); border: 1px solid var(--border); border-radius: 999px; padding: 4px 8px; font-size: 12px; color: var(--fg); white-space: nowrap; cursor: pointer; line-height: 14px; }
+    /* Greeting row */
+    .home-greeting {
+      display: flex; align-items: center; gap: 16px;
+      justify-content: center; width: 100%;
+    }
+    .home-greeting-text {
+      font-family: var(--font-display);
+      font-size: 48px; line-height: 68px; font-weight: 400;
+      color: var(--fg); white-space: nowrap;
+    }
+    /* Tag pills */
+    .home-tags { display: flex; gap: 4px; align-items: flex-start; flex-wrap: wrap; width: 100%; }
+    .home-tag {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 999px;
+      padding: 4px 8px; font-size: 12px; color: var(--fg);
+      white-space: nowrap; cursor: pointer; line-height: 14px;
+    }
     .home-tag:hover { border-color: var(--fg-muted); }
+    /* Chat input */
     .home-input-box {
       background: #fff; border: 1px solid var(--border); border-radius: 8px;
       padding: 16px; height: 120px; display: flex; flex-direction: column;
-      justify-content: space-between;
-      box-shadow: 0 8px 10px rgba(13,12,12,0.04);
-      cursor: text;
+      align-items: flex-start; gap: 4px;
+      box-shadow: 0 8px 5px rgba(13,12,12,0.04);
+      width: 100%; box-sizing: border-box; cursor: text;
     }
     .home-input-box textarea {
       flex: 1; border: none; outline: none; background: transparent;
-      font-size: 14px; color: var(--fg-muted); font-family: inherit;
+      font-size: 14px; color: var(--fg); font-family: var(--font);
       resize: none; width: 100%; line-height: 15px;
     }
     .home-input-box textarea::placeholder { color: var(--fg-muted); }
+    .home-input-footer { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+    /* Activity */
+    .home-activity { display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
+    .home-activity-label {
+      width: 100%; display: flex; align-items: center; justify-content: center;
+      padding: 8px 0; font-size: 14px; line-height: 15px; color: var(--fg-muted);
+    }
     .home-activity-row {
-      border-bottom: 1px solid var(--border); padding: 8px;
-      font-size: 14px; color: var(--fg); cursor: pointer; line-height: 15px;
+      width: 100%; border-bottom: 1px solid var(--border);
+      padding: 8px; font-size: 14px; line-height: 15px; color: var(--fg);
+      cursor: pointer; box-sizing: border-box;
+      display: flex; align-items: center; justify-content: space-between;
     }
     .home-activity-row:hover { background: var(--bg-soft); }
+    /* Metrics */
+    .home-metrics { display: flex; align-items: flex-start; padding: 16px; width: 100%; box-sizing: border-box; }
     .home-metric {
       flex: 1; border-left: 1px solid var(--border);
       padding: 4px 4px 4px 5px; display: flex; flex-direction: column; gap: 2px;
     }
-    .home-metric .hm-label { font-size: 10px; color: var(--fg-muted); line-height: 13px; }
-    .home-metric .hm-value { font-family: var(--font-display); font-size: 24px; font-weight: 400; color: var(--fg); line-height: 26px; white-space: nowrap; }
-    .home-metric .hm-sub { font-size: 12px; color: var(--fg); line-height: 14px; }
+    .hm-label { font-size: 10px; color: var(--fg-muted); line-height: 13px; }
+    .hm-value { font-family: var(--font-display); font-size: 24px; font-weight: 400; color: var(--fg); line-height: 26px; white-space: nowrap; }
+    .hm-sub   { font-size: 12px; color: var(--fg); line-height: 14px; }
+    /* Lists */
+    .home-lists { display: flex; gap: 16px; align-items: flex-start; padding: 16px; width: 100%; box-sizing: border-box; }
     .home-list { flex: 1; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-    .home-list-hdr { background: var(--bg); border-bottom: 1px solid var(--border); padding: 8px 8px; min-height: 52px; display: flex; align-items: center; }
-    .home-list-hdr span { font-size: 16px; font-weight: 500; color: var(--fg); font-family: var(--font); }
-    .home-list-row { border-bottom: 1px solid var(--border); padding: 8px; font-size: 14px; color: var(--fg); cursor: pointer; }
+    .home-list-hdr {
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: 8px; min-height: 52px; display: flex; align-items: center;
+    }
+    .home-list-hdr span { font-size: 16px; font-weight: 500; color: var(--fg); font-family: var(--font); line-height: 22px; }
+    .home-list-row { border-bottom: 1px solid var(--border); padding: 8px; font-size: 14px; line-height: 15px; color: var(--fg); cursor: pointer; }
     .home-list-row:hover { background: var(--bg-soft); }
     .home-list-row:last-child { border-bottom: none; }
     /* Hide topbar on home page */
@@ -3283,9 +3325,6 @@
         <button class="nav-item" data-nav="radar">
           <span class="nav-ico"><i class="ph ph-chart-line"></i></span><span class="nav-label">Radar</span>
         </button>
-        <button class="nav-item" data-nav="actuarial">
-          <span class="nav-ico"><i class="ph ph-calculator"></i></span><span class="nav-label">Actuarial Controls</span>
-        </button>
         <button class="nav-item" data-nav="settings">
           <span class="nav-ico"><i class="ph ph-gear"></i></span><span class="nav-label">Settings</span>
         </button>
@@ -5519,45 +5558,45 @@
 
       return `
         <div class="home-page">
-          <div class="home-center">
+          <div class="home-col">
 
-            <!-- Greeting -->
-            <div style="display:flex;align-items:center;gap:16px;justify-content:center;margin-bottom:16px">
+            <!-- Greeting: logo mark + Season Serif text, centered -->
+            <div class="home-greeting">
               ${logoMark}
-              <span style="font-family:var(--font-display);font-size:48px;font-weight:400;color:var(--fg);line-height:68px;white-space:nowrap">Good morning, SK</span>
+              <span class="home-greeting-text">Good morning, SK</span>
             </div>
 
-            <!-- Suggestion tags -->
-            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px">
+            <!-- Suggestion tag pills, left-aligned -->
+            <div class="home-tags">
               ${tags.map(t => `<span class="home-tag">${t}</span>`).join('')}
             </div>
 
-            <!-- Chat input -->
+            <!-- Chat input box: 120px tall, white, drop shadow -->
             <div class="home-input-box" id="home-input-box">
-              <textarea id="home-chat-input" placeholder="How can I help you today?" rows="2"></textarea>
-              <div style="display:flex;align-items:center;justify-content:space-between">
-                <button style="background:none;border:none;cursor:pointer;padding:0;color:var(--fg);display:flex;align-items:center;justify-content:center;width:16px;height:16px">
-                  <i class="ph ph-plus" style="font-size:14px"></i>
+              <textarea id="home-chat-input" placeholder="How can I help you today?"></textarea>
+              <div class="home-input-footer">
+                <button style="background:none;border:none;cursor:pointer;padding:0;color:var(--fg);display:flex;align-items:center;width:16px;height:16px">
+                  <i class="ph ph-plus" style="font-size:16px"></i>
                 </button>
-                <button id="home-chat-send" style="background:none;border:none;cursor:pointer;padding:0;color:var(--fg);display:flex;align-items:center;justify-content:center;width:16px;height:16px">
-                  <i class="ph ph-arrow-up" style="font-size:14px"></i>
+                <button id="home-chat-send" style="background:none;border:none;cursor:pointer;padding:0;color:var(--fg);display:flex;align-items:center;width:16px;height:16px">
+                  <i class="ph ph-arrow-up" style="font-size:16px"></i>
                 </button>
               </div>
             </div>
 
             <!-- Recent Activity -->
-            <div style="margin-top:0">
-              <div style="font-size:14px;color:var(--fg-muted);padding:8px;text-align:center;line-height:15px">Recent Activity</div>
-              <div class="home-activity-row">Summarize all active policies in the state of Florida</div>
-              <div class="home-activity-row">Review all existing claims that is related to slip and fall</div>
-              <div class="home-activity-row" style="display:flex;align-items:center;justify-content:space-between">
+            <div class="home-activity">
+              <div class="home-activity-label">Recent Activity</div>
+              <div class="home-activity-row"><span>Summarize all active policies in the state of Florida</span></div>
+              <div class="home-activity-row"><span>Review all existing claims that is related to slip and fall</span></div>
+              <div class="home-activity-row">
                 <span>Bobby mentioned you in <a href="#" data-nav="growth" style="color:#4b7174;text-decoration:underline">Submission: BDE Florida</a></span>
                 <i class="ph ph-check" style="font-size:14px;color:var(--fg-muted);flex-shrink:0;margin-left:8px"></i>
               </div>
             </div>
 
-            <!-- Metrics -->
-            <div style="display:flex;padding:16px">
+            <!-- 4-metric strip with left-border dividers -->
+            <div class="home-metrics">
               ${metrics.map(m => `
                 <div class="home-metric">
                   <div class="hm-label">${m.label}</div>
@@ -5567,8 +5606,8 @@
               `).join('')}
             </div>
 
-            <!-- Two lists -->
-            <div style="display:flex;gap:16px;padding:0 16px 16px">
+            <!-- Two lists side-by-side -->
+            <div class="home-lists">
               <div class="home-list">
                 <div class="home-list-hdr"><span>Appetite Guide</span></div>
                 ${listItems.map(a => `<div class="home-list-row">${a}</div>`).join('')}
@@ -7994,7 +8033,6 @@
           (State.page === 'chat' && t === 'chat') ||
           (State.page === 'applications' && t === 'applications') ||
           ((State.page === 'policies' || State.page === 'policy-detail') && t === 'policies') ||
-          (State.page === 'actuarial' && t === 'actuarial') ||
           (State.page === 'claims' && t === 'claims') ||
           (State.page === 'radar' && t === 'radar') ||
           ((State.page === 'growth' || State.page === 'detail') && t === 'growth'));
@@ -9081,7 +9119,7 @@
         if (!mapEl) return;
 
         radarMap = L.map('radar-map', { zoomControl: true, attributionControl: true })
-          .setView([27.95, -82.35], 9);
+          .setView([40.71, -74.01], 10);
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
           attribution: '© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/">CARTO</a>',
@@ -9278,6 +9316,36 @@ The Radar page shows a Leaflet.js map of the US with three overlay panels:
 - Alert severity filter: High (active), Extreme/Moderate/Minor (inactive)
 - Statistics: 1,000 exposures mapped | Average premium $258,786 | Total premium $258,786,000
 Coverage lines available: General Liability, Healthcare Providers Liability, Liquor Liability, Property, Professional Liability, Umbrella.`;
+
+      // ── AUTHENTIC UNDERWRITING GUIDELINES ─────────────────────────
+      ctx += `\n\n== AUTHENTIC SMALL COMMERCIAL UNDERWRITING GUIDELINES ==
+Contact: cole@authenticins.com | kyle@authenticins.com | 30 W 21st, Floor 6, New York NY 10010
+
+LIMITS OFFERED (Commercial Package Policy):
+- Commercial General Liability (all classes): Max $2M per occurrence / $4M aggregate
+- Liquor Liability: See guidelines
+- Hired Auto & Non-owned Auto Liability: All classes except Restaurant Delivery
+- Abuse and Molestation: $1M/$2M for Fitness Centers, Learning Centers, Restaurants, Retail
+- Employment Practices Liability: Up to $1M/$2M
+- Commercial Building & Business Personal Property: Restaurants, Retail, Fitness Centers, Learning Centers (No Habitational). Max TIV: $10M. Wind/Hail % deductibles up to 5% by ZIP. Brushfire Tier zones declined in CA.
+- Business Income & Extra Expense: Max = Actual Loss Sustained
+- Professional Liability: Max $1M/$2M. Only eligible classes (see below).
+
+GLOBAL RISK SELECTION / UNDERWRITING DECLINES:
+- Payroll per location > $15M (payroll-rated classes)
+- Revenue per location > $30M (sales-rated classes)
+- Declined or non-renewed for quality/misrepresentation in last 3 years
+- Coverage canceled/revoked/non-renewed in last 5 years (excl. non-payment)
+- Serious OSHA violations in past 3 years
+- Business-related lawsuits, mediations, or arbitrations filed against them
+- Customer aware of losses/circumstances that might give rise to a claim
+
+FORBIDDEN ACTIVITIES / EXCLUDED CLASSES:
+Construction work, artisan contractor, GC; Architects/engineers; Tree services; Transportation/public transit/shuttle; Trucking; Roofing/framing/siding/masonry/metal erection/welding; Snow plowing; Work >6ft depth or >30ft height; Blasting/demolition/wrecking; Dismantling buildings/vessels; Liquor stores; Pool work/lifeguarding; Security services; Janitorial in airports/bus stations/malls/hospitals/military bases; State/municipal/federal infrastructure work; Movers; Lumbering/logging; Subway/shaft/tunneling; Subaqueous work; Caisson/cofferdam/dam construction; Asbestos/dioxin/PCB exposure; Hazardous materials transport; Foundry/abrasive/sandblasting; Firearms work; Landlord/real estate agents; LNG/petroleum/mining; Explosives; Sawmills; Vacant buildings; Ambulance services; Building moving; Crane/rigging; Fireworks operators; Hot air balloon; Scaffolding; Tattoo/body piercing; Solar panel installation.
+
+PROFESSIONAL LIABILITY ELIGIBLE CLASSES:
+PL Endorsement to GL: Barber Shops & Beauty Salons, School-Beauty/Cosmetology/Hair/Barber, Florist Distributor/Shop, Dental Laboratory, Funeral Director, Hearing Aids Distributor/Store, Kennels, Optical Goods Distributor/Store, Optometrist, Pet Grooming (incl. Mobile), Photography Studio, Publisher w/ Printing, Printing/Screen Printing, Lawn Maintenance, Videography.
+Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court Reporter, Graphic Artists/Designers, Interpreter/Translator, Market Research Firm, Martial Arts Facility, Personal Trainer (Accredited), Photography Studio, Physical Fitness Facility, Stenographic/Secretarial, Travel Agency, Videography.`;
 
       // Active submission context (if user is on a submission detail page)
       const rec = (State.currentId && RECORDS[State.currentId]) ? RECORDS[State.currentId] : null;
