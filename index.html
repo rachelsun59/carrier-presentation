@@ -2936,6 +2936,94 @@
     .chat-typing span:nth-child(3) { animation-delay: .4s; }
     #chat-send.chat-send-active { color: var(--primary); }
 
+    /* ── Claims page ────────────────────────────────────────────── */
+    .claims-page { display:flex; flex-direction:column; gap:16px; }
+    .claims-breadcrumb { display:flex; align-items:center; gap:6px; }
+    .claims-tab-bar {
+      display:flex; gap:0; border-bottom:1px solid var(--border);
+      flex-shrink:0;
+    }
+    .claims-tab-btn {
+      padding:8px 12px; background:none; border:0; border-bottom:2px solid transparent;
+      margin-bottom:-1px; font:400 16px/22px var(--font); color:#868585;
+      cursor:pointer; transition:color .12s, border-color .12s;
+    }
+    .claims-tab-btn.active { font-weight:500; color:#3d3d3d; border-bottom-color:#cf5c3f; }
+
+    .claims-filter-row {
+      display:flex; align-items:center; gap:6px; flex-shrink:0;
+    }
+    .claims-select {
+      display:flex; align-items:center; gap:6px; padding:6px 10px;
+      border:1px solid #ebebeb; border-radius:4px; background:#fff;
+      font:400 14px/15px var(--font); color:#252424; cursor:pointer; white-space:nowrap;
+    }
+    .claims-select span { color:#868585; }
+    .claims-btn {
+      display:flex; align-items:center; gap:6px; padding:6px 12px;
+      border:1px solid #ebebeb; border-radius:4px; background:#fff;
+      font:400 14px/15px var(--font); color:#252424; cursor:pointer; white-space:nowrap;
+    }
+    .claims-btn:hover { background:#f5f5f5; }
+
+    .claims-recs {
+      background:#fbfbfb; border:1px solid #ebebeb; border-radius:10px;
+      padding:8px 16px 16px; display:flex; flex-direction:column; gap:10px; flex-shrink:0;
+    }
+    .claims-recs-header { display:flex; align-items:center; gap:8px; }
+    .claims-recs-title { font:400 20px/28px var(--font); color:#252424; flex:1; }
+    .claims-recs-pills { display:flex; flex-direction:column; gap:6px; }
+    .claims-rec-pill {
+      background:#ebebeb; border-radius:8px; padding:9px 12px;
+      font:400 14px/20px var(--font); color:#252424;
+    }
+
+    .claims-kpi-strip { display:flex; gap:0; flex-shrink:0; }
+    .claims-kpi {
+      flex:1; border-left:1px solid #ebebeb; padding:4px 4px 4px 10px;
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .claims-kpi:first-child { border-left:0; padding-left:0; }
+    .claims-kpi-val { font-family:var(--font-display); font-size:22px; line-height:26px; color:#252424; }
+    .claims-kpi-label { font:500 12px/14px var(--font); color:#252424; }
+    .claims-kpi-sub { font:400 10px/13px var(--font); color:#868585; }
+
+    .claims-charts-row { display:flex; gap:14px; flex-shrink:0; }
+    .claims-chart-panel {
+      flex:1; border:1px solid #ebebeb; border-radius:10px;
+      padding:14px 16px; display:flex; flex-direction:column; gap:10px;
+    }
+    .claims-chart-title { font:500 14px/20px var(--font); color:#252424; }
+    .claims-chart-area {
+      background:#f8fafc; border-radius:6px; height:220px; overflow:hidden;
+      display:flex; align-items:stretch;
+    }
+    .claims-chart-area svg { width:100%; height:100%; display:block; }
+    .claims-chart-legend { display:flex; gap:16px; flex-wrap:wrap; }
+    .legend-item { display:flex; align-items:center; gap:5px; font:400 10px/normal 'DM Sans',sans-serif; color:#868585; }
+    .legend-swatch { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+    .legend-line { width:20px; flex-shrink:0; }
+
+    .claims-tbl-wrap {
+      border:1px solid #ebebeb; border-radius:8px; overflow:hidden; flex-shrink:0;
+    }
+    .claims-tbl-header {
+      background:#fbfbfb; border-bottom:1px solid #ebebeb;
+      height:48px; display:flex; align-items:center; padding:0 16px;
+    }
+    .claims-tbl-title { font:500 16px/22px var(--font); color:#252424; }
+    .claims-table { width:100%; border-collapse:collapse; }
+    .claims-th {
+      background:#fbfbfb; border-bottom:1px solid #ebebeb;
+      padding:12px 16px; font:500 14px/15px var(--font); color:#252424;
+      white-space:nowrap; text-align:left;
+    }
+    .claims-td { padding:10px 16px; font:400 14px/15px var(--font); color:#252424; border-bottom:1px solid #f3f3f3; }
+    .claims-mono { font-family:'DM Mono',monospace; }
+    .claims-tbl-row { transition:background .1s; }
+    .claims-tbl-row:hover { background:#fbfbfb; }
+    .claims-tbl-row:last-child .claims-td { border-bottom:0; }
+
     /* ── Radar page ──────────────────────────────────────────────── */
     .main.radar-mode { padding: 0; position: relative; overflow: hidden; }
     .radar-wrap { position: relative; width: 100%; height: 100%; }
@@ -3044,6 +3132,40 @@
       cursor: pointer; transition: background .1s;
     }
     .radar-dropdown-item:hover { background: var(--bg-soft); }
+
+    /* Radar overlay panels (Layer / Alert Severity / Statistic) */
+    .radar-overlay-panel {
+      position: absolute; z-index: 800;
+      background: #fff; border: 1px solid #ebebeb; border-radius: 8px;
+      padding: 8px; display: flex; flex-direction: column; gap: 16px;
+      box-shadow: 0 4px 8px rgba(0,0,0,.04), 0 12px 28px rgba(255,255,255,.05);
+      pointer-events: auto; max-width: 210px; min-width: 180px;
+    }
+    .radar-overlay-label {
+      font: 500 14px/15px var(--font); color: #252424; padding: 4px 0 2px;
+    }
+    .radar-overlay-check-group { display: flex; flex-direction: column; gap: 0; }
+    .radar-overlay-check-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 8px; cursor: pointer;
+    }
+    .radar-overlay-checkbox {
+      width: 16px; height: 16px; border: 1.5px solid #868585;
+      border-radius: 4px; background: #fff; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .12s, border-color .12s;
+    }
+    .radar-overlay-checkbox.checked { background: var(--primary); border-color: var(--primary); }
+    .radar-overlay-checkbox.checked::after {
+      content: ''; display: block; width: 9px; height: 6px;
+      border-left: 2px solid #fff; border-bottom: 2px solid #fff;
+      transform: translateY(-1px) rotate(-45deg);
+    }
+    .radar-overlay-check-label { font: 500 14px/15px var(--font); color: #252424; }
+    .radar-stat-row {
+      font: 400 14px/15px var(--font); color: #252424;
+      padding: 2px 0;
+    }
     .radar-dropdown-item.selected { font-weight: 500; color: var(--primary); }
     .radar-icon-btn {
       background: none; border: 1px solid #ebebeb; border-radius: 4px;
@@ -3285,6 +3407,8 @@
       policyId: null,
       policyTab: 'overview',
       agentChatOpen: false,
+      claimsTab:     'total',
+      claimsAccount: null,
     };
 
     // Home queue — sorted by urgency (Today first), per Figma 2:1829.
@@ -4488,12 +4612,358 @@
     }
 
     function renderRenewals() { return renderPlaceholder('Renewals', 'arrows-clockwise'); }
-    function renderClaims()   { return renderPlaceholder('Claims', 'warning-circle'); }
+
+    // ── Claims page data ──────────────────────────────────────────
+    const CLAIMS_PORT_PERIODS = [
+      { label:'2021', premium:8.2,  lr:0.58, open:8,  closed:45 },
+      { label:'2022', premium:8.9,  lr:0.62, open:11, closed:52 },
+      { label:'2023', premium:10.1, lr:0.55, open:15, closed:48 },
+      { label:'2024', premium:11.3, lr:0.51, open:13, closed:55 },
+      { label:'2025', premium:12.8, lr:0.48, open:18, closed:61 },
+      { label:'YTD',  premium:6.4,  lr:0.44, open:22, closed:28 },
+    ];
+    const CLAIMS_PORT_ACCTS = [
+      { label:'Hilbgrocery',    val:9.31, display:'$9.31M' },
+      { label:'RT Restaurants', val:7.82, display:'$7.82M' },
+      { label:'Hub CA',         val:5.43, display:'$5.43M' },
+      { label:'Hub SMB',        val:4.29, display:'$4.29M' },
+      { label:'IMA-RRMA',       val:3.87, display:'$3.87M' },
+      { label:'Unleashed',      val:2.44, display:'$2.44M' },
+    ];
+    const CLAIMS_PORT_STATES = [
+      { label:'CA', val:14.2, display:'$14.2M' },
+      { label:'TX', val:8.6,  display:'$8.6M'  },
+      { label:'FL', val:5.3,  display:'$5.3M'  },
+      { label:'NY', val:4.1,  display:'$4.1M'  },
+      { label:'IL', val:1.0,  display:'$1.0M'  },
+    ];
+    const CLAIMS_ACCT_ROWS = [
+      { id:'hilbgrocery',   name:'Hilbgrocery',   product:'General Liability',      policies:12, prem:'$9.31M', incurred:'$4.82M', open:59, closed:28, lr:52.3 },
+      { id:'hubca',         name:'Hub CA',         product:'Workers Comp',           policies:8,  prem:'$5.43M', incurred:'$3.85M', open:43, closed:19, lr:70.9 },
+      { id:'ima-rrma',      name:'IMA-RRMA',       product:'General Liability',      policies:6,  prem:'$3.87M', incurred:'$2.02M', open:31, closed:24, lr:52.1 },
+      { id:'rtrestaurants', name:'RT Restaurants', product:'Liquor Liability',       policies:14, prem:'$7.82M', incurred:'$5.03M', open:71, closed:31, lr:64.4 },
+      { id:'hubsmb',        name:'Hub SMB',        product:'General Liability',      policies:9,  prem:'$4.29M', incurred:'$3.04M', open:37, closed:22, lr:70.9 },
+      { id:'unleashed',     name:'Unleashed',      product:'Professional Liability', policies:5,  prem:'$2.44M', incurred:'$1.45M', open:22, closed:18, lr:59.4 },
+    ];
+    const CLAIMS_DETAIL_DATA = {
+      hilbgrocery: {
+        name:'Hilbgrocery',
+        kpi:{ prem:'$9.31M', incurred:'$4.82M', open:59, closed:28, ibnr:'$2.52M', lr:'52.3%' },
+        recs:[
+          'Slip & fall incidents in produce section — 3 repeat locations identified, recommend targeted safety audit.',
+          'Escalate 2 open claims exceeding $500K threshold to senior adjuster for reserve adequacy review.',
+          'Schedule on-site safety inspection for distribution centers with highest claim frequency in Q2 2026.',
+        ],
+        periods:[
+          { label:'Jan', premium:1.55, lr:0.465, open:8,  closed:4 },
+          { label:'Feb', premium:1.55, lr:0.523, open:10, closed:4 },
+          { label:'Mar', premium:1.55, lr:0.503, open:9,  closed:2 },
+          { label:'Apr', premium:1.55, lr:0.594, open:12, closed:4 },
+          { label:'May', premium:1.55, lr:0.542, open:10, closed:4 },
+          { label:'Jun', premium:1.55, lr:0.484, open:10, closed:0 },
+        ],
+        monthly:[
+          { month:'Jan 2026', reported:12, open:8,  closed:4, incurred:'$0.72M', paid:'$0.38M', reserved:'$0.34M', lr:'46.5%' },
+          { month:'Feb 2026', reported:14, open:10, closed:4, incurred:'$0.81M', paid:'$0.42M', reserved:'$0.39M', lr:'52.3%' },
+          { month:'Mar 2026', reported:11, open:9,  closed:2, incurred:'$0.78M', paid:'$0.35M', reserved:'$0.43M', lr:'50.3%' },
+          { month:'Apr 2026', reported:16, open:12, closed:4, incurred:'$0.92M', paid:'$0.48M', reserved:'$0.44M', lr:'59.4%' },
+          { month:'May 2026', reported:14, open:10, closed:4, incurred:'$0.84M', paid:'$0.41M', reserved:'$0.43M', lr:'54.2%' },
+          { month:'Jun 2026', reported:10, open:10, closed:0, incurred:'$0.75M', paid:'$0.31M', reserved:'$0.44M', lr:'48.4%' },
+        ],
+      },
+    };
+
+    // ── Claims SVG / HTML chart helpers ───────────────────────────
+    function claimsComboSvg(periods, targetLr) {
+      const W=480,H=180,pL=44,pR=20,pT=14,pB=26;
+      const cW=W-pL-pR, cH=H-pT-pB, n=periods.length;
+      const maxP=Math.max(...periods.map(p=>p.premium));
+      const xc=i=>pL+(i+0.5)*(cW/n);
+      const yP=v=>pT+cH-(v/maxP)*cH;
+      const yL=v=>pT+cH-v*cH;
+      const bW=((cW/n)-6).toFixed(1);
+      const bars=periods.map((p,i)=>{
+        const x=(pL+i*(cW/n)+3).toFixed(1);
+        const bh=((p.premium/maxP)*cH).toFixed(1);
+        const y=(pT+cH-(p.premium/maxP)*cH).toFixed(1);
+        return `<rect x="${x}" y="${y}" width="${bW}" height="${bh}" fill="#bdd0d2" rx="2"/>`;
+      }).join('');
+      const pts=periods.map((p,i)=>`${xc(i).toFixed(1)},${yL(p.lr).toFixed(1)}`).join(' ');
+      const dots=periods.map((p,i)=>`<circle cx="${xc(i).toFixed(1)}" cy="${yL(p.lr).toFixed(1)}" r="3" fill="#cf5c3f"/>`).join('');
+      const ty=yL(targetLr).toFixed(1);
+      const xl=periods.map((p,i)=>`<text x="${xc(i).toFixed(1)}" y="${H-5}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#868585">${p.label}</text>`).join('');
+      return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${H}" fill="#f8fafc"/>${bars}<line x1="${pL}" y1="${ty}" x2="${W-pR}" y2="${ty}" stroke="#868585" stroke-width="1.5" stroke-dasharray="5,3"/><polyline points="${pts}" fill="none" stroke="#cf5c3f" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${dots}${xl}</svg>`;
+    }
+
+    function claimsStackedSvg(periods) {
+      const W=480,H=180,pL=44,pR=20,pT=14,pB=26;
+      const cW=W-pL-pR, cH=H-pT-pB, n=periods.length;
+      const maxT=Math.max(...periods.map(p=>p.open+p.closed));
+      const bW=((cW/n)-6).toFixed(1);
+      const bars=periods.map((p,i)=>{
+        const x=(pL+i*(cW/n)+3).toFixed(1);
+        const ch=((p.closed/maxT)*cH).toFixed(1);
+        const cy=(pT+cH-(p.closed/maxT)*cH).toFixed(1);
+        const oh=((p.open/maxT)*cH).toFixed(1);
+        const oy=(pT+cH-(p.closed/maxT)*cH-(p.open/maxT)*cH).toFixed(1);
+        return `<rect x="${x}" y="${cy}" width="${bW}" height="${ch}" fill="#afccef" rx="2"/><rect x="${x}" y="${oy}" width="${bW}" height="${oh}" fill="#2e69ae" rx="2"/>`;
+      }).join('');
+      const xc=i=>pL+(i+0.5)*(cW/n);
+      const xl=periods.map((p,i)=>`<text x="${xc(i).toFixed(1)}" y="${H-5}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#868585">${p.label}</text>`).join('');
+      return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${H}" fill="#f8fafc"/>${bars}${xl}</svg>`;
+    }
+
+    function claimsHorizBarsHtml(items, color) {
+      const max=Math.max(...items.map(i=>i.val));
+      return items.map(item=>{
+        const pct=(item.val/max*100).toFixed(1);
+        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><div style="width:90px;font:400 10px/normal 'DM Sans',sans-serif;color:#868585;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.label}</div><div style="flex:1;height:14px;background:#ebebeb;border-radius:3px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${color};border-radius:3px;"></div></div><div style="width:48px;font:400 10px/normal 'DM Mono',monospace;color:#252424;flex-shrink:0;">${item.display}</div></div>`;
+      }).join('');
+    }
+
+    // ── Claims render functions ────────────────────────────────────
+    function renderClaimsTotal() {
+      const recs = [
+        'Slip & fall frequency is 18% above the portfolio average — initiate targeted risk control outreach.',
+        'RT Restaurants loss ratio trending toward breach (64.4%) — recommend renewal terms review.',
+        '3 claims aged 18+ months without reserve movement — escalate for reserve adequacy assessment.',
+        'Hub CA WC severity spike in Q2 2026 (+32%) warrants on-site safety consultation.',
+      ];
+      const comboSvg   = claimsComboSvg(CLAIMS_PORT_PERIODS, 0.55);
+      const stackedSvg = claimsStackedSvg(CLAIMS_PORT_PERIODS);
+      const acctBars   = claimsHorizBarsHtml(CLAIMS_PORT_ACCTS,  '#4b7174');
+      const stateBars  = claimsHorizBarsHtml(CLAIMS_PORT_STATES, '#2e69ae');
+      return `
+        <div class="claims-filter-row">
+          <div class="claims-select"><span>Year:</span> 2026 <i class="ph ph-caret-down" style="font-size:12px;margin-left:2px"></i></div>
+          <div class="claims-select"><span>Line:</span> All Lines <i class="ph ph-caret-down" style="font-size:12px;margin-left:2px"></i></div>
+          <div class="claims-select"><span>Account:</span> All Accounts <i class="ph ph-caret-down" style="font-size:12px;margin-left:2px"></i></div>
+          <div style="flex:1"></div>
+          <button class="claims-btn"><i class="ph ph-download-simple" style="font-size:14px"></i> Export</button>
+        </div>
+        <div class="claims-recs">
+          <div class="claims-recs-header">
+            <i class="ph ph-lightbulb-filament" style="font-size:20px;color:#cf5c3f"></i>
+            <span class="claims-recs-title">Recommendations</span>
+          </div>
+          <div class="claims-recs-pills">
+            ${recs.map(r=>`<div class="claims-rec-pill">${r}</div>`).join('')}
+          </div>
+        </div>
+        <div class="claims-kpi-strip">
+          <div class="claims-kpi"><div class="claims-kpi-val">$33.2M</div><div class="claims-kpi-label">Earned Premium</div><div class="claims-kpi-sub">YTD 2026</div></div>
+          <div class="claims-kpi"><div class="claims-kpi-val">$17.1M</div><div class="claims-kpi-label">Total Incurred</div><div class="claims-kpi-sub">YTD 2026</div></div>
+          <div class="claims-kpi"><div class="claims-kpi-val">263 / 142</div><div class="claims-kpi-label">Open / Closed Claims</div><div class="claims-kpi-sub">YTD 2026</div></div>
+          <div class="claims-kpi"><div class="claims-kpi-val">$8.3M</div><div class="claims-kpi-label">Total IBNR</div><div class="claims-kpi-sub">Estimated</div></div>
+          <div class="claims-kpi"><div class="claims-kpi-val" style="color:#cf5c3f">51.5%</div><div class="claims-kpi-label">Portfolio Loss Ratio</div><div class="claims-kpi-sub">Target: 55.0%</div></div>
+        </div>
+        <div class="claims-charts-row">
+          <div class="claims-chart-panel">
+            <div class="claims-chart-title">Earned Premium vs. Loss Ratio</div>
+            <div class="claims-chart-area">${comboSvg}</div>
+            <div class="claims-chart-legend">
+              <div class="legend-item"><div class="legend-swatch" style="background:#bdd0d2"></div>Earned Premium</div>
+              <div class="legend-item"><svg class="legend-line" height="10"><line x1="0" y1="5" x2="20" y2="5" stroke="#cf5c3f" stroke-width="2"/></svg>Loss Ratio</div>
+              <div class="legend-item"><svg class="legend-line" height="10"><line x1="0" y1="5" x2="20" y2="5" stroke="#868585" stroke-width="1.5" stroke-dasharray="4,3"/></svg>Target LR</div>
+            </div>
+          </div>
+          <div class="claims-chart-panel">
+            <div class="claims-chart-title">Open vs. Closed Claims</div>
+            <div class="claims-chart-area">${stackedSvg}</div>
+            <div class="claims-chart-legend">
+              <div class="legend-item"><div class="legend-swatch" style="background:#2e69ae"></div>Open</div>
+              <div class="legend-item"><div class="legend-swatch" style="background:#afccef"></div>Closed</div>
+            </div>
+          </div>
+        </div>
+        <div class="claims-charts-row">
+          <div class="claims-chart-panel">
+            <div class="claims-chart-title">Earned Premium by Account</div>
+            <div style="padding:14px 8px 6px;">${acctBars}</div>
+          </div>
+          <div class="claims-chart-panel">
+            <div class="claims-chart-title">Earned Premium by State</div>
+            <div style="padding:14px 8px 6px;">${stateBars}</div>
+          </div>
+        </div>`;
+    }
+
+    function renderClaimsAccountTable() {
+      const lrBadge = lr => {
+        const ok = lr < 62;
+        return `<span style="display:inline-block;background:${ok?'#e8f5e9':'#fce4ec'};color:${ok?'#2e7d32':'#c62828'};border-radius:4px;padding:2px 8px;font-size:12px;font-weight:500;">${lr.toFixed(1)}%</span>`;
+      };
+      const rows = CLAIMS_ACCT_ROWS.map(r=>`
+        <tr class="claims-tbl-row" data-claims-account="${r.id}" style="cursor:pointer">
+          <td class="claims-td" style="font-weight:500">${r.name}</td>
+          <td class="claims-td">${r.product}</td>
+          <td class="claims-td claims-mono">${r.policies}</td>
+          <td class="claims-td claims-mono">${r.prem}</td>
+          <td class="claims-td claims-mono">${r.incurred}</td>
+          <td class="claims-td claims-mono">${r.open}</td>
+          <td class="claims-td claims-mono">${r.closed}</td>
+          <td class="claims-td">${lrBadge(r.lr)}</td>
+        </tr>`).join('');
+      return `
+        <div class="claims-tbl-wrap">
+          <div class="claims-tbl-header"><span class="claims-tbl-title">All Accounts</span></div>
+          <table class="claims-table">
+            <thead><tr>
+              <th class="claims-th">Account</th>
+              <th class="claims-th">Primary Product</th>
+              <th class="claims-th claims-mono">Policies</th>
+              <th class="claims-th claims-mono">Earned Prem</th>
+              <th class="claims-th claims-mono">Total Incurred</th>
+              <th class="claims-th claims-mono">Open Claims</th>
+              <th class="claims-th claims-mono">Closed Claims</th>
+              <th class="claims-th">Loss Ratio</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }
+
+    function renderClaimsDetail(accountId) {
+      const d = CLAIMS_DETAIL_DATA[accountId] || CLAIMS_DETAIL_DATA['hilbgrocery'];
+      const comboSvg   = claimsComboSvg(d.periods, 0.55);
+      const stackedSvg = claimsStackedSvg(d.periods);
+      const tableRows = d.monthly.map(m=>`
+        <tr class="claims-tbl-row">
+          <td class="claims-td">${m.month}</td>
+          <td class="claims-td claims-mono">${m.reported}</td>
+          <td class="claims-td claims-mono">${m.open}</td>
+          <td class="claims-td claims-mono">${m.closed}</td>
+          <td class="claims-td claims-mono">${m.incurred}</td>
+          <td class="claims-td claims-mono">${m.paid}</td>
+          <td class="claims-td claims-mono">${m.reserved}</td>
+          <td class="claims-td">${m.lr}</td>
+        </tr>`).join('');
+      return `
+        <div class="claims-page">
+          <div class="claims-breadcrumb">
+            <button id="claims-breadcrumb" style="background:none;border:0;padding:0;color:#868585;font:400 14px/20px var(--font);cursor:pointer;text-decoration:underline;">Claims</button>
+            <i class="ph ph-caret-right" style="font-size:12px;color:#868585"></i>
+            <span style="font:500 14px/20px var(--font);color:#252424">${d.name}</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-shrink:0">
+            <div style="font-family:var(--font-display);font-size:24px;line-height:32px;color:#252424">${d.name}</div>
+            <div class="claims-recs" style="max-width:400px;flex-shrink:0">
+              <div class="claims-recs-header">
+                <i class="ph ph-lightbulb-filament" style="font-size:18px;color:#cf5c3f"></i>
+                <span style="font:500 14px/20px var(--font);color:#252424">Recommendations</span>
+              </div>
+              <div class="claims-recs-pills">
+                ${d.recs.map(r=>`<div class="claims-rec-pill">${r}</div>`).join('')}
+              </div>
+            </div>
+          </div>
+          <div class="claims-kpi-strip">
+            <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.prem}</div><div class="claims-kpi-label">Earned Premium</div><div class="claims-kpi-sub">YTD 2026</div></div>
+            <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.incurred}</div><div class="claims-kpi-label">Total Incurred</div><div class="claims-kpi-sub">YTD 2026</div></div>
+            <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.open} / ${d.kpi.closed}</div><div class="claims-kpi-label">Open / Closed</div><div class="claims-kpi-sub">Claims YTD</div></div>
+            <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.ibnr}</div><div class="claims-kpi-label">Estimated IBNR</div><div class="claims-kpi-sub">As of Jun 2026</div></div>
+            <div class="claims-kpi"><div class="claims-kpi-val" style="color:#cf5c3f">${d.kpi.lr}</div><div class="claims-kpi-label">Loss Ratio</div><div class="claims-kpi-sub">Target: 55.0%</div></div>
+          </div>
+          <div class="claims-charts-row">
+            <div class="claims-chart-panel">
+              <div class="claims-chart-title">Monthly Earned Premium vs. Loss Ratio</div>
+              <div class="claims-chart-area">${comboSvg}</div>
+              <div class="claims-chart-legend">
+                <div class="legend-item"><div class="legend-swatch" style="background:#bdd0d2"></div>Earned Premium</div>
+                <div class="legend-item"><svg class="legend-line" height="10"><line x1="0" y1="5" x2="20" y2="5" stroke="#cf5c3f" stroke-width="2"/></svg>Loss Ratio</div>
+                <div class="legend-item"><svg class="legend-line" height="10"><line x1="0" y1="5" x2="20" y2="5" stroke="#868585" stroke-width="1.5" stroke-dasharray="4,3"/></svg>Target LR</div>
+              </div>
+            </div>
+            <div class="claims-chart-panel">
+              <div class="claims-chart-title">Monthly Open vs. Closed Claims</div>
+              <div class="claims-chart-area">${stackedSvg}</div>
+              <div class="claims-chart-legend">
+                <div class="legend-item"><div class="legend-swatch" style="background:#2e69ae"></div>Open</div>
+                <div class="legend-item"><div class="legend-swatch" style="background:#afccef"></div>Closed</div>
+              </div>
+            </div>
+          </div>
+          <div class="claims-tbl-wrap">
+            <div class="claims-tbl-header"><span class="claims-tbl-title">Monthly Details</span></div>
+            <table class="claims-table">
+              <thead><tr>
+                <th class="claims-th">Month</th>
+                <th class="claims-th claims-mono">Reported</th>
+                <th class="claims-th claims-mono">Open</th>
+                <th class="claims-th claims-mono">Closed</th>
+                <th class="claims-th claims-mono">Incurred</th>
+                <th class="claims-th claims-mono">Paid</th>
+                <th class="claims-th claims-mono">Reserved</th>
+                <th class="claims-th">LR</th>
+              </tr></thead>
+              <tbody>${tableRows}</tbody>
+            </table>
+          </div>
+        </div>`;
+    }
+
+    function renderClaims() {
+      if (State.claimsAccount) return renderClaimsDetail(State.claimsAccount);
+      const tab = State.claimsTab;
+      return `
+        <div class="claims-page">
+          <div class="claims-tab-bar">
+            <button class="claims-tab-btn ${tab==='total'?'active':''}" data-ctab="total">Total Portfolio</button>
+            <button class="claims-tab-btn ${tab==='account'?'active':''}" data-ctab="account">Account Performance</button>
+          </div>
+          ${tab === 'total' ? renderClaimsTotal() : renderClaimsAccountTable()}
+        </div>`;
+    }
     function renderRadar() {
       const products = ['General Liability','Healthcare Providers Liability','Liquor Liability','Property','Professional Liability','Umbrella'];
       return `
         <div class="radar-wrap">
           <div id="radar-map"></div>
+
+          <!-- Layer selector panel (top-right) -->
+          <div class="radar-overlay-panel" style="top:28px;right:16px">
+            <div class="radar-overlay-check-group">
+              ${[
+                {id:'layer-exposures', label:'Exposures', checked:true},
+                {id:'layer-alerts',    label:'Alerts',    checked:true},
+                {id:'layer-zipcodes',  label:'Zip Codes', checked:true},
+                {id:'layer-states',    label:'States',    checked:false},
+                {id:'layer-weather',   label:'Weather',   checked:false},
+              ].map(item=>`
+              <label class="radar-overlay-check-row">
+                <div class="radar-overlay-checkbox ${item.checked?'checked':''}"></div>
+                <span class="radar-overlay-check-label">${item.label}</span>
+              </label>`).join('')}
+            </div>
+          </div>
+
+          <!-- Alert Severity panel (middle-right) -->
+          <div class="radar-overlay-panel" style="top:220px;right:16px">
+            <div class="radar-overlay-check-group">
+              <div class="radar-overlay-label">Alert Severity</div>
+              ${[
+                {label:'Extreme (red)',    checked:false},
+                {label:'High (orange)',    checked:true},
+                {label:'Moderate (yellow)',checked:false},
+                {label:'Minor (blue)',     checked:false},
+              ].map(item=>`
+              <label class="radar-overlay-check-row">
+                <div class="radar-overlay-checkbox ${item.checked?'checked':''}"></div>
+                <span class="radar-overlay-check-label">${item.label}</span>
+              </label>`).join('')}
+            </div>
+          </div>
+
+          <!-- Statistic panel (bottom-right) -->
+          <div class="radar-overlay-panel" style="bottom:36px;right:16px">
+            <div class="radar-overlay-check-group">
+              <div class="radar-overlay-label">Statistic</div>
+              <div class="radar-stat-row">Exposure: 560</div>
+              <div class="radar-stat-row">Average Premium: $59,203</div>
+              <div class="radar-stat-row">Total Premium: $10,092,803</div>
+            </div>
+          </div>
+
           <div class="radar-filter">
             <div class="radar-filter-header">
               <i class="ph ph-funnel" style="font-size:16px;color:#868585;flex-shrink:0"></i>
@@ -7540,6 +8010,31 @@ Need by: ${s.needBy || ''}`;
           });
           document.addEventListener('click', () => { if (statusMenu) statusMenu.style.display = 'none'; });
         }
+      }
+
+      // Claims page
+      if (State.page === 'claims') {
+        // Tab switching
+        document.querySelectorAll('[data-ctab]').forEach(btn => {
+          btn.onclick = () => {
+            State.claimsTab = btn.dataset.ctab;
+            State.claimsAccount = null;
+            render();
+          };
+        });
+        // Account row click → detail view
+        document.querySelectorAll('[data-claims-account]').forEach(row => {
+          row.onclick = () => {
+            State.claimsAccount = row.dataset.claimsAccount;
+            render();
+          };
+        });
+        // Breadcrumb back
+        const breadcrumb = document.getElementById('claims-breadcrumb');
+        if (breadcrumb) breadcrumb.onclick = () => {
+          State.claimsAccount = null;
+          render();
+        };
       }
 
       // Make Decision (replaces Status Update) — both the title-row button
