@@ -8075,6 +8075,75 @@
     function agentBuildSystemPrompt() {
       const rec = (State.currentId && RECORDS[State.currentId]) ? RECORDS[State.currentId] : null;
       let ctx = `You are an AI assistant embedded in Authentic Insurance's underwriting platform. You help underwriters quickly understand submissions, flag risks, and answer insurance-related questions. Be concise, direct, and professional. Format lists with bullet points when helpful.\n\nCurrent page: ${State.page}`;
+
+      // ── Claims page context ────────────────────────────────────
+      if (State.page === 'claims') {
+        ctx += `\n\n== PORTFOLIO SUMMARY (YTD 2026) ==
+Earned Premium: $34.5M | Total Incurred: $5.47M | Est. Ultimate: $19.7M | IBNR: $14.2M
+Open Claims: 336 | Closed Claims: 786 | Total Claims: 1,122
+Portfolio Loss Ratio: 57.1% | Target LR: 60.0%
+
+== TOP 10 STATES BY EARNED PREMIUM ==
+NY $9.32M (LR 49.1%, 78 claims, 37 open)
+FL $6.28M (LR 58.0%, 175 claims, 61 open)
+CA $2.90M (LR 59.0%, 83 claims, 32 open)
+TX $2.45M (LR 55.7%, 76 claims, 24 open)
+NJ $1.65M (LR 63.4%, 27 claims, 8 open)
+GA $1.08M (LR 56.2%, 50 claims, 15 open)
+CT $0.87M (LR 61.5%, 32 claims, 12 open)
+PA $0.82M (LR 67.6%, 138 claims, 18 open)
+TN $0.55M (LR 54.9%, 22 claims, 9 open)
+MO $0.53M (LR 57.0%, 14 claims, 3 open)
+
+== MONTHLY TREND (Jul-25 → Jun-26) ==
+Jul-25: Earned $0.94M, LR 55.3%, 3 open / 18 closed
+Aug-25: Earned $1.19M, LR 70.0%, 7 open / 29 closed
+Sep-25: Earned $1.28M, LR 59.3%, 4 open / 28 closed
+Oct-25: Earned $1.54M, LR 59.4%, 9 open / 33 closed
+Nov-25: Earned $1.75M, LR 53.8%, 10 open / 28 closed
+Dec-25: Earned $2.25M, LR 60.9%, 20 open / 47 closed
+Jan-26: Earned $2.71M, LR 62.8%, 27 open / 62 closed
+Feb-26: Earned $2.78M, LR 59.8%, 26 open / 67 closed
+Mar-26: Earned $3.47M, LR 58.6%, 42 open / 75 closed
+Apr-26: Earned $3.73M, LR 53.5%, 34 open / 51 closed
+May-26: Earned $4.67M, LR 57.6%, 63 open / 117 closed
+Jun-26: Earned $5.22M, LR 53.8%, 84 open / 167 closed
+
+== ALL 15 BUILDS (sorted by GWP) ==
+Build | GWP | Earned | Open/Total Claims | Incurred | Est. Ultimate | LR
+hilbgrocery    | $9.31M | $4.82M | 28/59  | $417K  | $2.52M | 52.3% ✓
+hubca          | $8.05M | $4.51M | 62/207 | $925K  | $2.98M | 66.0% ⚠
+ima-rrma       | $7.35M | $1.21M | 3/3    | $6K    | $597K  | 49.4% ✓
+rtrestaurants  | $5.58M | $1.95M | 14/18  | $168K  | $1.08M | 55.3% ✓
+alliantgrocery | $5.11M | $1.36M | 9/213  | $25K   | $668K  | 49.0% ✓
+hubsmb         | $3.23M | $1.51M | 12/41  | $400K  | $1.07M | 70.9% ⚠
+unleashed      | $3.01M | $2.31M | 21/91  | $582K  | $1.37M | 59.4% ✓
+gallagher      | $2.60M | $0.66M | 6/9    | $41K   | $354K  | 53.4% ✓
+mcgriff        | $2.21M | $0.99M | 23/44  | $176K  | $639K  | 64.4% ⚠
+mindbody       | $2.19M | $1.52M | 5/23   | $459K  | $927K  | 60.8% ⚠
+borg           | $2.10M | $1.15M | 12/18  | $247K  | $608K  | 53.1% ✓
+alliantsmb     | $2.01M | $0.27M | 3/3    | $1K    | $129K  | 48.5% ✓
+morstan        | $2.00M | $1.08M | 5/7    | $25K   | $440K  | 40.9% ✓
+pushpress      | $1.77M | $1.23M | 0/5    | $32K   | $423K  | 34.5% ✓
+withcoverage   | $1.76M | $0.90M | 8/19   | $57K   | $431K  | 48.0% ✓
+(✓ = below 60% target, ⚠ = above target)`;
+
+        // Active build detail
+        if (State.claimsAccount && CLAIMS_DETAIL_DATA[State.claimsAccount]) {
+          const d = CLAIMS_DETAIL_DATA[State.claimsAccount];
+          ctx += `\n\n== ACTIVE BUILD: ${d.name.toUpperCase()} ==
+Earned Premium: ${d.kpi.prem} | Incurred: ${d.kpi.incurred} | IBNR: ${d.kpi.ibnr} | LR: ${d.kpi.lr}
+Open Claims: ${d.kpi.open} | Closed Claims: ${d.kpi.closed}
+Recommendations:`;
+          d.recs.forEach((r, i) => { ctx += `\n  ${i+1}. ${r}`; });
+          ctx += '\nMonthly detail (Jan–Jun 2026):';
+          d.monthly.forEach(m => {
+            ctx += `\n  ${m.month}: ${m.reported} reported, ${m.open} open, ${m.closed} closed, incurred ${m.incurred}, paid ${m.paid}, est. ultimate ${m.reserved}, LR ${m.lr}`;
+          });
+        }
+      }
+
+      // ── Submission context ─────────────────────────────────────
       if (rec) {
         const s = rec;
         ctx += `\n\nActive submission: ${s.name || ''}
