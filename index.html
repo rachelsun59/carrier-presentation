@@ -9485,7 +9485,7 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
 
       // If this is the first message, switch to conversation view
       if (chatConversation.length === 1) {
-        render();   // re-renders chat page with #chat-messages container
+        render();   // re-renders chat page with #chat-messages container (already shows user msg)
         // re-grab refs after re-render
         const newTA  = document.getElementById('chat-textarea');
         const newBtn = document.getElementById('chat-send');
@@ -9494,16 +9494,15 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
       } else {
         ta.value = '';
         if (btn) btn.disabled = true;
-      }
-
-      // Append user bubble
-      const msgContainer = document.getElementById('chat-messages');
-      if (msgContainer) {
-        const u = document.createElement('div');
-        u.className = 'chat-msg user';
-        u.textContent = text;
-        msgContainer.appendChild(u);
-        msgContainer.scrollTop = msgContainer.scrollHeight;
+        // Append user bubble (render() already handled it for the first message)
+        const msgContainer = document.getElementById('chat-messages');
+        if (msgContainer) {
+          const u = document.createElement('div');
+          u.className = 'chat-msg user';
+          u.textContent = text;
+          msgContainer.appendChild(u);
+          msgContainer.scrollTop = msgContainer.scrollHeight;
+        }
       }
 
       // Typing indicator
