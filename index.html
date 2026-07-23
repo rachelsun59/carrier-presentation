@@ -4615,60 +4615,494 @@
 
     // ── Claims page data ──────────────────────────────────────────
     const CLAIMS_PORT_PERIODS = [
-      { label:'2021', premium:8.2,  lr:0.58, open:8,  closed:45 },
-      { label:'2022', premium:8.9,  lr:0.62, open:11, closed:52 },
-      { label:'2023', premium:10.1, lr:0.55, open:15, closed:48 },
-      { label:'2024', premium:11.3, lr:0.51, open:13, closed:55 },
-      { label:'2025', premium:12.8, lr:0.48, open:18, closed:61 },
-      { label:'YTD',  premium:6.4,  lr:0.44, open:22, closed:28 },
+      { label:'Jul-25', premium:0.941, lr:0.553, open:3,  closed:18  },
+      { label:'Aug-25', premium:1.189, lr:0.700, open:7,  closed:29  },
+      { label:'Sep-25', premium:1.275, lr:0.593, open:4,  closed:28  },
+      { label:'Oct-25', premium:1.540, lr:0.594, open:9,  closed:33  },
+      { label:'Nov-25', premium:1.745, lr:0.538, open:10, closed:28  },
+      { label:'Dec-25', premium:2.247, lr:0.609, open:20, closed:47  },
+      { label:'Jan-26', premium:2.713, lr:0.628, open:27, closed:62  },
+      { label:'Feb-26', premium:2.775, lr:0.598, open:26, closed:67  },
+      { label:'Mar-26', premium:3.466, lr:0.586, open:42, closed:75  },
+      { label:'Apr-26', premium:3.727, lr:0.535, open:34, closed:51  },
+      { label:'May-26', premium:4.669, lr:0.576, open:63, closed:117 },
+      { label:'Jun-26', premium:5.223, lr:0.538, open:84, closed:167 },
     ];
     const CLAIMS_PORT_ACCTS = [
-      { label:'Hilbgrocery',    val:9.31, display:'$9.31M' },
-      { label:'RT Restaurants', val:7.82, display:'$7.82M' },
-      { label:'Hub CA',         val:5.43, display:'$5.43M' },
-      { label:'Hub SMB',        val:4.29, display:'$4.29M' },
-      { label:'IMA-RRMA',       val:3.87, display:'$3.87M' },
-      { label:'Unleashed',      val:2.44, display:'$2.44M' },
+      { label:'hilbgrocery',    val:4.817, display:'$4.82M' },
+      { label:'hubca',          val:4.509, display:'$4.51M' },
+      { label:'unleashed',      val:2.305, display:'$2.31M' },
+      { label:'rtrestaurants',  val:1.954, display:'$1.95M' },
+      { label:'mindbody',       val:1.524, display:'$1.52M' },
+      { label:'hubsmb',         val:1.508, display:'$1.51M' },
+      { label:'alliantgrocery', val:1.364, display:'$1.36M' },
+      { label:'borg',           val:1.146, display:'$1.15M' },
+      { label:'morstan',        val:1.078, display:'$1.08M' },
+      { label:'mcgriff',        val:0.991, display:'$0.99M' },
     ];
     const CLAIMS_PORT_STATES = [
-      { label:'CA', val:14.2, display:'$14.2M' },
-      { label:'TX', val:8.6,  display:'$8.6M'  },
-      { label:'FL', val:5.3,  display:'$5.3M'  },
-      { label:'NY', val:4.1,  display:'$4.1M'  },
-      { label:'IL', val:1.0,  display:'$1.0M'  },
+      { label:'NY', val:9.318, display:'$9.32M' },
+      { label:'FL', val:6.279, display:'$6.28M' },
+      { label:'CA', val:2.899, display:'$2.90M' },
+      { label:'TX', val:2.447, display:'$2.45M' },
+      { label:'NJ', val:1.646, display:'$1.65M' },
+      { label:'GA', val:1.080, display:'$1.08M' },
+      { label:'CT', val:0.872, display:'$0.87M' },
+      { label:'PA', val:0.819, display:'$0.82M' },
+      { label:'TN', val:0.550, display:'$0.55M' },
+      { label:'MO', val:0.534, display:'$0.53M' },
     ];
     const CLAIMS_ACCT_ROWS = [
-      { id:'hilbgrocery',   name:'Hilbgrocery',   product:'General Liability',      policies:12, prem:'$9.31M', incurred:'$4.82M', open:59, closed:28, lr:52.3 },
-      { id:'hubca',         name:'Hub CA',         product:'Workers Comp',           policies:8,  prem:'$5.43M', incurred:'$3.85M', open:43, closed:19, lr:70.9 },
-      { id:'ima-rrma',      name:'IMA-RRMA',       product:'General Liability',      policies:6,  prem:'$3.87M', incurred:'$2.02M', open:31, closed:24, lr:52.1 },
-      { id:'rtrestaurants', name:'RT Restaurants', product:'Liquor Liability',       policies:14, prem:'$7.82M', incurred:'$5.03M', open:71, closed:31, lr:64.4 },
-      { id:'hubsmb',        name:'Hub SMB',        product:'General Liability',      policies:9,  prem:'$4.29M', incurred:'$3.04M', open:37, closed:22, lr:70.9 },
-      { id:'unleashed',     name:'Unleashed',      product:'Professional Liability', policies:5,  prem:'$2.44M', incurred:'$1.45M', open:22, closed:18, lr:59.4 },
+      { id:'hilbgrocery',    name:'hilbgrocery',    gwp:'$9.31M', prem:'$4.82M', claims:59,  open:28, closed:31,  incurred:'$417K',  ultimate:'$2.52M', lr:52.3 },
+      { id:'hubca',          name:'hubca',           gwp:'$8.05M', prem:'$4.51M', claims:207, open:62, closed:145, incurred:'$925K',  ultimate:'$2.98M', lr:66.0 },
+      { id:'ima-rrma',       name:'ima-rrma',        gwp:'$7.35M', prem:'$1.21M', claims:3,   open:3,  closed:0,   incurred:'$6K',    ultimate:'$597K',  lr:49.4 },
+      { id:'rtrestaurants',  name:'rtrestaurants',   gwp:'$5.58M', prem:'$1.95M', claims:18,  open:14, closed:4,   incurred:'$168K',  ultimate:'$1.08M', lr:55.3 },
+      { id:'alliantgrocery', name:'alliantgrocery',  gwp:'$5.11M', prem:'$1.36M', claims:213, open:9,  closed:204, incurred:'$25K',   ultimate:'$668K',  lr:49.0 },
+      { id:'hubsmb',         name:'hubsmb',          gwp:'$3.23M', prem:'$1.51M', claims:41,  open:12, closed:29,  incurred:'$400K',  ultimate:'$1.07M', lr:70.9 },
+      { id:'unleashed',      name:'unleashed',       gwp:'$3.01M', prem:'$2.31M', claims:91,  open:21, closed:70,  incurred:'$582K',  ultimate:'$1.37M', lr:59.4 },
+      { id:'gallagher',      name:'gallagher',       gwp:'$2.60M', prem:'$0.66M', claims:9,   open:6,  closed:3,   incurred:'$41K',   ultimate:'$354K',  lr:53.4 },
+      { id:'mcgriff',        name:'mcgriff',         gwp:'$2.21M', prem:'$0.99M', claims:44,  open:23, closed:21,  incurred:'$176K',  ultimate:'$639K',  lr:64.4 },
+      { id:'mindbody',       name:'mindbody',        gwp:'$2.19M', prem:'$1.52M', claims:23,  open:5,  closed:18,  incurred:'$459K',  ultimate:'$927K',  lr:60.8 },
+      { id:'borg',           name:'borg',            gwp:'$2.10M', prem:'$1.15M', claims:18,  open:12, closed:6,   incurred:'$247K',  ultimate:'$608K',  lr:53.1 },
+      { id:'alliantsmb',     name:'alliantsmb',      gwp:'$2.01M', prem:'$0.27M', claims:3,   open:3,  closed:0,   incurred:'$1K',    ultimate:'$129K',  lr:48.5 },
+      { id:'morstan',        name:'morstan',         gwp:'$2.00M', prem:'$1.08M', claims:7,   open:5,  closed:2,   incurred:'$25K',   ultimate:'$440K',  lr:40.9 },
+      { id:'pushpress',      name:'pushpress',       gwp:'$1.77M', prem:'$1.23M', claims:5,   open:0,  closed:5,   incurred:'$32K',   ultimate:'$423K',  lr:34.5 },
+      { id:'withcoverage',   name:'withcoverage',    gwp:'$1.76M', prem:'$0.90M', claims:19,  open:8,  closed:11,  incurred:'$57K',   ultimate:'$431K',  lr:48.0 },
     ];
     const CLAIMS_DETAIL_DATA = {
       hilbgrocery: {
-        name:'Hilbgrocery',
-        kpi:{ prem:'$9.31M', incurred:'$4.82M', open:59, closed:28, ibnr:'$2.52M', lr:'52.3%' },
+        name:'hilbgrocery',
+        kpi:{ prem:'$4.82M', incurred:'$417K', open:28, closed:31, ibnr:'$2.10M', lr:'52.3%' },
         recs:[
-          'Slip & fall incidents in produce section — 3 repeat locations identified, recommend targeted safety audit.',
-          'Escalate 2 open claims exceeding $500K threshold to senior adjuster for reserve adequacy review.',
-          'Schedule on-site safety inspection for distribution centers with highest claim frequency in Q2 2026.',
+          'March 2026 frequency spike (13 claims, $105K incurred, 69.7% LR) — 7 open claims remain; recommend expedited resolution review.',
+          'IBNR of $2.10M vs $417K case incurred indicates significant tail exposure — Feb–Mar trend warrants enhanced reserve monitoring.',
+          'Overall LR of 52.3% is favorable vs. 60% target — maintain current loss control program with focus on Q1 2026 open items.',
         ],
         periods:[
-          { label:'Jan', premium:1.55, lr:0.465, open:8,  closed:4 },
-          { label:'Feb', premium:1.55, lr:0.523, open:10, closed:4 },
-          { label:'Mar', premium:1.55, lr:0.503, open:9,  closed:2 },
-          { label:'Apr', premium:1.55, lr:0.594, open:12, closed:4 },
-          { label:'May', premium:1.55, lr:0.542, open:10, closed:4 },
-          { label:'Jun', premium:1.55, lr:0.484, open:10, closed:0 },
+          { label:'Sep-25', premium:0.307, lr:0.623, open:1, closed:3 },
+          { label:'Oct-25', premium:0.323, lr:0.442, open:1, closed:0 },
+          { label:'Nov-25', premium:0.324, lr:0.476, open:1, closed:1 },
+          { label:'Dec-25', premium:0.344, lr:0.447, open:1, closed:3 },
+          { label:'Jan-26', premium:0.455, lr:0.512, open:1, closed:5 },
+          { label:'Feb-26', premium:0.408, lr:0.603, open:5, closed:5 },
+          { label:'Mar-26', premium:0.454, lr:0.697, open:7, closed:6 },
+          { label:'Apr-26', premium:0.439, lr:0.504, open:2, closed:2 },
+          { label:'May-26', premium:0.454, lr:0.568, open:5, closed:3 },
+          { label:'Jun-26', premium:0.424, lr:0.494, open:0, closed:1 },
         ],
         monthly:[
-          { month:'Jan 2026', reported:12, open:8,  closed:4, incurred:'$0.72M', paid:'$0.38M', reserved:'$0.34M', lr:'46.5%' },
-          { month:'Feb 2026', reported:14, open:10, closed:4, incurred:'$0.81M', paid:'$0.42M', reserved:'$0.39M', lr:'52.3%' },
-          { month:'Mar 2026', reported:11, open:9,  closed:2, incurred:'$0.78M', paid:'$0.35M', reserved:'$0.43M', lr:'50.3%' },
-          { month:'Apr 2026', reported:16, open:12, closed:4, incurred:'$0.92M', paid:'$0.48M', reserved:'$0.44M', lr:'59.4%' },
-          { month:'May 2026', reported:14, open:10, closed:4, incurred:'$0.84M', paid:'$0.41M', reserved:'$0.43M', lr:'54.2%' },
-          { month:'Jun 2026', reported:10, open:10, closed:0, incurred:'$0.75M', paid:'$0.31M', reserved:'$0.44M', lr:'48.4%' },
+          { month:'Jan 2026', reported:6,  open:1, closed:5, incurred:'$31K',  paid:'$6K', reserved:'$233K', lr:'51.2%' },
+          { month:'Feb 2026', reported:10, open:5, closed:5, incurred:'$60K',  paid:'$9K', reserved:'$246K', lr:'60.3%' },
+          { month:'Mar 2026', reported:13, open:7, closed:6, incurred:'$105K', paid:'$9K', reserved:'$316K', lr:'69.7%' },
+          { month:'Apr 2026', reported:4,  open:2, closed:2, incurred:'$12K',  paid:'$7K', reserved:'$221K', lr:'50.4%' },
+          { month:'May 2026', reported:8,  open:5, closed:3, incurred:'$38K',  paid:'$0',  reserved:'$257K', lr:'56.8%' },
+          { month:'Jun 2026', reported:1,  open:0, closed:1, incurred:'$0',    paid:'$0',  reserved:'$209K', lr:'49.4%' },
+        ],
+      },
+      hubca: {
+        name:'hubca',
+        kpi:{ prem:'$4.51M', incurred:'$925K', open:62, closed:145, ibnr:'$2.05M', lr:'66.0%' },
+        recs:[
+          'Hub CA LR at 66.0% exceeds the 60% target — recommend renewal terms review and rate adjustment for next cycle.',
+          '62 open claims with $2.98M estimated ultimate indicate substantial reserve development ahead — review high-severity items.',
+          'Claim frequency of 207 across the period is elevated; on-site safety consultation and risk engineering engagement recommended.',
+        ],
+        periods:[
+          { label:'Sep-25', premium:0.42, lr:0.620, open:4,  closed:14 },
+          { label:'Oct-25', premium:0.45, lr:0.680, open:6,  closed:15 },
+          { label:'Nov-25', premium:0.46, lr:0.650, open:7,  closed:14 },
+          { label:'Dec-25', premium:0.50, lr:0.690, open:8,  closed:16 },
+          { label:'Jan-26', premium:0.48, lr:0.720, open:9,  closed:15 },
+          { label:'Feb-26', premium:0.48, lr:0.640, open:8,  closed:14 },
+          { label:'Mar-26', premium:0.51, lr:0.680, open:9,  closed:14 },
+          { label:'Apr-26', premium:0.52, lr:0.630, open:7,  closed:13 },
+          { label:'May-26', premium:0.52, lr:0.660, open:7,  closed:14 },
+          { label:'Jun-26', premium:0.57, lr:0.610, open:5,  closed:11 },
+        ],
+        monthly:[
+          { month:'Jan 2026', reported:24, open:9, closed:15, incurred:'$98K',  paid:'$31K', reserved:'$326K', lr:'72.0%' },
+          { month:'Feb 2026', reported:22, open:8, closed:14, incurred:'$92K',  paid:'$28K', reserved:'$312K', lr:'64.0%' },
+          { month:'Mar 2026', reported:23, open:9, closed:14, incurred:'$89K',  paid:'$24K', reserved:'$318K', lr:'68.0%' },
+          { month:'Apr 2026', reported:20, open:7, closed:13, incurred:'$85K',  paid:'$22K', reserved:'$309K', lr:'63.0%' },
+          { month:'May 2026', reported:21, open:7, closed:14, incurred:'$82K',  paid:'$19K', reserved:'$312K', lr:'66.0%' },
+          { month:'Jun 2026', reported:16, open:5, closed:11, incurred:'$61K',  paid:'$14K', reserved:'$297K', lr:'61.0%' },
+        ],
+      },
+      'ima-rrma': {
+        name:'ima-rrma',
+        kpi:{ prem:'$1.21M', incurred:'$6K', open:3, closed:0, ibnr:'$591K', lr:'49.4%' },
+        recs:[
+          'All 3 reported claims are still open — recommend status review to determine reserve adequacy and closure timeline.',
+          'IBNR of $591K against only $6K case incurred signals early-stage claims with significant projected development.',
+          'LR of 49.4% is favorable vs. 60% target; low claim frequency suggests stable risk profile — maintain current terms.',
+        ],
+        periods:[
+          { label:'Sep-25', premium:0.11, lr:0.41, open:0, closed:0 },
+          { label:'Oct-25', premium:0.12, lr:0.43, open:0, closed:0 },
+          { label:'Nov-25', premium:0.12, lr:0.45, open:0, closed:0 },
+          { label:'Dec-25', premium:0.12, lr:0.47, open:0, closed:0 },
+          { label:'Jan-26', premium:0.13, lr:0.48, open:0, closed:0 },
+          { label:'Feb-26', premium:0.13, lr:0.50, open:1, closed:0 },
+          { label:'Mar-26', premium:0.13, lr:0.51, open:1, closed:0 },
+          { label:'Apr-26', premium:0.13, lr:0.50, open:1, closed:0 },
+          { label:'May-26', premium:0.13, lr:0.49, open:0, closed:0 },
+          { label:'Jun-26', premium:0.13, lr:0.49, open:0, closed:0 },
+        ],
+        monthly:[
+          { month:'Jan 2026', reported:0, open:0, closed:0, incurred:'$0',  paid:'$0', reserved:'$58K',  lr:'48.0%' },
+          { month:'Feb 2026', reported:1, open:1, closed:0, incurred:'$2K', paid:'$0', reserved:'$63K',  lr:'50.0%' },
+          { month:'Mar 2026', reported:1, open:1, closed:0, incurred:'$2K', paid:'$0', reserved:'$63K',  lr:'51.0%' },
+          { month:'Apr 2026', reported:1, open:1, closed:0, incurred:'$2K', paid:'$0', reserved:'$62K',  lr:'50.0%' },
+          { month:'May 2026', reported:0, open:0, closed:0, incurred:'$0',  paid:'$0', reserved:'$62K',  lr:'49.0%' },
+          { month:'Jun 2026', reported:0, open:0, closed:0, incurred:'$0',  paid:'$0', reserved:'$62K',  lr:'49.0%' },
+        ],
+      },
+      rtrestaurants: {
+        name:'rtrestaurants',
+        kpi:{ prem:'$1.95M', incurred:'$168K', open:14, closed:4, ibnr:'$912K', lr:'55.3%' },
+        recs:[
+          '14 of 18 claims remain open — prioritize claim closure strategy to limit further development on this account.',
+          'IBNR of $912K against $168K case incurred suggests claims are early-stage and may develop significantly.',
+          'LR of 55.3% is below 60% target — maintain current terms pending resolution of the 14 open claims.',
+        ],
+        periods:[
+          { label:'Sep-25', premium:0.17, lr:0.50, open:1, closed:0 },
+          { label:'Oct-25', premium:0.18, lr:0.52, open:1, closed:0 },
+          { label:'Nov-25', premium:0.19, lr:0.54, open:2, closed:0 },
+          { label:'Dec-25', premium:0.20, lr:0.55, open:2, closed:1 },
+          { label:'Jan-26', premium:0.20, lr:0.57, open:2, closed:1 },
+          { label:'Feb-26', premium:0.20, lr:0.55, open:2, closed:1 },
+          { label:'Mar-26', premium:0.21, lr:0.56, open:2, closed:1 },
+          { label:'Apr-26', premium:0.21, lr:0.54, open:1, closed:0 },
+          { label:'May-26', premium:0.20, lr:0.55, open:1, closed:0 },
+          { label:'Jun-26', premium:0.20, lr:0.53, open:0, closed:0 },
+        ],
+        monthly:[
+          { month:'Jan 2026', reported:2, open:2, closed:0, incurred:'$18K', paid:'$2K', reserved:'$108K', lr:'57.0%' },
+          { month:'Feb 2026', reported:2, open:2, closed:0, incurred:'$17K', paid:'$2K', reserved:'$107K', lr:'55.0%' },
+          { month:'Mar 2026', reported:3, open:2, closed:1, incurred:'$28K', paid:'$3K', reserved:'$115K', lr:'56.0%' },
+          { month:'Apr 2026', reported:2, open:1, closed:1, incurred:'$18K', paid:'$2K', reserved:'$107K', lr:'54.0%' },
+          { month:'May 2026', reported:2, open:1, closed:1, incurred:'$17K', paid:'$2K', reserved:'$107K', lr:'55.0%' },
+          { month:'Jun 2026', reported:1, open:0, closed:1, incurred:'$9K',  paid:'$2K', reserved:'$102K', lr:'53.0%' },
+        ],
+      },
+      alliantgrocery: {
+        name:'alliantgrocery',
+        kpi:{ prem:'$1.36M', incurred:'$25K', open:9, closed:204, ibnr:'$643K', lr:'49.0%' },
+        recs:[
+          '213 total claims with 204 closed reflects high-frequency, low-severity pattern typical of grocery retail operations.',
+          'LR of 49.0% is favorable; low average severity ($25K total incurred) indicates effective claims management.',
+          'Monitor the 9 remaining open claims — any adverse development could shift LR above the 60% target.',
+        ],
+        periods:[
+          { label:'Sep-25', premium:0.12, lr:0.48, open:1, closed:18 },
+          { label:'Oct-25', premium:0.13, lr:0.48, open:1, closed:19 },
+          { label:'Nov-25', premium:0.13, lr:0.49, open:1, closed:19 },
+          { label:'Dec-25', premium:0.14, lr:0.49, open:1, closed:22 },
+          { label:'Jan-26', premium:0.14, lr:0.49, open:1, closed:22 },
+          { label:'Feb-26', premium:0.14, lr:0.48, open:1, closed:21 },
+          { label:'Mar-26', premium:0.14, lr:0.49, open:1, closed:21 },
+          { label:'Apr-26', premium:0.14, lr:0.49, open:1, closed:21 },
+          { label:'May-26', premium:0.14, lr:0.49, open:1, closed:20 },
+          { label:'Jun-26', premium:0.14, lr:0.49, open:1, closed:21 },
+        ],
+        monthly:[
+          { month:'Jan 2026', reported:23, open:1, closed:22, incurred:'$3K', paid:'$0', reserved:'$65K', lr:'49.0%' },
+          { month:'Feb 2026', reported:22, open:1, closed:21, incurred:'$3K', paid:'$0', reserved:'$64K', lr:'48.0%' },
+          { month:'Mar 2026', reported:22, open:1, closed:21, incurred:'$3K', paid:'$0', reserved:'$65K', lr:'49.0%' },
+          { month:'Apr 2026', reported:22, open:1, closed:21, incurred:'$3K', paid:'$0', reserved:'$65K', lr:'49.0%' },
+          { month:'May 2026', reported:21, open:1, closed:20, incurred:'$3K', paid:'$0', reserved:'$65K', lr:'49.0%' },
+          { month:'Jun 2026', reported:22, open:1, closed:21, incurred:'$3K', paid:'$0', reserved:'$65K', lr:'49.0%' },
+        ],
+      },
+      hubsmb: {
+        name:'hubsmb',
+        kpi:{ prem:'$1.51M', incurred:'$400K', open:12, closed:29, ibnr:'$670K', lr:'70.9%' },
+        recs:[
+          'Hub SMB has the highest portfolio LR at 70.9% — immediate renewal terms review and mandatory loss control audit required.',
+          'Open reserve of $400K with $1.07M estimated ultimate; IBNR of $670K suggests significant additional development ahead.',
+          'Claim frequency of 41 for a $1.51M earned premium book is elevated — evaluate risk selection criteria at renewal.',
+        ],
+        periods:[
+          { label:'Sep-25', premium:0.14, lr:0.68, open:1, closed:3 },
+          { label:'Oct-25', premium:0.15, lr:0.74, open:2, closed:3 },
+          { label:'Nov-25', premium:0.15, lr:0.71, open:2, closed:2 },
+          { label:'Dec-25', premium:0.16, lr:0.73, open:2, closed:3 },
+          { label:'Jan-26', premium:0.16, lr:0.75, open:2, closed:4 },
+          { label:'Feb-26', premium:0.15, lr:0.69, open:1, closed:3 },
+          { label:'Mar-26', premium:0.16, lr:0.72, open:1, closed:4 },
+          { label:'Apr-26', premium:0.16, lr:0.70, open:1, closed:3 },
+          { label:'May-26', premium:0.16, lr:0.71, open:1, closed:3 },
+          { label:'Jun-26', premium:0.16, lr:0.68, open:1, closed:1 },
+        ],
+        monthly:[
+          { month:'Jan 2026', reported:5, open:2, closed:3, incurred:'$45K', paid:'$12K', reserved:'$112K', lr:'75.0%' },
+          { month:'Feb 2026', reported:4, open:1, closed:3, incurred:'$38K', paid:'$10K', reserved:'$106K', lr:'69.0%' },
+          { month:'Mar 2026', reported:5, open:1, closed:4, incurred:'$41K', paid:'$11K', reserved:'$109K', lr:'72.0%' },
+          { month:'Apr 2026', reported:4, open:1, closed:3, incurred:'$39K', paid:'$10K', reserved:'$107K', lr:'70.0%' },
+          { month:'May 2026', reported:4, open:1, closed:3, incurred:'$40K', paid:'$11K', reserved:'$108K', lr:'71.0%' },
+          { month:'Jun 2026', reported:4, open:1, closed:3, incurred:'$38K', paid:'$10K', reserved:'$106K', lr:'68.0%' },
+        ],
+      },
+      unleashed: {
+        name:'unleashed',
+        kpi:{ prem:'$2.31M', incurred:'$582K', open:21, closed:70, ibnr:'$788K', lr:'59.4%' },
+        recs:[
+          'Unleashed LR of 59.4% is just below the 60% target — monitor closely; any adverse development risks a breach.',
+          '21 open claims with $788K IBNR outstanding; ensure reserve adequacy review before Q3 close.',
+          'Claim frequency of 91 is elevated for this account size — consider risk engineering engagement to address loss drivers.',
+        ],
+        periods:[
+          { label:'Sep-25', premium:0.20, lr:0.58, open:2, closed:6  },
+          { label:'Oct-25', premium:0.22, lr:0.60, open:2, closed:7  },
+          { label:'Nov-25', premium:0.23, lr:0.59, open:2, closed:7  },
+          { label:'Dec-25', premium:0.24, lr:0.60, open:2, closed:7  },
+          { label:'Jan-26', premium:0.24, lr:0.61, open:2, closed:7  },
+          { label:'Feb-26', premium:0.23, lr:0.59, open:2, closed:7  },
+          { label:'Mar-26', premium:0.24, lr:0.60, open:2, closed:7  },
+          { label:'Apr-26', premium:0.24, lr:0.58, open:2, closed:7  },
+          { label:'May-26', premium:0.23, lr:0.59, open:3, closed:7  },
+          { label:'Jun-26', premium:0.24, lr:0.58, open:2, closed:6  },
+        ],
+        monthly:[
+          { month:'Jan 2026', reported:9, open:2, closed:7, incurred:'$59K', paid:'$37K', reserved:'$138K', lr:'61.0%' },
+          { month:'Feb 2026', reported:9, open:2, closed:7, incurred:'$58K', paid:'$36K', reserved:'$137K', lr:'59.0%' },
+          { month:'Mar 2026', reported:9, open:2, closed:7, incurred:'$59K', paid:'$37K', reserved:'$137K', lr:'60.0%' },
+          { month:'Apr 2026', reported:9, open:2, closed:7, incurred:'$57K', paid:'$36K', reserved:'$136K', lr:'58.0%' },
+          { month:'May 2026', reported:9, open:3, closed:6, incurred:'$58K', paid:'$37K', reserved:'$137K', lr:'59.0%' },
+          { month:'Jun 2026', reported:8, open:2, closed:6, incurred:'$54K', paid:'$34K', reserved:'$135K', lr:'58.0%' },
+        ],
+      },
+      gallagher: {
+        name:'gallagher',
+        kpi:{ prem:'$0.66M', incurred:'$41K', open:6, closed:3, ibnr:'$313K', lr:'53.4%' },
+        recs:[
+          '6 of 9 claims are still open — recommend detailed claim file review to assess reserve adequacy on each.',
+          'IBNR of $313K against $41K case incurred indicates early-stage development with significant projected tail.',
+          'LR of 53.4% is below 60% target; small account size makes LR sensitive to any single large claim movement.',
+        ],
+        periods:[
+          { label:'Sep-25', premium:0.06, lr:0.51, open:0, closed:0 },
+          { label:'Oct-25', premium:0.06, lr:0.52, open:1, closed:0 },
+          { label:'Nov-25', premium:0.07, lr:0.53, open:1, closed:0 },
+          { label:'Dec-25', premium:0.07, lr:0.54, open:1, closed:1 },
+          { label:'Jan-26', premium:0.07, lr:0.55, open:1, closed:1 },
+          { label:'Feb-26', premium:0.07, lr:0.53, open:1, closed:0 },
+          { label:'Mar-26', premium:0.07, lr:0.54, open:1, closed:0 },
+          { label:'Apr-26', premium:0.07, lr:0.53, open:1, closed:1 },
+          { label:'May-26', premium:0.07, lr:0.53, open:0, closed:0 },
+          { label:'Jun-26', premium:0.07, lr:0.52, open:0, closed:0 },
+        ],
+        monthly:[
+          { month:'Jan 2026', reported:1, open:1, closed:0, incurred:'$5K', paid:'$0', reserved:'$36K', lr:'55.0%' },
+          { month:'Feb 2026', reported:1, open:1, closed:0, incurred:'$5K', paid:'$0', reserved:'$36K', lr:'53.0%' },
+          { month:'Mar 2026', reported:2, open:1, closed:1, incurred:'$9K', paid:'$1K', reserved:'$38K', lr:'54.0%' },
+          { month:'Apr 2026', reported:1, open:1, closed:0, incurred:'$5K', paid:'$0', reserved:'$36K', lr:'53.0%' },
+          { month:'May 2026', reported:1, open:1, closed:0, incurred:'$5K', paid:'$0', reserved:'$36K', lr:'53.0%' },
+          { month:'Jun 2026', reported:1, open:1, closed:0, incurred:'$5K', paid:'$0', reserved:'$36K', lr:'52.0%' },
+        ],
+      },
+      mcgriff: {
+        name:'mcgriff',
+        kpi:{ prem:'$0.99M', incurred:'$176K', open:23, closed:21, ibnr:'$463K', lr:'64.4%' },
+        recs:[
+          'McGriff LR of 64.4% exceeds the 60% target — evaluate renewal pricing and underwriting conditions for this account.',
+          '23 open claims is high relative to account size; prioritize reserve adequacy review on the oldest open items.',
+          'Sustained above-target LR trend warrants structured loss control plan before next renewal.',
+        ],
+        periods:[
+          { label:'Sep-25', premium:0.09, lr:0.62, open:2, closed:2 },
+          { label:'Oct-25', premium:0.10, lr:0.64, open:2, closed:2 },
+          { label:'Nov-25', premium:0.10, lr:0.64, open:2, closed:2 },
+          { label:'Dec-25', premium:0.10, lr:0.65, open:2, closed:2 },
+          { label:'Jan-26', premium:0.10, lr:0.66, open:3, closed:2 },
+          { label:'Feb-26', premium:0.10, lr:0.64, open:2, closed:2 },
+          { label:'Mar-26', premium:0.10, lr:0.65, open:2, closed:2 },
+          { label:'Apr-26', premium:0.10, lr:0.63, open:2, closed:2 },
+          { label:'May-26', premium:0.10, lr:0.64, open:3, closed:2 },
+          { label:'Jun-26', premium:0.11, lr:0.63, open:3, closed:1 },
+        ],
+        monthly:[
+          { month:'Jan 2026', reported:5, open:3, closed:2, incurred:'$19K', paid:'$6K', reserved:'$65K', lr:'66.0%' },
+          { month:'Feb 2026', reported:4, open:2, closed:2, incurred:'$17K', paid:'$5K', reserved:'$63K', lr:'64.0%' },
+          { month:'Mar 2026', reported:5, open:2, closed:3, incurred:'$19K', paid:'$6K', reserved:'$65K', lr:'65.0%' },
+          { month:'Apr 2026', reported:4, open:2, closed:2, incurred:'$17K', paid:'$5K', reserved:'$63K', lr:'63.0%' },
+          { month:'May 2026', reported:5, open:3, closed:2, incurred:'$19K', paid:'$6K', reserved:'$64K', lr:'64.0%' },
+          { month:'Jun 2026', reported:5, open:3, closed:2, incurred:'$19K', paid:'$6K', reserved:'$64K', lr:'63.0%' },
+        ],
+      },
+      mindbody: {
+        name:'mindbody',
+        kpi:{ prem:'$1.52M', incurred:'$459K', open:5, closed:18, ibnr:'$468K', lr:'60.8%' },
+        recs:[
+          'Mindbody LR of 60.8% is marginally above the 60% target — discuss terms adjustment at next renewal.',
+          'High paid-to-incurred ratio ($383K / $459K) suggests active claims management is progressing well.',
+          '5 open claims with $468K IBNR — ensure adequate reserves are set on the most recent reported claims.',
+        ],
+        periods:[
+          { label:'Sep-25', premium:0.14, lr:0.59, open:0, closed:2 },
+          { label:'Oct-25', premium:0.15, lr:0.60, open:0, closed:2 },
+          { label:'Nov-25', premium:0.15, lr:0.61, open:1, closed:2 },
+          { label:'Dec-25', premium:0.16, lr:0.62, open:1, closed:2 },
+          { label:'Jan-26', premium:0.16, lr:0.62, open:1, closed:2 },
+          { label:'Feb-26', premium:0.15, lr:0.61, open:1, closed:2 },
+          { label:'Mar-26', premium:0.16, lr:0.61, open:1, closed:2 },
+          { label:'Apr-26', premium:0.16, lr:0.60, open:0, closed:2 },
+          { label:'May-26', premium:0.15, lr:0.61, open:1, closed:2 },
+          { label:'Jun-26', premium:0.16, lr:0.60, open:0, closed:0 },
+        ],
+        monthly:[
+          { month:'Jan 2026', reported:3, open:1, closed:2, incurred:'$49K', paid:'$39K', reserved:'$94K',  lr:'62.0%' },
+          { month:'Feb 2026', reported:2, open:1, closed:1, incurred:'$46K', paid:'$37K', reserved:'$91K',  lr:'61.0%' },
+          { month:'Mar 2026', reported:3, open:1, closed:2, incurred:'$47K', paid:'$38K', reserved:'$92K',  lr:'61.0%' },
+          { month:'Apr 2026', reported:2, open:0, closed:2, incurred:'$44K', paid:'$38K', reserved:'$90K',  lr:'60.0%' },
+          { month:'May 2026', reported:3, open:1, closed:2, incurred:'$46K', paid:'$38K', reserved:'$91K',  lr:'61.0%' },
+          { month:'Jun 2026', reported:3, open:0, closed:3, incurred:'$47K', paid:'$38K', reserved:'$92K',  lr:'60.0%' },
+        ],
+      },
+      borg: {
+        name:'borg',
+        kpi:{ prem:'$1.15M', incurred:'$247K', open:12, closed:6, ibnr:'$361K', lr:'53.1%' },
+        recs:[
+          '12 of 18 claims remain open — high open rate (67%) warrants a focused claim closure strategy to reduce reserve uncertainty.',
+          'IBNR of $361K against $247K case incurred indicates significant projected tail; validate reserves on top open claims.',
+          'LR of 53.1% is below 60% target; favorable performance supports current terms with continued monitoring.',
+        ],
+        periods:[
+          { label:'Sep-25', premium:0.10, lr:0.51, open:1, closed:0 },
+          { label:'Oct-25', premium:0.11, lr:0.53, open:1, closed:0 },
+          { label:'Nov-25', premium:0.11, lr:0.52, open:1, closed:1 },
+          { label:'Dec-25', premium:0.12, lr:0.53, open:2, closed:1 },
+          { label:'Jan-26', premium:0.12, lr:0.54, open:2, closed:1 },
+          { label:'Feb-26', premium:0.12, lr:0.53, open:2, closed:1 },
+          { label:'Mar-26', premium:0.12, lr:0.54, open:2, closed:1 },
+          { label:'Apr-26', premium:0.12, lr:0.52, open:1, closed:0 },
+          { label:'May-26', premium:0.12, lr:0.53, open:0, closed:1 },
+          { label:'Jun-26', premium:0.12, lr:0.52, open:0, closed:0 },
+        ],
+        monthly:[
+          { month:'Jan 2026', reported:3, open:2, closed:1, incurred:'$28K', paid:'$7K', reserved:'$64K', lr:'54.0%' },
+          { month:'Feb 2026', reported:3, open:2, closed:1, incurred:'$27K', paid:'$7K', reserved:'$64K', lr:'53.0%' },
+          { month:'Mar 2026', reported:3, open:2, closed:1, incurred:'$28K', paid:'$7K', reserved:'$64K', lr:'54.0%' },
+          { month:'Apr 2026', reported:2, open:1, closed:1, incurred:'$22K', paid:'$6K', reserved:'$61K', lr:'52.0%' },
+          { month:'May 2026', reported:2, open:0, closed:2, incurred:'$22K', paid:'$6K', reserved:'$61K', lr:'53.0%' },
+          { month:'Jun 2026', reported:2, open:0, closed:2, incurred:'$22K', paid:'$6K', reserved:'$61K', lr:'52.0%' },
+        ],
+      },
+      alliantsmb: {
+        name:'alliantsmb',
+        kpi:{ prem:'$0.27M', incurred:'$1K', open:3, closed:0, ibnr:'$128K', lr:'48.5%' },
+        recs:[
+          'All 3 reported claims remain open with minimal case incurred — recommend immediate status assessment.',
+          'IBNR of $128K against $1K case incurred implies very early-stage development on all open claims.',
+          'LR of 48.5% is favorable but account is small ($0.27M earned) — sensitivity to single claim development is high.',
+        ],
+        periods:[
+          { label:'Sep-25', premium:0.02, lr:0.46, open:0, closed:0 },
+          { label:'Oct-25', premium:0.02, lr:0.47, open:0, closed:0 },
+          { label:'Nov-25', premium:0.03, lr:0.47, open:0, closed:0 },
+          { label:'Dec-25', premium:0.03, lr:0.48, open:0, closed:0 },
+          { label:'Jan-26', premium:0.03, lr:0.48, open:0, closed:0 },
+          { label:'Feb-26', premium:0.03, lr:0.49, open:1, closed:0 },
+          { label:'Mar-26', premium:0.03, lr:0.49, open:1, closed:0 },
+          { label:'Apr-26', premium:0.03, lr:0.48, open:1, closed:0 },
+          { label:'May-26', premium:0.03, lr:0.48, open:0, closed:0 },
+          { label:'Jun-26', premium:0.03, lr:0.48, open:0, closed:0 },
+        ],
+        monthly:[
+          { month:'Jan 2026', reported:0, open:0, closed:0, incurred:'$0',  paid:'$0', reserved:'$13K', lr:'48.0%' },
+          { month:'Feb 2026', reported:1, open:1, closed:0, incurred:'$0',  paid:'$0', reserved:'$13K', lr:'49.0%' },
+          { month:'Mar 2026', reported:1, open:1, closed:0, incurred:'$1K', paid:'$0', reserved:'$13K', lr:'49.0%' },
+          { month:'Apr 2026', reported:1, open:1, closed:0, incurred:'$0',  paid:'$0', reserved:'$13K', lr:'48.0%' },
+          { month:'May 2026', reported:0, open:0, closed:0, incurred:'$0',  paid:'$0', reserved:'$13K', lr:'48.0%' },
+          { month:'Jun 2026', reported:0, open:0, closed:0, incurred:'$0',  paid:'$0', reserved:'$13K', lr:'48.0%' },
+        ],
+      },
+      morstan: {
+        name:'morstan',
+        kpi:{ prem:'$1.08M', incurred:'$25K', open:5, closed:2, ibnr:'$415K', lr:'40.9%' },
+        recs:[
+          'Morstan has the second-lowest LR in the portfolio at 40.9% — model account; consider increased capacity at renewal.',
+          'IBNR of $415K against $25K case incurred reflects conservative early-stage reserves on 5 open claims.',
+          'Claim frequency of 7 over the period is low and controlled — maintain current risk selection approach.',
+        ],
+        periods:[
+          { label:'Sep-25', premium:0.10, lr:0.40, open:0, closed:0 },
+          { label:'Oct-25', premium:0.10, lr:0.40, open:0, closed:0 },
+          { label:'Nov-25', premium:0.11, lr:0.41, open:1, closed:0 },
+          { label:'Dec-25', premium:0.11, lr:0.41, open:1, closed:1 },
+          { label:'Jan-26', premium:0.11, lr:0.41, open:1, closed:0 },
+          { label:'Feb-26', premium:0.11, lr:0.41, open:1, closed:0 },
+          { label:'Mar-26', premium:0.11, lr:0.41, open:1, closed:1 },
+          { label:'Apr-26', premium:0.11, lr:0.41, open:0, closed:0 },
+          { label:'May-26', premium:0.11, lr:0.41, open:0, closed:0 },
+          { label:'Jun-26', premium:0.11, lr:0.41, open:0, closed:0 },
+        ],
+        monthly:[
+          { month:'Jan 2026', reported:1, open:1, closed:0, incurred:'$3K', paid:'$0', reserved:'$44K', lr:'41.0%' },
+          { month:'Feb 2026', reported:1, open:1, closed:0, incurred:'$3K', paid:'$0', reserved:'$44K', lr:'41.0%' },
+          { month:'Mar 2026', reported:2, open:1, closed:1, incurred:'$6K', paid:'$1K', reserved:'$45K', lr:'41.0%' },
+          { month:'Apr 2026', reported:1, open:1, closed:0, incurred:'$3K', paid:'$0', reserved:'$44K', lr:'41.0%' },
+          { month:'May 2026', reported:1, open:1, closed:0, incurred:'$3K', paid:'$0', reserved:'$44K', lr:'41.0%' },
+          { month:'Jun 2026', reported:1, open:0, closed:1, incurred:'$3K', paid:'$0', reserved:'$44K', lr:'41.0%' },
+        ],
+      },
+      pushpress: {
+        name:'pushpress',
+        kpi:{ prem:'$1.23M', incurred:'$32K', open:0, closed:5, ibnr:'$391K', lr:'34.5%' },
+        recs:[
+          'PushPress has the lowest LR in the portfolio at 34.5% with all 5 claims closed — best-performing account by loss ratio.',
+          'Zero open claims reflects complete claim resolution; IBNR of $391K represents residual ULAE and potential late reporting.',
+          'Favorable loss experience supports account retention and potential for expanded program or capacity increase.',
+        ],
+        periods:[
+          { label:'Sep-25', premium:0.11, lr:0.33, open:0, closed:1 },
+          { label:'Oct-25', premium:0.12, lr:0.34, open:0, closed:0 },
+          { label:'Nov-25', premium:0.12, lr:0.34, open:0, closed:1 },
+          { label:'Dec-25', premium:0.13, lr:0.35, open:0, closed:1 },
+          { label:'Jan-26', premium:0.13, lr:0.35, open:0, closed:1 },
+          { label:'Feb-26', premium:0.13, lr:0.34, open:0, closed:0 },
+          { label:'Mar-26', premium:0.13, lr:0.35, open:0, closed:1 },
+          { label:'Apr-26', premium:0.13, lr:0.34, open:0, closed:0 },
+          { label:'May-26', premium:0.13, lr:0.35, open:0, closed:0 },
+          { label:'Jun-26', premium:0.13, lr:0.34, open:0, closed:0 },
+        ],
+        monthly:[
+          { month:'Jan 2026', reported:1, open:0, closed:1, incurred:'$6K', paid:'$6K', reserved:'$40K', lr:'35.0%' },
+          { month:'Feb 2026', reported:0, open:0, closed:0, incurred:'$0',  paid:'$0',  reserved:'$40K', lr:'34.0%' },
+          { month:'Mar 2026', reported:1, open:0, closed:1, incurred:'$6K', paid:'$6K', reserved:'$40K', lr:'35.0%' },
+          { month:'Apr 2026', reported:0, open:0, closed:0, incurred:'$0',  paid:'$0',  reserved:'$40K', lr:'34.0%' },
+          { month:'May 2026', reported:0, open:0, closed:0, incurred:'$0',  paid:'$0',  reserved:'$40K', lr:'35.0%' },
+          { month:'Jun 2026', reported:0, open:0, closed:0, incurred:'$0',  paid:'$0',  reserved:'$40K', lr:'34.0%' },
+        ],
+      },
+      withcoverage: {
+        name:'withcoverage',
+        kpi:{ prem:'$0.90M', incurred:'$57K', open:8, closed:11, ibnr:'$374K', lr:'48.0%' },
+        recs:[
+          '8 open claims with $374K IBNR — review reserve adequacy on claims aged 6+ months.',
+          'LR of 48.0% is favorable vs. 60% target; claim frequency of 19 is moderate and manageable.',
+          'Paid-to-incurred ratio of 37% ($21K / $57K) indicates active claims still in early development — monitor for deterioration.',
+        ],
+        periods:[
+          { label:'Sep-25', premium:0.08, lr:0.46, open:0, closed:1 },
+          { label:'Oct-25', premium:0.09, lr:0.47, open:1, closed:1 },
+          { label:'Nov-25', premium:0.09, lr:0.47, open:1, closed:1 },
+          { label:'Dec-25', premium:0.09, lr:0.48, open:1, closed:1 },
+          { label:'Jan-26', premium:0.09, lr:0.48, open:1, closed:1 },
+          { label:'Feb-26', premium:0.09, lr:0.48, open:1, closed:1 },
+          { label:'Mar-26', premium:0.10, lr:0.48, open:1, closed:1 },
+          { label:'Apr-26', premium:0.10, lr:0.48, open:1, closed:1 },
+          { label:'May-26', premium:0.09, lr:0.48, open:1, closed:1 },
+          { label:'Jun-26', premium:0.09, lr:0.48, open:0, closed:1 },
+        ],
+        monthly:[
+          { month:'Jan 2026', reported:2, open:1, closed:1, incurred:'$7K', paid:'$3K', reserved:'$43K', lr:'48.0%' },
+          { month:'Feb 2026', reported:2, open:1, closed:1, incurred:'$7K', paid:'$3K', reserved:'$43K', lr:'48.0%' },
+          { month:'Mar 2026', reported:2, open:1, closed:1, incurred:'$7K', paid:'$3K', reserved:'$43K', lr:'48.0%' },
+          { month:'Apr 2026', reported:2, open:1, closed:1, incurred:'$7K', paid:'$3K', reserved:'$43K', lr:'48.0%' },
+          { month:'May 2026', reported:2, open:1, closed:1, incurred:'$7K', paid:'$3K', reserved:'$43K', lr:'48.0%' },
+          { month:'Jun 2026', reported:2, open:1, closed:1, incurred:'$7K', paid:'$3K', reserved:'$43K', lr:'48.0%' },
         ],
       },
     };
@@ -4724,12 +5158,12 @@
     // ── Claims render functions ────────────────────────────────────
     function renderClaimsTotal() {
       const recs = [
-        'Slip & fall frequency is 18% above the portfolio average — initiate targeted risk control outreach.',
-        'RT Restaurants loss ratio trending toward breach (64.4%) — recommend renewal terms review.',
-        '3 claims aged 18+ months without reserve movement — escalate for reserve adequacy assessment.',
-        'Hub CA WC severity spike in Q2 2026 (+32%) warrants on-site safety consultation.',
+        'Hub SMB LR at 70.9% — highest in portfolio; renewal terms review and mandatory loss control audit required before next cycle.',
+        'Hub CA at 66.0% LR with 62 open claims and $2.98M estimated ultimate — priority account for reserve adequacy review.',
+        'PA state LR at 67.6% with 138 claims (highest state by count) — evaluate underwriting concentration in this geography.',
+        'Portfolio open claim count increasing: 84 open in Jun-2026 vs. 27 in Jan-2026 — escalating frequency trend requires monitoring.',
       ];
-      const comboSvg   = claimsComboSvg(CLAIMS_PORT_PERIODS, 0.55);
+      const comboSvg   = claimsComboSvg(CLAIMS_PORT_PERIODS, 0.60);
       const stackedSvg = claimsStackedSvg(CLAIMS_PORT_PERIODS);
       const acctBars   = claimsHorizBarsHtml(CLAIMS_PORT_ACCTS,  '#4b7174');
       const stateBars  = claimsHorizBarsHtml(CLAIMS_PORT_STATES, '#2e69ae');
@@ -4737,7 +5171,7 @@
         <div class="claims-filter-row">
           <div class="claims-select"><span>Year:</span> 2026 <i class="ph ph-caret-down" style="font-size:12px;margin-left:2px"></i></div>
           <div class="claims-select"><span>Line:</span> All Lines <i class="ph ph-caret-down" style="font-size:12px;margin-left:2px"></i></div>
-          <div class="claims-select"><span>Account:</span> All Accounts <i class="ph ph-caret-down" style="font-size:12px;margin-left:2px"></i></div>
+          <div class="claims-select"><span>Build:</span> All Builds <i class="ph ph-caret-down" style="font-size:12px;margin-left:2px"></i></div>
           <div style="flex:1"></div>
           <button class="claims-btn"><i class="ph ph-download-simple" style="font-size:14px"></i> Export</button>
         </div>
@@ -4751,11 +5185,11 @@
           </div>
         </div>
         <div class="claims-kpi-strip">
-          <div class="claims-kpi"><div class="claims-kpi-val">$33.2M</div><div class="claims-kpi-label">Earned Premium</div><div class="claims-kpi-sub">YTD 2026</div></div>
-          <div class="claims-kpi"><div class="claims-kpi-val">$17.1M</div><div class="claims-kpi-label">Total Incurred</div><div class="claims-kpi-sub">YTD 2026</div></div>
-          <div class="claims-kpi"><div class="claims-kpi-val">263 / 142</div><div class="claims-kpi-label">Open / Closed Claims</div><div class="claims-kpi-sub">YTD 2026</div></div>
-          <div class="claims-kpi"><div class="claims-kpi-val">$8.3M</div><div class="claims-kpi-label">Total IBNR</div><div class="claims-kpi-sub">Estimated</div></div>
-          <div class="claims-kpi"><div class="claims-kpi-val" style="color:#cf5c3f">51.5%</div><div class="claims-kpi-label">Portfolio Loss Ratio</div><div class="claims-kpi-sub">Target: 55.0%</div></div>
+          <div class="claims-kpi"><div class="claims-kpi-val">$34.5M</div><div class="claims-kpi-label">Earned Premium</div><div class="claims-kpi-sub">YTD 2026</div></div>
+          <div class="claims-kpi"><div class="claims-kpi-val">$5.47M</div><div class="claims-kpi-label">Total Incurred</div><div class="claims-kpi-sub">YTD 2026</div></div>
+          <div class="claims-kpi"><div class="claims-kpi-val">336 / 786</div><div class="claims-kpi-label">Open / Closed Claims</div><div class="claims-kpi-sub">YTD 2026</div></div>
+          <div class="claims-kpi"><div class="claims-kpi-val">$14.2M</div><div class="claims-kpi-label">Total IBNR</div><div class="claims-kpi-sub">Estimated</div></div>
+          <div class="claims-kpi"><div class="claims-kpi-val" style="color:#cf5c3f">57.1%</div><div class="claims-kpi-label">Portfolio Loss Ratio</div><div class="claims-kpi-sub">Target: 60.0%</div></div>
         </div>
         <div class="claims-charts-row">
           <div class="claims-chart-panel">
@@ -4778,7 +5212,7 @@
         </div>
         <div class="claims-charts-row">
           <div class="claims-chart-panel">
-            <div class="claims-chart-title">Earned Premium by Account</div>
+            <div class="claims-chart-title">Earned Premium by Build</div>
             <div style="padding:14px 8px 6px;">${acctBars}</div>
           </div>
           <div class="claims-chart-panel">
@@ -4790,32 +5224,30 @@
 
     function renderClaimsAccountTable() {
       const lrBadge = lr => {
-        const ok = lr < 62;
+        const ok = lr < 60;
         return `<span style="display:inline-block;background:${ok?'#e8f5e9':'#fce4ec'};color:${ok?'#2e7d32':'#c62828'};border-radius:4px;padding:2px 8px;font-size:12px;font-weight:500;">${lr.toFixed(1)}%</span>`;
       };
       const rows = CLAIMS_ACCT_ROWS.map(r=>`
         <tr class="claims-tbl-row" data-claims-account="${r.id}" style="cursor:pointer">
           <td class="claims-td" style="font-weight:500">${r.name}</td>
-          <td class="claims-td">${r.product}</td>
-          <td class="claims-td claims-mono">${r.policies}</td>
+          <td class="claims-td claims-mono">${r.gwp}</td>
           <td class="claims-td claims-mono">${r.prem}</td>
+          <td class="claims-td claims-mono">${r.open} / ${r.claims}</td>
           <td class="claims-td claims-mono">${r.incurred}</td>
-          <td class="claims-td claims-mono">${r.open}</td>
-          <td class="claims-td claims-mono">${r.closed}</td>
+          <td class="claims-td claims-mono">${r.ultimate}</td>
           <td class="claims-td">${lrBadge(r.lr)}</td>
         </tr>`).join('');
       return `
         <div class="claims-tbl-wrap">
-          <div class="claims-tbl-header"><span class="claims-tbl-title">All Accounts</span></div>
+          <div class="claims-tbl-header"><span class="claims-tbl-title">All Builds</span></div>
           <table class="claims-table">
             <thead><tr>
-              <th class="claims-th">Account</th>
-              <th class="claims-th">Primary Product</th>
-              <th class="claims-th claims-mono">Policies</th>
+              <th class="claims-th">Build</th>
+              <th class="claims-th claims-mono">GWP</th>
               <th class="claims-th claims-mono">Earned Prem</th>
+              <th class="claims-th claims-mono">Open / Total</th>
               <th class="claims-th claims-mono">Total Incurred</th>
-              <th class="claims-th claims-mono">Open Claims</th>
-              <th class="claims-th claims-mono">Closed Claims</th>
+              <th class="claims-th claims-mono">Est. Ultimate</th>
               <th class="claims-th">Loss Ratio</th>
             </tr></thead>
             <tbody>${rows}</tbody>
@@ -4825,7 +5257,7 @@
 
     function renderClaimsDetail(accountId) {
       const d = CLAIMS_DETAIL_DATA[accountId] || CLAIMS_DETAIL_DATA['hilbgrocery'];
-      const comboSvg   = claimsComboSvg(d.periods, 0.55);
+      const comboSvg   = claimsComboSvg(d.periods, 0.60);
       const stackedSvg = claimsStackedSvg(d.periods);
       const tableRows = d.monthly.map(m=>`
         <tr class="claims-tbl-row">
@@ -4862,7 +5294,7 @@
             <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.incurred}</div><div class="claims-kpi-label">Total Incurred</div><div class="claims-kpi-sub">YTD 2026</div></div>
             <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.open} / ${d.kpi.closed}</div><div class="claims-kpi-label">Open / Closed</div><div class="claims-kpi-sub">Claims YTD</div></div>
             <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.ibnr}</div><div class="claims-kpi-label">Estimated IBNR</div><div class="claims-kpi-sub">As of Jun 2026</div></div>
-            <div class="claims-kpi"><div class="claims-kpi-val" style="color:#cf5c3f">${d.kpi.lr}</div><div class="claims-kpi-label">Loss Ratio</div><div class="claims-kpi-sub">Target: 55.0%</div></div>
+            <div class="claims-kpi"><div class="claims-kpi-val" style="color:#cf5c3f">${d.kpi.lr}</div><div class="claims-kpi-label">Loss Ratio</div><div class="claims-kpi-sub">Target: 60.0%</div></div>
           </div>
           <div class="claims-charts-row">
             <div class="claims-chart-panel">
@@ -4893,7 +5325,7 @@
                 <th class="claims-th claims-mono">Closed</th>
                 <th class="claims-th claims-mono">Incurred</th>
                 <th class="claims-th claims-mono">Paid</th>
-                <th class="claims-th claims-mono">Reserved</th>
+                <th class="claims-th claims-mono">Est. Ultimate</th>
                 <th class="claims-th">LR</th>
               </tr></thead>
               <tbody>${tableRows}</tbody>
@@ -4909,7 +5341,7 @@
         <div class="claims-page">
           <div class="claims-tab-bar">
             <button class="claims-tab-btn ${tab==='total'?'active':''}" data-ctab="total">Total Portfolio</button>
-            <button class="claims-tab-btn ${tab==='account'?'active':''}" data-ctab="account">Account Performance</button>
+            <button class="claims-tab-btn ${tab==='account'?'active':''}" data-ctab="account">Builds</button>
           </div>
           ${tab === 'total' ? renderClaimsTotal() : renderClaimsAccountTable()}
         </div>`;
