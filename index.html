@@ -2734,6 +2734,34 @@
     }
 
     /* ── Agent chat button + panel ─────────────────────────────── */
+    /* Agent floating button — Figma 43:14691 */
+    #agent-btn {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      z-index: 300;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 4px;
+      border: 1px solid var(--border, #ebebeb);
+      background: var(--surface, #fff);
+      color: var(--fg, #252424);
+      font-family: var(--font, 'DM Sans', sans-serif);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 15px;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      transition: box-shadow var(--transition-base), background var(--transition-base);
+    }
+    #agent-btn:hover {
+      background: var(--bg-accent);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    #agent-btn .ph { font-size: 16px; }
     #agent-btn.hidden { display: none !important; }
 
     /* Policy detail timeline */
@@ -3368,9 +3396,6 @@
       </div>
 
       <div class="nav-foot">
-        <button id="agent-btn" class="nav-item hidden">
-          <span class="nav-ico"><i class="ph ph-star-four" style="color:var(--tertiary)"></i></span><span class="nav-label">Agent</span>
-        </button>
         <button class="nav-item">
           <span class="nav-ico"><i class="ph ph-building"></i></span><span class="nav-label">All Organizations</span>
         </button>
@@ -3397,6 +3422,12 @@
 
         <main class="main" id="main"></main>
       </div>
+
+      <!-- ── Agent floating button (Figma 43:14691) ────────────────── -->
+      <button id="agent-btn" class="hidden" title="Open Agent">
+        <i class="ph ph-star-four"></i>
+        <span>Agent</span>
+      </button>
 
       <!-- ── Agent chat panel ─────────────────────────────────────── -->
       <div id="agent-panel" class="hidden">
