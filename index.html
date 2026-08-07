@@ -3375,6 +3375,50 @@
     .ctt-hz { cursor: crosshair; }
     [data-ctt] { position: relative; }
 
+    /* ── Claims redesign ─────────────────────────────────────────── */
+    /* KPI strip – divider between cells */
+    .claims-kpi-strip { display:flex; gap:0; flex-shrink:0; border:1px solid var(--border,#ebebeb); border-radius:8px; overflow:hidden; background:white; }
+    .claims-kpi { flex:1; padding:14px 16px; border-right:1px solid var(--border,#ebebeb); }
+    .claims-kpi:last-child { border-right:0; }
+    .claims-kpi-val { font-family:var(--font-display); font-size:22px; line-height:28px; color:#252424; }
+    .claims-kpi-label { font:500 11px/14px var(--font); color:#252424; margin-top:2px; }
+    .claims-kpi-sub { font:400 10px/13px var(--font); color:#868585; margin-top:1px; }
+    /* Filter row */
+    .claims-filter-row { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .claims-filter-sel { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border,#ebebeb); border-radius:6px; padding:6px 10px; font:400 13px/18px var(--font); color:#252424; background:white; cursor:pointer; white-space:nowrap; }
+    .claims-filter-sel span { color:#868585; }
+    .claims-dl-btn { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border,#ebebeb); border-radius:6px; padding:6px 12px; font:500 13px/18px var(--font); color:#252424; background:white; cursor:pointer; white-space:nowrap; }
+    .claims-dl-btn:hover { background:#f8f8f8; }
+    /* Recommendation box */
+    .claims-rec-box { border:1px solid var(--border,#ebebeb); border-radius:8px; background:white; overflow:hidden; flex-shrink:0; }
+    .claims-rec-box-head { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border,#ebebeb); }
+    .claims-rec-box-title { display:flex; align-items:center; gap:8px; font:500 14px/20px var(--font); color:#252424; }
+    .claims-rec-regen { display:flex; align-items:center; gap:4px; background:none; border:0; font:400 12px/16px var(--font); color:#868585; cursor:pointer; padding:4px 6px; border-radius:4px; }
+    .claims-rec-regen:hover { background:#f5f5f5; }
+    .claims-rec-row { padding:12px 16px; font:400 13px/19px var(--font); color:#252424; border-bottom:1px solid var(--border,#ebebeb); background:#fafafa; }
+    .claims-rec-row:last-child { border-bottom:0; }
+    /* Detail tabs */
+    .claims-detail-tabs { display:flex; align-items:center; gap:0; border-bottom:1px solid var(--border,#ebebeb); flex-shrink:0; }
+    .claims-detail-tab { padding:8px 16px; font:400 14px/20px var(--font); color:#868585; background:none; border:0; border-bottom:2px solid transparent; cursor:pointer; margin-bottom:-1px; }
+    .claims-detail-tab.active { color:#252424; font-weight:500; border-bottom-color:#cf5c3f; }
+    /* All Accounts table */
+    .claims-tbl-section { border:1px solid var(--border,#ebebeb); border-radius:8px; overflow:hidden; background:white; flex-shrink:0; }
+    .claims-tbl-section-head { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--border,#ebebeb); }
+    .claims-tbl-section-title { font:500 16px/22px var(--font); color:#252424; }
+    .claims-full-tbl { width:100%; border-collapse:collapse; }
+    .claims-full-th { padding:10px 14px; font:500 12px/16px var(--font); color:#868585; border-bottom:1px solid var(--border,#ebebeb); text-align:left; white-space:nowrap; }
+    .claims-full-th.r { text-align:right; }
+    .claims-full-td { padding:12px 14px; font:400 13px/18px var(--font); color:#252424; border-bottom:1px solid #f5f5f5; white-space:nowrap; }
+    .claims-full-td.r { text-align:right; font-variant-numeric:tabular-nums; }
+    .claims-full-td.mono { font-family: 'DM Mono', monospace; }
+    .claims-tbl-row:last-child .claims-full-td { border-bottom:0; }
+    /* Loss runs table */
+    .claims-lr-badge { display:inline-flex; align-items:center; justify-content:center; border-radius:999px; padding:2px 8px; font:500 11px/15px var(--font); }
+    /* Pagination */
+    .claims-pagination { display:flex; align-items:center; justify-content:flex-end; gap:12px; padding:10px 16px; border-top:1px solid var(--border,#ebebeb); font:400 12px/16px var(--font); color:#868585; }
+    .claims-pg-btn { display:flex; align-items:center; justify-content:center; width:24px; height:24px; border:1px solid var(--border,#ebebeb); border-radius:4px; background:white; cursor:pointer; color:#252424; font-size:12px; }
+    .claims-pg-sel { border:1px solid var(--border,#ebebeb); border-radius:4px; padding:2px 6px; font:400 12px/16px var(--font); color:#252424; background:white; }
+
     /* ── Radar page ──────────────────────────────────────────────── */
     .main.radar-mode { padding: 0; position: relative; overflow: hidden; }
     .radar-wrap { position: relative; width: 100%; height: 100%; }
@@ -3756,8 +3800,9 @@
       policyTab: 'overview',
       policyCovSection: 'account',
       agentChatOpen: false,
-      claimsTab:     'total',
-      claimsAccount: null,
+      claimsTab:       'performance',
+      claimsAccount:   null,
+      claimsDetailTab: 'portfolio',
     };
 
     // Home queue — sorted by urgency (Today first), per Figma 2:1829.
@@ -5128,28 +5173,20 @@
       { label:'Jun-26', premium:5.223, lr:0.538, open:84, closed:167 },
     ];
     const CLAIMS_PORT_ACCTS = [
-      { label:'hilbgrocery',    val:4.817, display:'$4.82M', claims:59,  open:28, lr:52.3, incurred:'$417K',  ultimate:'$2.52M' },
-      { label:'hubca',          val:4.509, display:'$4.51M', claims:207, open:62, lr:66.0, incurred:'$925K',  ultimate:'$2.98M' },
-      { label:'unleashed',      val:2.305, display:'$2.31M', claims:91,  open:21, lr:59.4, incurred:'$582K',  ultimate:'$1.37M' },
-      { label:'rtrestaurants',  val:1.954, display:'$1.95M', claims:18,  open:14, lr:55.3, incurred:'$168K',  ultimate:'$1.08M' },
-      { label:'mindbody',       val:1.524, display:'$1.52M', claims:23,  open:5,  lr:60.8, incurred:'$459K',  ultimate:'$927K'  },
-      { label:'hubsmb',         val:1.508, display:'$1.51M', claims:41,  open:12, lr:70.9, incurred:'$400K',  ultimate:'$1.07M' },
-      { label:'alliantgrocery', val:1.364, display:'$1.36M', claims:213, open:9,  lr:49.0, incurred:'$25K',   ultimate:'$668K'  },
-      { label:'borg',           val:1.146, display:'$1.15M', claims:18,  open:12, lr:53.1, incurred:'$247K',  ultimate:'$608K'  },
-      { label:'morstan',        val:1.078, display:'$1.08M', claims:7,   open:5,  lr:40.9, incurred:'$25K',   ultimate:'$440K'  },
-      { label:'mcgriff',        val:0.991, display:'$0.99M', claims:44,  open:23, lr:64.4, incurred:'$176K',  ultimate:'$639K'  },
+      { label:'hilbgrocery',   val:9.31, display:'$9.31M', claims:59,  open:28, lr:52.3, incurred:'$417K',  ultimate:'$2.52M' },
+      { label:'hubca',         val:8.05, display:'$8.05M', claims:207, open:62, lr:66.0, incurred:'$925K',  ultimate:'$2.98M' },
+      { label:'ima-rrma',      val:7.35, display:'$7.35M', claims:3,   open:3,  lr:49.4, incurred:'$6K',    ultimate:'$597K'  },
+      { label:'rtrestaurants', val:5.58, display:'$5.58M', claims:18,  open:14, lr:55.3, incurred:'$168K',  ultimate:'$1.08M' },
+      { label:'alliantgrocery',val:5.11, display:'$5.11M', claims:213, open:9,  lr:49.0, incurred:'$25K',   ultimate:'$668K'  },
+      { label:'hubsmb',        val:3.23, display:'$3.23M', claims:41,  open:12, lr:70.9, incurred:'$400K',  ultimate:'$1.07M' },
     ];
     const CLAIMS_PORT_STATES = [
-      { label:'NY', val:9.318, display:'$9.32M', claims:78,  open:37, lr:49.1, incurred:'$627K',  ultimate:'$4.57M' },
-      { label:'FL', val:6.279, display:'$6.28M', claims:175, open:61, lr:58.0, incurred:'$891K',  ultimate:'$3.64M' },
-      { label:'CA', val:2.899, display:'$2.90M', claims:83,  open:32, lr:59.0, incurred:'$621K',  ultimate:'$1.71M' },
-      { label:'TX', val:2.447, display:'$2.45M', claims:76,  open:24, lr:55.7, incurred:'$403K',  ultimate:'$1.36M' },
-      { label:'NJ', val:1.646, display:'$1.65M', claims:27,  open:8,  lr:63.4, incurred:'$377K',  ultimate:'$1.04M' },
-      { label:'GA', val:1.080, display:'$1.08M', claims:50,  open:15, lr:56.2, incurred:'$165K',  ultimate:'$608K'  },
-      { label:'CT', val:0.872, display:'$0.87M', claims:32,  open:12, lr:61.5, incurred:'$174K',  ultimate:'$537K'  },
-      { label:'PA', val:0.819, display:'$0.82M', claims:138, open:18, lr:67.6, incurred:'$211K',  ultimate:'$554K'  },
-      { label:'TN', val:0.550, display:'$0.55M', claims:22,  open:9,  lr:54.9, incurred:'$76K',   ultimate:'$302K'  },
-      { label:'MO', val:0.534, display:'$0.53M', claims:14,  open:3,  lr:57.0, incurred:'$80K',   ultimate:'$305K'  },
+      { label:'NY', val:15.42, display:'$15.4M', claims:78,  open:37, lr:49.1, incurred:'$627K',  ultimate:'$4.57M' },
+      { label:'FL', val:10.83, display:'$10.8M', claims:175, open:61, lr:58.0, incurred:'$891K',  ultimate:'$3.64M' },
+      { label:'CA', val:5.02,  display:'$5.02M', claims:83,  open:32, lr:59.0, incurred:'$621K',  ultimate:'$1.71M' },
+      { label:'TX', val:4.23,  display:'$4.23M', claims:76,  open:24, lr:55.7, incurred:'$403K',  ultimate:'$1.36M' },
+      { label:'NJ', val:2.85,  display:'$2.85M', claims:27,  open:8,  lr:63.4, incurred:'$377K',  ultimate:'$1.04M' },
+      { label:'GA', val:1.87,  display:'$1.87M', claims:50,  open:15, lr:56.2, incurred:'$165K',  ultimate:'$608K'  },
     ];
     const CLAIMS_ACCT_ROWS = [
       { id:'hilbgrocery',    name:'hilbgrocery',    gwp:'$9.31M', prem:'$4.82M', claims:59,  open:28, closed:31,  incurred:'$417K',  ultimate:'$2.52M', lr:52.3 },
@@ -5196,6 +5233,18 @@
           { month:'Apr 2026', reported:4,  open:2, closed:2, incurred:'$12K',  paid:'$7K', reserved:'$221K', lr:'50.4%' },
           { month:'May 2026', reported:8,  open:5, closed:3, incurred:'$38K',  paid:'$0',  reserved:'$257K', lr:'56.8%' },
           { month:'Jun 2026', reported:1,  open:0, closed:1, incurred:'$0',    paid:'$0',  reserved:'$209K', lr:'49.4%' },
+        ],
+        lossRuns:[
+          { lossDate:'01/15/2026', valDate:'06/30/2026', ay:'2026', location:'Brooklyn, NY',  desc:'Slip & Fall — Customer',  caseIncurred:'$45,000', netIncurred:'$45,000', status:'Open'   },
+          { lossDate:'02/03/2026', valDate:'06/30/2026', ay:'2026', location:'Bronx, NY',     desc:'Product Liability',        caseIncurred:'$32,500', netIncurred:'$32,500', status:'Open'   },
+          { lossDate:'02/22/2026', valDate:'06/30/2026', ay:'2026', location:'Queens, NY',    desc:'Slip & Fall — Customer',  caseIncurred:'$28,000', netIncurred:'$28,000', status:'Open'   },
+          { lossDate:'03/08/2026', valDate:'06/30/2026', ay:'2026', location:'Manhattan, NY', desc:'Employee Injury',          caseIncurred:'$18,750', netIncurred:'$18,750', status:'Open'   },
+          { lossDate:'03/12/2026', valDate:'06/30/2026', ay:'2026', location:'Staten Is, NY', desc:'Property Damage',          caseIncurred:'$12,000', netIncurred:'$12,000', status:'Closed' },
+          { lossDate:'03/19/2026', valDate:'06/30/2026', ay:'2026', location:'Brooklyn, NY',  desc:'Slip & Fall — Customer',  caseIncurred:'$9,500',  netIncurred:'$9,500',  status:'Open'   },
+          { lossDate:'04/05/2026', valDate:'06/30/2026', ay:'2026', location:'Queens, NY',    desc:'Product Liability',        caseIncurred:'$7,200',  netIncurred:'$7,200',  status:'Closed' },
+          { lossDate:'04/17/2026', valDate:'06/30/2026', ay:'2026', location:'Bronx, NY',     desc:'Slip & Fall — Employee',  caseIncurred:'$5,800',  netIncurred:'$5,800',  status:'Open'   },
+          { lossDate:'05/02/2026', valDate:'06/30/2026', ay:'2026', location:'Manhattan, NY', desc:'Customer Injury',          caseIncurred:'$4,100',  netIncurred:'$4,100',  status:'Closed' },
+          { lossDate:'05/28/2026', valDate:'06/30/2026', ay:'2026', location:'Brooklyn, NY',  desc:'Property Damage',          caseIncurred:'$3,500',  netIncurred:'$3,500',  status:'Closed' },
         ],
       },
       hubca: {
@@ -5702,33 +5751,48 @@
     }
 
     // ── Claims render functions ────────────────────────────────────
-    function renderClaimsTotal() {
+    function renderClaimsPerformance() {
+      const lrBadge = lr => {
+        const ok = lr < 60;
+        return `<span style="display:inline-block;background:${ok?'#e8f5e9':'#fce4ec'};color:${ok?'#2e7d32':'#c62828'};border-radius:4px;padding:2px 8px;font-size:12px;font-weight:500;">${lr.toFixed(1)}%</span>`;
+      };
       const recs = [
         'Hub SMB LR at 70.9% — highest in portfolio; renewal terms review and mandatory loss control audit required before next cycle.',
         'Hub CA at 66.0% LR with 62 open claims and $2.98M estimated ultimate — priority account for reserve adequacy review.',
-        'PA state LR at 67.6% with 138 claims (highest state by count) — evaluate underwriting concentration in this geography.',
         'Portfolio open claim count increasing: 84 open in Jun-2026 vs. 27 in Jan-2026 — escalating frequency trend requires monitoring.',
       ];
       const comboSvg   = claimsComboSvg(CLAIMS_PORT_PERIODS, 0.60);
       const stackedSvg = claimsStackedSvg(CLAIMS_PORT_PERIODS);
       const acctBars   = claimsHorizBarsHtml(CLAIMS_PORT_ACCTS,  '#4b7174');
       const stateBars  = claimsHorizBarsHtml(CLAIMS_PORT_STATES, '#2e69ae');
+      const acctRows = CLAIMS_ACCT_ROWS.map(r=>`
+        <tr class="claims-tbl-row" data-claims-account="${r.id}" style="cursor:pointer">
+          <td class="claims-full-td" style="font-weight:500">${r.name}</td>
+          <td class="claims-full-td r mono">${r.gwp}</td>
+          <td class="claims-full-td r mono">${r.prem}</td>
+          <td class="claims-full-td r mono">${r.claims}</td>
+          <td class="claims-full-td r mono">${r.open}</td>
+          <td class="claims-full-td r mono">${r.ultimate}</td>
+          <td class="claims-full-td r">${lrBadge(r.lr)}</td>
+          <td class="claims-full-td r mono">${r.incurred}</td>
+        </tr>`).join('');
       return `
         <div class="claims-filter-row">
-          <div class="claims-select"><span>Year:</span> 2026 <i class="ph ph-caret-down" style="font-size:12px;margin-left:2px"></i></div>
-          <div class="claims-select"><span>Coverage:</span> All Coverage <i class="ph ph-caret-down" style="font-size:12px;margin-left:2px"></i></div>
-          <div class="claims-select"><span>Build:</span> All Builds <i class="ph ph-caret-down" style="font-size:12px;margin-left:2px"></i></div>
+          <div class="claims-filter-sel"><span>Total Years</span><i class="ph ph-caret-down" style="font-size:11px;color:#868585"></i></div>
+          <div class="claims-filter-sel"><span>All Builds</span><i class="ph ph-caret-down" style="font-size:11px;color:#868585"></i></div>
+          <div class="claims-filter-sel"><span>All Coverage</span><i class="ph ph-caret-down" style="font-size:11px;color:#868585"></i></div>
           <div style="flex:1"></div>
-          <button class="claims-btn"><i class="ph ph-download-simple" style="font-size:14px"></i> Export</button>
+          <button class="claims-dl-btn"><i class="ph ph-download-simple" style="font-size:14px"></i> Download</button>
         </div>
-        <div class="claims-recs">
-          <div class="claims-recs-header">
-            <i class="ph ph-lightbulb-filament" style="font-size:20px;color:#cf5c3f"></i>
-            <span class="claims-recs-title">Recommendations</span>
+        <div class="claims-rec-box">
+          <div class="claims-rec-box-head">
+            <div class="claims-rec-box-title">
+              <span style="font-size:16px;color:#cf5c3f">✦</span>
+              AI Recommendations
+            </div>
+            <button class="claims-rec-regen"><i class="ph ph-arrows-clockwise" style="font-size:13px"></i> Regenerate</button>
           </div>
-          <div class="claims-recs-pills">
-            ${recs.map(r=>`<div class="claims-rec-pill">${r}</div>`).join('')}
-          </div>
+          ${recs.map(r=>`<div class="claims-rec-row">${r}</div>`).join('')}
         </div>
         <div class="claims-kpi-strip">
           <div class="claims-kpi"><div class="claims-kpi-val">$34.5M</div><div class="claims-kpi-label">Earned Premium</div><div class="claims-kpi-sub">Pro-Rata to Jun 2026</div></div>
@@ -5740,7 +5804,7 @@
         </div>
         <div class="claims-charts-row">
           <div class="claims-chart-panel">
-            <div class="claims-chart-title">Earned Premium vs. Loss Ratio</div>
+            <div class="claims-chart-title">Earned Premium & Ultimate Loss Ratio by Month — All Coverage</div>
             <div class="claims-chart-area">${comboSvg}</div>
             <div class="claims-chart-legend">
               <div class="legend-item"><div class="legend-swatch" style="background:#bdd0d2"></div>Earned Premium</div>
@@ -5749,7 +5813,7 @@
             </div>
           </div>
           <div class="claims-chart-panel">
-            <div class="claims-chart-title">Open vs. Closed Claims</div>
+            <div class="claims-chart-title">Claims by Month</div>
             <div class="claims-chart-area">${stackedSvg}</div>
             <div class="claims-chart-legend">
               <div class="legend-item"><div class="legend-swatch" style="background:#2e69ae"></div>Open</div>
@@ -5759,91 +5823,81 @@
         </div>
         <div class="claims-charts-row">
           <div class="claims-chart-panel">
-            <div class="claims-chart-title">Earned Premium by Build</div>
+            <div class="claims-chart-title">Top Accounts by Written Premium ($M)</div>
             <div style="padding:14px 8px 6px;">${acctBars}</div>
           </div>
           <div class="claims-chart-panel">
-            <div class="claims-chart-title">Earned Premium by State</div>
+            <div class="claims-chart-title">Top States by Written Premium ($M)</div>
             <div style="padding:14px 8px 6px;">${stateBars}</div>
           </div>
-        </div>`;
-    }
-
-    function renderClaimsAccountTable() {
-      const lrBadge = lr => {
-        const ok = lr < 60;
-        return `<span style="display:inline-block;background:${ok?'#e8f5e9':'#fce4ec'};color:${ok?'#2e7d32':'#c62828'};border-radius:4px;padding:2px 8px;font-size:12px;font-weight:500;">${lr.toFixed(1)}%</span>`;
-      };
-      const rows = CLAIMS_ACCT_ROWS.map(r=>`
-        <tr class="claims-tbl-row" data-claims-account="${r.id}" style="cursor:pointer">
-          <td class="claims-td" style="font-weight:500">${r.name}</td>
-          <td class="claims-td claims-mono">${r.gwp}</td>
-          <td class="claims-td claims-mono">${r.prem}</td>
-          <td class="claims-td claims-mono">${r.open} / ${r.claims}</td>
-          <td class="claims-td claims-mono">${r.incurred}</td>
-          <td class="claims-td claims-mono">${r.ultimate}</td>
-          <td class="claims-td">${lrBadge(r.lr)}</td>
-        </tr>`).join('');
-      return `
-        <div class="claims-tbl-wrap">
-          <div class="claims-tbl-header"><span class="claims-tbl-title">All Builds</span></div>
-          <table class="claims-table">
+        </div>
+        <div class="claims-tbl-section">
+          <div class="claims-tbl-section-head">
+            <span class="claims-tbl-section-title">All Accounts</span>
+            <button class="claims-dl-btn"><i class="ph ph-download-simple" style="font-size:13px"></i> Export</button>
+          </div>
+          <table class="claims-full-tbl">
             <thead><tr>
-              <th class="claims-th">Build</th>
-              <th class="claims-th claims-mono">GWP</th>
-              <th class="claims-th claims-mono">Earned Prem</th>
-              <th class="claims-th claims-mono">Open / Total</th>
-              <th class="claims-th claims-mono">Total Incurred</th>
-              <th class="claims-th claims-mono">Est. Ultimate</th>
-              <th class="claims-th">Loss Ratio</th>
+              <th class="claims-full-th">Account Name</th>
+              <th class="claims-full-th r">Written Premium</th>
+              <th class="claims-full-th r">Earned Premium</th>
+              <th class="claims-full-th r">Total Claims</th>
+              <th class="claims-full-th r">Open Claims</th>
+              <th class="claims-full-th r">EST. Ultimate</th>
+              <th class="claims-full-th r">Ultimate LR</th>
+              <th class="claims-full-th r">IBNR</th>
             </tr></thead>
-            <tbody>${rows}</tbody>
+            <tbody>${acctRows}</tbody>
           </table>
         </div>`;
     }
 
     function renderClaimsDetail(accountId) {
       const d = CLAIMS_DETAIL_DATA[accountId] || CLAIMS_DETAIL_DATA['hilbgrocery'];
-      const comboSvg   = claimsComboSvg(d.periods, 0.60, 'dp');
-      const stackedSvg = claimsStackedSvg(d.periods, 'ds');
-      const tableRows = d.monthly.map(m=>`
-        <tr class="claims-tbl-row">
-          <td class="claims-td">${m.month}</td>
-          <td class="claims-td claims-mono">${m.reported}</td>
-          <td class="claims-td claims-mono">${m.open}</td>
-          <td class="claims-td claims-mono">${m.closed}</td>
-          <td class="claims-td claims-mono">${m.incurred}</td>
-          <td class="claims-td claims-mono">${m.paid}</td>
-          <td class="claims-td claims-mono">${m.reserved}</td>
-          <td class="claims-td">${m.lr}</td>
-        </tr>`).join('');
-      return `
-        <div class="claims-page">
-          <div class="claims-breadcrumb">
-            <button id="claims-breadcrumb" style="background:none;border:0;padding:0;color:#868585;font:400 14px/20px var(--font);cursor:pointer;text-decoration:underline;">Claims</button>
-            <i class="ph ph-caret-right" style="font-size:12px;color:#868585"></i>
-            <span style="font:500 14px/20px var(--font);color:#252424">${d.name}</span>
+      const row = CLAIMS_ACCT_ROWS.find(r => r.id === accountId) || CLAIMS_ACCT_ROWS[0];
+      const dtab = State.claimsDetailTab || 'portfolio';
+
+      // Total Portfolio tab content
+      const renderPortfolioTab = () => {
+        const comboSvg   = claimsComboSvg(d.periods, 0.60, 'dp');
+        const stackedSvg = claimsStackedSvg(d.periods, 'ds');
+        const tableRows = d.monthly.map(m=>`
+          <tr class="claims-tbl-row">
+            <td class="claims-td">${m.month}</td>
+            <td class="claims-td claims-mono">${m.reported}</td>
+            <td class="claims-td claims-mono">${m.open}</td>
+            <td class="claims-td claims-mono">${m.closed}</td>
+            <td class="claims-td claims-mono">${m.incurred}</td>
+            <td class="claims-td claims-mono">${m.paid}</td>
+            <td class="claims-td claims-mono">${m.reserved}</td>
+            <td class="claims-td">${m.lr}</td>
+          </tr>`).join('');
+        const recs = d.recs || [];
+        return `
+          <div class="claims-filter-row">
+            <div class="claims-filter-sel"><span>Total Years</span><i class="ph ph-caret-down" style="font-size:11px;color:#868585"></i></div>
+            <div class="claims-filter-sel"><span>All Coverage</span><i class="ph ph-caret-down" style="font-size:11px;color:#868585"></i></div>
+            <div style="flex:1"></div>
+            <button class="claims-dl-btn"><i class="ph ph-download-simple" style="font-size:13px"></i> Download</button>
           </div>
-          <div style="font-family:var(--font-display);font-size:24px;line-height:32px;color:#252424;flex-shrink:0">${d.name}</div>
-          <div class="claims-recs">
-            <div class="claims-recs-header">
-              <i class="ph ph-lightbulb-filament" style="font-size:18px;color:#cf5c3f"></i>
-              <span style="font:500 14px/20px var(--font);color:#252424">Recommendations</span>
+          <div class="claims-rec-box">
+            <div class="claims-rec-box-head">
+              <div class="claims-rec-box-title"><span style="font-size:16px;color:#cf5c3f">✦</span> AI Recommendations</div>
+              <button class="claims-rec-regen"><i class="ph ph-arrows-clockwise" style="font-size:13px"></i> Regenerate</button>
             </div>
-            <div class="claims-recs-pills">
-              ${d.recs.map(r=>`<div class="claims-rec-pill">${r}</div>`).join('')}
-            </div>
+            ${recs.map(r=>`<div class="claims-rec-row">${r}</div>`).join('')}
           </div>
           <div class="claims-kpi-strip">
+            <div class="claims-kpi"><div class="claims-kpi-val">${row.gwp}</div><div class="claims-kpi-label">Written Premium</div><div class="claims-kpi-sub">YTD 2026</div></div>
             <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.prem}</div><div class="claims-kpi-label">Earned Premium</div><div class="claims-kpi-sub">YTD 2026</div></div>
-            <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.incurred}</div><div class="claims-kpi-label">Total Incurred</div><div class="claims-kpi-sub">YTD 2026</div></div>
+            <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.incurred}</div><div class="claims-kpi-label">Total Incurred</div><div class="claims-kpi-sub">Case Reserves</div></div>
             <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.open} / ${d.kpi.closed}</div><div class="claims-kpi-label">Open / Closed</div><div class="claims-kpi-sub">Claims YTD</div></div>
-            <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.ibnr}</div><div class="claims-kpi-label">Estimated IBNR</div><div class="claims-kpi-sub">As of Jun 2026</div></div>
+            <div class="claims-kpi"><div class="claims-kpi-val">${d.kpi.ibnr}</div><div class="claims-kpi-label">Est. IBNR</div><div class="claims-kpi-sub">As of Jun 2026</div></div>
             <div class="claims-kpi"><div class="claims-kpi-val" style="color:${parseFloat(d.kpi.lr)<60?'#2e7d32':'#cf5c3f'}">${d.kpi.lr}</div><div class="claims-kpi-label">Loss Ratio</div><div class="claims-kpi-sub">Target: 60.0%</div></div>
           </div>
           <div class="claims-charts-row">
             <div class="claims-chart-panel">
-              <div class="claims-chart-title">Monthly Earned Premium vs. Loss Ratio</div>
+              <div class="claims-chart-title">Monthly Earned Premium & Loss Ratio</div>
               <div class="claims-chart-area">${comboSvg}</div>
               <div class="claims-chart-legend">
                 <div class="legend-item"><div class="legend-swatch" style="background:#bdd0d2"></div>Earned Premium</div>
@@ -5870,11 +5924,126 @@
                 <th class="claims-th claims-mono">Closed</th>
                 <th class="claims-th claims-mono">Incurred</th>
                 <th class="claims-th claims-mono">Paid</th>
-                <th class="claims-th claims-mono">Est. Ultimate</th>
+                <th class="claims-th claims-mono">Reserved</th>
                 <th class="claims-th">LR</th>
               </tr></thead>
               <tbody>${tableRows}</tbody>
             </table>
+          </div>`;
+      };
+
+      // Loss Runs tab content
+      const renderLossRunsTab = () => {
+        const runs = d.lossRuns || [];
+        const lrRows = runs.map(lr=>`
+          <tr class="claims-tbl-row">
+            <td class="claims-full-td mono">${lr.lossDate}</td>
+            <td class="claims-full-td mono">${lr.valDate}</td>
+            <td class="claims-full-td">${lr.ay}</td>
+            <td class="claims-full-td">${lr.location}</td>
+            <td class="claims-full-td">${lr.desc}</td>
+            <td class="claims-full-td r mono">${lr.caseIncurred}</td>
+            <td class="claims-full-td r mono">${lr.netIncurred}</td>
+            <td class="claims-full-td">
+              <span class="claims-lr-badge" style="background:${lr.status==='Open'?'#e3f1fa':'#e8f5e9'};color:${lr.status==='Open'?'#1a6596':'#2e7d32'}">${lr.status}</span>
+            </td>
+          </tr>`).join('');
+        return `
+          <div class="claims-filter-row">
+            <div class="claims-filter-sel"><span>All Years</span><i class="ph ph-caret-down" style="font-size:11px;color:#868585"></i></div>
+            <div class="claims-filter-sel"><span>All Status</span><i class="ph ph-caret-down" style="font-size:11px;color:#868585"></i></div>
+            <div style="flex:1"></div>
+            <button class="claims-dl-btn"><i class="ph ph-download-simple" style="font-size:13px"></i> Download</button>
+          </div>
+          <div style="font:400 13px/18px var(--font);color:#868585;flex-shrink:0">Claims (${runs.length})</div>
+          <div class="claims-tbl-section" style="flex-shrink:0">
+            <table class="claims-full-tbl">
+              <thead><tr>
+                <th class="claims-full-th">Loss Date</th>
+                <th class="claims-full-th">Valuation Date</th>
+                <th class="claims-full-th">AY</th>
+                <th class="claims-full-th">Location</th>
+                <th class="claims-full-th">Event Description</th>
+                <th class="claims-full-th r">Case Incurred</th>
+                <th class="claims-full-th r">Net Incurred</th>
+                <th class="claims-full-th">Status</th>
+              </tr></thead>
+              <tbody>${lrRows}</tbody>
+            </table>
+            <div class="claims-pagination">
+              <span>Rows per page:</span>
+              <select class="claims-pg-sel"><option>10</option><option>25</option><option>50</option></select>
+              <span>1–${runs.length} of ${runs.length}</span>
+              <button class="claims-pg-btn"><i class="ph ph-caret-left" style="font-size:11px"></i></button>
+              <button class="claims-pg-btn"><i class="ph ph-caret-right" style="font-size:11px"></i></button>
+            </div>
+          </div>`;
+      };
+
+      return `
+        <div class="claims-page">
+          <div class="claims-breadcrumb">
+            <button id="claims-breadcrumb" style="background:none;border:0;padding:0;color:#868585;font:400 14px/20px var(--font);cursor:pointer;text-decoration:underline;">Claims</button>
+            <i class="ph ph-caret-right" style="font-size:12px;color:#868585"></i>
+            <span style="font:500 14px/20px var(--font);color:#252424">${d.name}</span>
+          </div>
+          <div style="font-family:var(--font-display);font-size:24px;line-height:32px;color:#252424;flex-shrink:0">${d.name}</div>
+          <div class="claims-detail-tabs">
+            <button class="claims-detail-tab ${dtab==='portfolio'?'active':''}" data-detail-tab="portfolio">Total Portfolio</button>
+            <button class="claims-detail-tab ${dtab==='lossruns'?'active':''}" data-detail-tab="lossruns">Loss Runs</button>
+          </div>
+          ${dtab === 'portfolio' ? renderPortfolioTab() : renderLossRunsTab()}
+        </div>`;
+    }
+
+    function renderClaimsReport() {
+      const lrBadge = lr => {
+        const ok = lr < 60;
+        return `<span style="display:inline-block;background:${ok?'#e8f5e9':'#fce4ec'};color:${ok?'#2e7d32':'#c62828'};border-radius:4px;padding:2px 8px;font-size:12px;font-weight:500;">${lr.toFixed(1)}%</span>`;
+      };
+      const rows = CLAIMS_ACCT_ROWS.map(r=>`
+        <tr class="claims-tbl-row" data-claims-account="${r.id}" style="cursor:pointer">
+          <td class="claims-full-td" style="font-weight:500">${r.name}</td>
+          <td class="claims-full-td r mono">${r.gwp}</td>
+          <td class="claims-full-td r mono">${r.prem}</td>
+          <td class="claims-full-td r mono">${r.claims}</td>
+          <td class="claims-full-td r mono">${r.open}</td>
+          <td class="claims-full-td r mono">${r.ultimate}</td>
+          <td class="claims-full-td r">${lrBadge(r.lr)}</td>
+          <td class="claims-full-td r mono">${r.incurred}</td>
+        </tr>`).join('');
+      return `
+        <div class="claims-filter-row">
+          <div class="claims-filter-sel"><span>Total Years</span><i class="ph ph-caret-down" style="font-size:11px;color:#868585"></i></div>
+          <div class="claims-filter-sel"><span>All Builds</span><i class="ph ph-caret-down" style="font-size:11px;color:#868585"></i></div>
+          <div class="claims-filter-sel"><span>All Coverage</span><i class="ph ph-caret-down" style="font-size:11px;color:#868585"></i></div>
+          <div style="flex:1"></div>
+          <button class="claims-dl-btn"><i class="ph ph-download-simple" style="font-size:13px"></i> Download Report</button>
+        </div>
+        <div class="claims-tbl-section">
+          <div class="claims-tbl-section-head">
+            <span class="claims-tbl-section-title">Account Claim Report</span>
+            <span style="font:400 12px/16px var(--font);color:#868585">Click any account to view loss runs</span>
+          </div>
+          <table class="claims-full-tbl">
+            <thead><tr>
+              <th class="claims-full-th">Account Name</th>
+              <th class="claims-full-th r">Written Premium</th>
+              <th class="claims-full-th r">Earned Premium</th>
+              <th class="claims-full-th r">Total Claims</th>
+              <th class="claims-full-th r">Open Claims</th>
+              <th class="claims-full-th r">EST. Ultimate</th>
+              <th class="claims-full-th r">Ultimate LR</th>
+              <th class="claims-full-th r">IBNR</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+          <div class="claims-pagination">
+            <span>Rows per page:</span>
+            <select class="claims-pg-sel"><option>15</option><option>25</option><option>50</option></select>
+            <span>1–${CLAIMS_ACCT_ROWS.length} of ${CLAIMS_ACCT_ROWS.length}</span>
+            <button class="claims-pg-btn"><i class="ph ph-caret-left" style="font-size:11px"></i></button>
+            <button class="claims-pg-btn"><i class="ph ph-caret-right" style="font-size:11px"></i></button>
           </div>
         </div>`;
     }
@@ -5886,10 +6055,10 @@
         <div class="claims-page">
           <div style="font-family:var(--font-display);font-size:24px;line-height:26px;font-weight:400;color:#252424;flex-shrink:0">Claims</div>
           <div class="claims-tab-bar">
-            <button class="claims-tab-btn ${tab==='total'?'active':''}" data-ctab="total">Total Portfolio</button>
-            <button class="claims-tab-btn ${tab==='account'?'active':''}" data-ctab="account">Builds</button>
+            <button class="claims-tab-btn ${tab==='performance'?'active':''}" data-ctab="performance">Total Account Performance</button>
+            <button class="claims-tab-btn ${tab==='report'?'active':''}" data-ctab="report">Claim Report</button>
           </div>
-          ${tab === 'total' ? renderClaimsTotal() : renderClaimsAccountTable()}
+          ${tab === 'report' ? renderClaimsReport() : renderClaimsPerformance()}
         </div>`;
     }
     function renderRadar() {
@@ -10377,7 +10546,7 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
 
       // Claims page
       if (State.page === 'claims') {
-        // Tab switching
+        // Top-level tab switching
         document.querySelectorAll('[data-ctab]').forEach(btn => {
           btn.onclick = () => {
             State.claimsTab = btn.dataset.ctab;
@@ -10385,10 +10554,18 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
             render();
           };
         });
+        // Detail sub-tab switching (Total Portfolio | Loss Runs)
+        document.querySelectorAll('[data-detail-tab]').forEach(btn => {
+          btn.onclick = () => {
+            State.claimsDetailTab = btn.dataset.detailTab;
+            render();
+          };
+        });
         // Account row click → detail view
         document.querySelectorAll('[data-claims-account]').forEach(row => {
           row.onclick = () => {
             State.claimsAccount = row.dataset.claimsAccount;
+            State.claimsDetailTab = 'portfolio';
             render();
           };
         });
