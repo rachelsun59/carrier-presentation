@@ -3387,6 +3387,7 @@
     .claims-filter-row { display:flex; align-items:center; gap:8px; flex-shrink:0; }
     .claims-filter-sel { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border,#ebebeb); border-radius:6px; padding:6px 10px; font:400 13px/18px var(--font); color:#252424; background:white; cursor:pointer; white-space:nowrap; }
     .claims-filter-sel span { color:#868585; }
+    select.claims-filter-sel { -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 256 256'%3E%3Cpath fill='%23868585' d='m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80A8 8 0 0 1 53.66 90.34L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; padding-right:28px; }
     .claims-dl-btn { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border,#ebebeb); border-radius:6px; padding:6px 12px; font:500 13px/18px var(--font); color:#252424; background:white; cursor:pointer; white-space:nowrap; }
     .claims-dl-btn:hover { background:#f8f8f8; }
     /* Recommendation box */
@@ -3803,6 +3804,7 @@
       claimsTab:       'performance',
       claimsAccount:   null,
       claimsDetailTab: 'portfolio',
+      claimsReport: { account:'', product:'', status:'', page:1 },
     };
 
     // Home queue — sorted by urgency (Today first), per Figma 2:1829.
@@ -5205,6 +5207,55 @@
       { id:'pushpress',      name:'pushpress',       gwp:'$1.77M', prem:'$1.23M', claims:5,   open:0,  closed:5,   incurred:'$32K',   ultimate:'$423K',  lr:34.5 },
       { id:'withcoverage',   name:'withcoverage',    gwp:'$1.76M', prem:'$0.90M', claims:19,  open:8,  closed:11,  incurred:'$57K',   ultimate:'$431K',  lr:48.0 },
     ];
+    const ALL_CLAIMS_DATA = [
+      { id:'CLM-001', account:'hilbgrocery',   insured:'Hilb Grocery Inc.',         policy:'6210629HLB-GL1', product:'GL', location:'Brooklyn, NY',       desc:'Slip & Fall — Customer',      date:'Jan 15, 2026', status:'Open',   incurred:'$45,000' },
+      { id:'CLM-002', account:'hilbgrocery',   insured:'Hilb Grocery Inc.',         policy:'6210629HLB-GL1', product:'GL', location:'Bronx, NY',           desc:'Product Liability',           date:'Feb 03, 2026', status:'Open',   incurred:'$32,500' },
+      { id:'CLM-003', account:'hilbgrocery',   insured:'Hilb Grocery Inc.',         policy:'6210629HLB-GL1', product:'GL', location:'Queens, NY',          desc:'Slip & Fall — Customer',      date:'Feb 22, 2026', status:'Open',   incurred:'$28,000' },
+      { id:'CLM-004', account:'hilbgrocery',   insured:'Hilb Grocery Inc.',         policy:'6210629HLB-GL1', product:'GL', location:'Manhattan, NY',       desc:'Employee Injury',             date:'Mar 08, 2026', status:'Open',   incurred:'$18,750' },
+      { id:'CLM-005', account:'hilbgrocery',   insured:'Hilb Grocery Inc.',         policy:'6210629HLB-GL1', product:'GL', location:'Staten Island, NY',   desc:'Property Damage',             date:'Mar 12, 2026', status:'Closed', incurred:'$12,000' },
+      { id:'CLM-006', account:'hilbgrocery',   insured:'Hilb Grocery Inc.',         policy:'6210629HLB-GL1', product:'GL', location:'Brooklyn, NY',        desc:'Slip & Fall — Customer',      date:'Mar 19, 2026', status:'Open',   incurred:'$9,500'  },
+      { id:'CLM-007', account:'hubca',         insured:'BDE Florida LLC',           policy:'6210629HCA-GL1', product:'GL', location:'St. Petersburg, FL',  desc:'Customer Slip',               date:'Aug 04, 2026', status:'Open',   incurred:'$38,000' },
+      { id:'CLM-008', account:'hubca',         insured:'Anthraper Enterprise Inc.', policy:'6210629HCA-GL2', product:'GL', location:'Tampa, FL',           desc:'Customer Slip',               date:'Aug 04, 2026', status:'Open',   incurred:'$22,000' },
+      { id:'CLM-009', account:'hubca',         insured:'Ten Rod Donuts Inc.',       policy:'6210629HCA-GL3', product:'GL', location:'Miami, FL',            desc:'Fire — Kitchen',              date:'Jul 28, 2026', status:'Open',   incurred:'$95,000' },
+      { id:'CLM-010', account:'hubca',         insured:'Seaside Dining Group',      policy:'6210629HCA-GL4', product:'GL', location:'Fort Lauderdale, FL', desc:'Wrongful Death',              date:'Jul 15, 2026', status:'Open',   incurred:'$250,000'},
+      { id:'CLM-011', account:'hubca',         insured:'Wings of Dallas Inc.',      policy:'6210629HCA-GL5', product:'GL', location:'Orlando, FL',         desc:'Wrongful Death',              date:'Jul 10, 2026', status:'Open',   incurred:'$185,000'},
+      { id:'CLM-012', account:'hubca',         insured:'19293 LLC',                 policy:'6210629HCA-GL6', product:'GL', location:'Jacksonville, FL',    desc:'Customer Slip',               date:'Jun 30, 2026', status:'Closed', incurred:'$14,500' },
+      { id:'CLM-013', account:'hubca',         insured:'BDE Florida LLC',           policy:'6210629HCA-PL1', product:'PL', location:'St. Petersburg, FL',  desc:'Professional Error',          date:'Jun 15, 2026', status:'Open',   incurred:'$42,000' },
+      { id:'CLM-014', account:'hubca',         insured:'Seaside Dining Group',      policy:'6210629HCA-LL1', product:'LL', location:'Fort Lauderdale, FL', desc:'Liquor Liability — DUI',      date:'May 28, 2026', status:'Open',   incurred:'$78,000' },
+      { id:'CLM-015', account:'rtrestaurants', insured:'RT Restaurants LLC',        policy:'6210629RTR-GL1', product:'GL', location:'Dallas, TX',          desc:'Food Poisoning',              date:'Mar 05, 2026', status:'Open',   incurred:'$28,000' },
+      { id:'CLM-016', account:'rtrestaurants', insured:'RT Restaurants LLC',        policy:'6210629RTR-GL1', product:'GL', location:'Houston, TX',         desc:'Slip & Fall',                 date:'Apr 12, 2026', status:'Open',   incurred:'$22,000' },
+      { id:'CLM-017', account:'rtrestaurants', insured:'RT Restaurants LLC',        policy:'6210629RTR-LL1', product:'LL', location:'Austin, TX',          desc:'Liquor Liability — Assault',  date:'May 08, 2026', status:'Open',   incurred:'$55,000' },
+      { id:'CLM-018', account:'rtrestaurants', insured:'RT Restaurants LLC',        policy:'6210629RTR-GL1', product:'GL', location:'San Antonio, TX',     desc:'Premises Liability',          date:'Feb 18, 2026', status:'Closed', incurred:'$8,500'  },
+      { id:'CLM-019', account:'alliantgrocery',insured:'Alliant Grocery Corp',      policy:'6210629ALG-GL1', product:'GL', location:'Atlanta, GA',         desc:'Customer Injury',             date:'Jan 08, 2026', status:'Closed', incurred:'$3,200'  },
+      { id:'CLM-020', account:'alliantgrocery',insured:'Alliant Grocery Corp',      policy:'6210629ALG-GL1', product:'GL', location:'Savannah, GA',        desc:'Slip & Fall',                 date:'Feb 14, 2026', status:'Closed', incurred:'$6,400'  },
+      { id:'CLM-021', account:'alliantgrocery',insured:'Alliant Grocery Corp',      policy:'6210629ALG-GL1', product:'GL', location:'Macon, GA',           desc:'Product Contamination',       date:'Mar 22, 2026', status:'Open',   incurred:'$4,100'  },
+      { id:'CLM-022', account:'hubsmb',        insured:'Hub SMB Holdings',          policy:'6210629HSB-GL1', product:'GL', location:'New York, NY',        desc:'Premises Injury',             date:'Feb 05, 2026', status:'Open',   incurred:'$18,000' },
+      { id:'CLM-023', account:'hubsmb',        insured:'Hub SMB Holdings',          policy:'6210629HSB-GL1', product:'GL', location:'Newark, NJ',          desc:'Equipment Damage',            date:'Mar 18, 2026', status:'Open',   incurred:'$12,500' },
+      { id:'CLM-024', account:'hubsmb',        insured:'Hub SMB Holdings',          policy:'6210629HSB-PL1', product:'PL', location:'Jersey City, NJ',     desc:'Professional Liability',      date:'Apr 02, 2026', status:'Open',   incurred:'$35,000' },
+      { id:'CLM-025', account:'unleashed',     insured:'Unleashed Pet Supply',      policy:'6210629UNL-GL1', product:'GL', location:'Los Angeles, CA',     desc:'Animal Bite — Customer',      date:'Jan 22, 2026', status:'Closed', incurred:'$14,000' },
+      { id:'CLM-026', account:'unleashed',     insured:'Unleashed Pet Supply',      policy:'6210629UNL-GL1', product:'GL', location:'San Diego, CA',       desc:'Slip & Fall',                 date:'Feb 28, 2026', status:'Open',   incurred:'$9,800'  },
+      { id:'CLM-027', account:'unleashed',     insured:'Unleashed Pet Supply',      policy:'6210629UNL-GL1', product:'GL', location:'San Francisco, CA',   desc:'Animal Bite — Employee',      date:'Mar 15, 2026', status:'Open',   incurred:'$22,000' },
+      { id:'CLM-028', account:'unleashed',     insured:'Unleashed Pet Supply',      policy:'6210629UNL-PL1', product:'PL', location:'Sacramento, CA',      desc:'Professional Error',          date:'Apr 08, 2026', status:'Closed', incurred:'$8,500'  },
+      { id:'CLM-029', account:'gallagher',     insured:'Gallagher Foodservice',     policy:'6210629GAL-GL1', product:'GL', location:'Chicago, IL',         desc:'Customer Injury',             date:'Mar 30, 2026', status:'Open',   incurred:'$28,000' },
+      { id:'CLM-030', account:'gallagher',     insured:'Gallagher Foodservice',     policy:'6210629GAL-GL1', product:'GL', location:'Springfield, IL',     desc:'Property Damage',             date:'Apr 18, 2026', status:'Open',   incurred:'$16,000' },
+      { id:'CLM-031', account:'mcgriff',       insured:'McGriff Industries',        policy:'6210629MCG-GL1', product:'GL', location:'Charlotte, NC',        desc:'Premises Liability',          date:'Feb 10, 2026', status:'Open',   incurred:'$31,000' },
+      { id:'CLM-032', account:'mcgriff',       insured:'McGriff Industries',        policy:'6210629MCG-PL1', product:'PL', location:'Raleigh, NC',          desc:'Professional Error',          date:'Mar 25, 2026', status:'Open',   incurred:'$45,000' },
+      { id:'CLM-033', account:'mcgriff',       insured:'McGriff Industries',        policy:'6210629MCG-GL1', product:'GL', location:'Durham, NC',           desc:'Employee Injury',             date:'Apr 30, 2026', status:'Closed', incurred:'$9,500'  },
+      { id:'CLM-034', account:'mindbody',      insured:'Mindbody Fitness Inc.',     policy:'6210629MBD-GL1', product:'GL', location:'Santa Barbara, CA',    desc:'Equipment Injury',            date:'Jan 30, 2026', status:'Open',   incurred:'$42,000' },
+      { id:'CLM-035', account:'mindbody',      insured:'Mindbody Fitness Inc.',     policy:'6210629MBD-GL1', product:'GL', location:'San Luis Obispo, CA', desc:'Member Injury',               date:'Mar 12, 2026', status:'Closed', incurred:'$18,000' },
+      { id:'CLM-036', account:'borg',          insured:'Borg Enterprises',          policy:'6210629BRG-GL1', product:'GL', location:'Philadelphia, PA',     desc:'Slip & Fall',                 date:'Feb 15, 2026', status:'Open',   incurred:'$25,000' },
+      { id:'CLM-037', account:'borg',          insured:'Borg Enterprises',          policy:'6210629BRG-GL1', product:'GL', location:'Pittsburgh, PA',       desc:'Equipment Damage',            date:'Apr 05, 2026', status:'Open',   incurred:'$19,000' },
+      { id:'CLM-038', account:'alliantsmb',    insured:'Alliant SMB Group',         policy:'6210629ALS-GL1', product:'GL', location:'Boston, MA',          desc:'Customer Injury',             date:'Apr 20, 2026', status:'Open',   incurred:'$5,500'  },
+      { id:'CLM-039', account:'morstan',       insured:'Morstan General Inc.',      policy:'6210629MRS-GL1', product:'GL', location:'Nashville, TN',        desc:'Premises Liability',          date:'Mar 08, 2026', status:'Open',   incurred:'$18,500' },
+      { id:'CLM-040', account:'morstan',       insured:'Morstan General Inc.',      policy:'6210629MRS-PL1', product:'PL', location:'Memphis, TN',          desc:'Professional Error',          date:'Apr 15, 2026', status:'Open',   incurred:'$28,000' },
+      { id:'CLM-041', account:'pushpress',     insured:'PushPress Inc.',            policy:'6210629PPR-PL1', product:'PL', location:'Denver, CO',           desc:'Software Error',              date:'Feb 22, 2026', status:'Closed', incurred:'$12,000' },
+      { id:'CLM-042', account:'pushpress',     insured:'PushPress Inc.',            policy:'6210629PPR-PL1', product:'PL', location:'Boulder, CO',          desc:'Data Breach',                 date:'Mar 30, 2026', status:'Closed', incurred:'$20,000' },
+      { id:'CLM-043', account:'withcoverage',  insured:'WithCoverage LLC',          policy:'6210629WCV-GL1', product:'GL', location:'Seattle, WA',          desc:'Customer Injury',             date:'Mar 18, 2026', status:'Open',   incurred:'$8,500'  },
+      { id:'CLM-044', account:'withcoverage',  insured:'WithCoverage LLC',          policy:'6210629WCV-PL1', product:'PL', location:'Portland, OR',         desc:'Professional Error',          date:'Apr 28, 2026', status:'Open',   incurred:'$15,000' },
+      { id:'CLM-045', account:'ima-rrma',      insured:'IMA RRMA Group',            policy:'6210629IMA-GL1', product:'GL', location:'New York, NY',         desc:'Premises Liability',          date:'Feb 18, 2026', status:'Open',   incurred:'$2,500'  },
+      { id:'CLM-046', account:'ima-rrma',      insured:'IMA RRMA Group',            policy:'6210629IMA-GL1', product:'GL', location:'New Jersey, NJ',       desc:'Equipment Failure',           date:'Apr 05, 2026', status:'Open',   incurred:'$2,800'  },
+      { id:'CLM-047', account:'ima-rrma',      insured:'IMA RRMA Group',            policy:'6210629IMA-GL1', product:'GL', location:'Connecticut, CT',      desc:'Slip & Fall',                 date:'May 12, 2026', status:'Open',   incurred:'$900'    },
+    ];
     const CLAIMS_DETAIL_DATA = {
       hilbgrocery: {
         name:'hilbgrocery',
@@ -5997,53 +6048,146 @@
     }
 
     function renderClaimsReport() {
-      const lrBadge = lr => {
-        const ok = lr < 60;
-        return `<span style="display:inline-block;background:${ok?'#e8f5e9':'#fce4ec'};color:${ok?'#2e7d32':'#c62828'};border-radius:4px;padding:2px 8px;font-size:12px;font-weight:500;">${lr.toFixed(1)}%</span>`;
+      const f = State.claimsReport;
+      const PAGE_SIZE = 15;
+
+      // Filter
+      let claims = ALL_CLAIMS_DATA.slice();
+      if (f.account) claims = claims.filter(c => c.account === f.account);
+      if (f.product) claims = claims.filter(c => c.product === f.product);
+      if (f.status)  claims = claims.filter(c => c.status  === f.status);
+
+      // KPI aggregates from filtered set
+      const totalOpen   = claims.filter(c=>c.status==='Open').length;
+      const totalClosed = claims.filter(c=>c.status==='Closed').length;
+      const severe      = claims.filter(c=>parseInt(c.incurred.replace(/[$,]/g,''))>=50000).length;
+
+      // Pagination
+      const totalPages = Math.max(1, Math.ceil(claims.length / PAGE_SIZE));
+      const page       = Math.min(f.page || 1, totalPages);
+      const start      = (page - 1) * PAGE_SIZE;
+      const pageClaims = claims.slice(start, start + PAGE_SIZE);
+
+      // Product badge
+      const productBadge = p => {
+        const colors = { GL:'#e3f1fa:#1a6596', PL:'#f3eafd:#7c3aed', LL:'#fff3e0:#b45309' };
+        const [bg,fg] = (colors[p]||'#f0f0f0:#555').split(':');
+        return `<span style="display:inline-flex;align-items:center;background:${bg};color:${fg};border-radius:4px;padding:1px 7px;font:500 11px/16px var(--font);white-space:nowrap">${p}</span>`;
       };
-      const rows = CLAIMS_ACCT_ROWS.map(r=>`
-        <tr class="claims-tbl-row" data-claims-account="${r.id}" style="cursor:pointer">
-          <td class="claims-full-td" style="font-weight:500">${r.name}</td>
-          <td class="claims-full-td r mono">${r.gwp}</td>
-          <td class="claims-full-td r mono">${r.prem}</td>
-          <td class="claims-full-td r mono">${r.claims}</td>
-          <td class="claims-full-td r mono">${r.open}</td>
-          <td class="claims-full-td r mono">${r.ultimate}</td>
-          <td class="claims-full-td r">${lrBadge(r.lr)}</td>
-          <td class="claims-full-td r mono">${r.incurred}</td>
+
+      // Status badge
+      const statusBadge = s => {
+        const open = s === 'Open';
+        return `<span style="display:inline-flex;align-items:center;gap:4px;background:${open?'#e3f1fa':'#e8f5e9'};color:${open?'#1a6596':'#2e7d32'};border-radius:4px;padding:2px 8px;font:500 11px/15px var(--font)">
+          <span style="width:5px;height:5px;border-radius:50%;background:${open?'#1a6596':'#2e7d32'};flex-shrink:0"></span>${s}</span>`;
+      };
+
+      // Account options
+      const accounts = [...new Set(ALL_CLAIMS_DATA.map(c=>c.account))].sort();
+
+      const tableRows = pageClaims.map(c=>`
+        <tr class="claims-tbl-row">
+          <td class="claims-full-td" style="padding-left:16px">
+            <div style="width:16px;height:16px;border:1px solid #868585;border-radius:4px;flex-shrink:0"></div>
+          </td>
+          <td class="claims-full-td" style="font-weight:500;white-space:nowrap">${c.account}</td>
+          <td class="claims-full-td" style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${c.insured}">${c.insured}</td>
+          <td class="claims-full-td mono" style="font-size:12px;color:#868585">${c.policy}</td>
+          <td class="claims-full-td">${productBadge(c.product)}</td>
+          <td class="claims-full-td" style="white-space:nowrap">${c.location}</td>
+          <td class="claims-full-td" style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${c.desc}">${c.desc}</td>
+          <td class="claims-full-td" style="white-space:nowrap;color:#868585;font-size:13px">${c.date}</td>
+          <td class="claims-full-td">${statusBadge(c.status)}</td>
         </tr>`).join('');
+
+      const pagerBtn = (dir, disabled) => `
+        <button class="claims-pg-btn" ${disabled?'disabled style="opacity:.4;cursor:default"':''} data-claims-page="${dir}">
+          <i class="ph ph-caret-${dir==='prev'?'left':'right'}" style="font-size:11px"></i>
+        </button>`;
+
+      const selOpts = (vals, cur, key) =>
+        vals.map(v=>`<option value="${v}" ${cur===v?'selected':''}>${v||'All'}</option>`).join('');
+
       return `
-        <div class="claims-filter-row">
-          <div class="claims-filter-sel"><span>Total Years</span><i class="ph ph-caret-down" style="font-size:11px;color:#868585"></i></div>
-          <div class="claims-filter-sel"><span>All Builds</span><i class="ph ph-caret-down" style="font-size:11px;color:#868585"></i></div>
-          <div class="claims-filter-sel"><span>All Coverage</span><i class="ph ph-caret-down" style="font-size:11px;color:#868585"></i></div>
-          <div style="flex:1"></div>
-          <button class="claims-dl-btn"><i class="ph ph-download-simple" style="font-size:13px"></i> Download Report</button>
+        <div class="claims-kpi-strip" style="border-radius:0;border-left:0;border-right:0;border-top:0">
+          <div class="claims-kpi">
+            <div class="claims-kpi-label" style="font-size:10px;color:#868585">Total Open Claims</div>
+            <div style="display:flex;align-items:center;gap:4px;margin:2px 0">
+              <div class="claims-kpi-val">${totalOpen}</div>
+              <span style="display:inline-flex;align-items:center;gap:3px;background:#eaf5ef;border:1px solid #abd7bf;border-radius:999px;padding:2px 7px;font:400 12px/14px var(--font);color:#277e4f;white-space:nowrap">
+                <i class="ph ph-trend-up" style="font-size:12px"></i> +10
+              </span>
+            </div>
+            <div class="claims-kpi-sub">As of today</div>
+          </div>
+          <div class="claims-kpi">
+            <div class="claims-kpi-label" style="font-size:10px;color:#868585">Total Closed Claims</div>
+            <div style="display:flex;align-items:center;gap:4px;margin:2px 0">
+              <div class="claims-kpi-val">${totalClosed}</div>
+              <span style="display:inline-flex;align-items:center;gap:3px;background:#eaf5ef;border:1px solid #abd7bf;border-radius:999px;padding:2px 7px;font:400 12px/14px var(--font);color:#277e4f;white-space:nowrap">
+                <i class="ph ph-trend-up" style="font-size:12px"></i> +20
+              </span>
+            </div>
+            <div class="claims-kpi-sub">As of today</div>
+          </div>
+          <div class="claims-kpi">
+            <div class="claims-kpi-label" style="font-size:10px;color:#868585">Severe Claims</div>
+            <div class="claims-kpi-val" style="margin:2px 0">${severe}</div>
+            <div class="claims-kpi-sub">Incurred ≥ $50K</div>
+          </div>
+          <div class="claims-kpi">
+            <div class="claims-kpi-label" style="font-size:10px;color:#868585">New Premium</div>
+            <div class="claims-kpi-val" style="margin:2px 0">$2M</div>
+            <div class="claims-kpi-sub">Upcoming</div>
+          </div>
+          <div class="claims-kpi" style="border-right:0">
+            <div class="claims-kpi-label" style="font-size:10px;color:#868585">Incl. IBNR</div>
+            <div class="claims-kpi-val" style="margin:2px 0">$19.7M</div>
+            <div class="claims-kpi-sub">Est. Ultimate Loss</div>
+          </div>
         </div>
-        <div class="claims-tbl-section">
+        <div class="claims-filter-row">
+          <select class="claims-filter-sel" id="cr-account" style="appearance:none">
+            <option value="">All Accounts</option>
+            ${selOpts(accounts, f.account, 'account')}
+          </select>
+          <select class="claims-filter-sel" id="cr-product" style="appearance:none">
+            <option value="">All Products</option>
+            ${selOpts(['GL','PL','LL'], f.product, 'product')}
+          </select>
+          <select class="claims-filter-sel" id="cr-status" style="appearance:none">
+            <option value="">All Status</option>
+            ${selOpts(['Open','Closed'], f.status, 'status')}
+          </select>
+          <div style="flex:1"></div>
+          <button class="claims-dl-btn"><i class="ph ph-download-simple" style="font-size:13px"></i> Download</button>
+        </div>
+        <div class="claims-tbl-section" style="flex-shrink:0">
           <div class="claims-tbl-section-head">
-            <span class="claims-tbl-section-title">Account Claim Report</span>
-            <span style="font:400 12px/16px var(--font);color:#868585">Click any account to view loss runs</span>
+            <span class="claims-tbl-section-title">All Claims</span>
+            <span style="font:400 12px/16px var(--font);color:#868585">${claims.length} claim${claims.length!==1?'s':''}</span>
           </div>
           <table class="claims-full-tbl">
             <thead><tr>
+              <th class="claims-full-th" style="width:48px;padding-left:16px">
+                <div style="width:16px;height:16px;border:1px solid #868585;border-radius:4px"></div>
+              </th>
               <th class="claims-full-th">Account Name</th>
-              <th class="claims-full-th r">Written Premium</th>
-              <th class="claims-full-th r">Earned Premium</th>
-              <th class="claims-full-th r">Total Claims</th>
-              <th class="claims-full-th r">Open Claims</th>
-              <th class="claims-full-th r">EST. Ultimate</th>
-              <th class="claims-full-th r">Ultimate LR</th>
-              <th class="claims-full-th r">IBNR</th>
+              <th class="claims-full-th">Insured Name</th>
+              <th class="claims-full-th">Policy Number</th>
+              <th class="claims-full-th">Product</th>
+              <th class="claims-full-th">Location</th>
+              <th class="claims-full-th">Event Description</th>
+              <th class="claims-full-th">Claim Date</th>
+              <th class="claims-full-th">Status</th>
             </tr></thead>
-            <tbody>${rows}</tbody>
+            <tbody>${tableRows || '<tr><td colspan="9" style="padding:24px;text-align:center;color:#868585">No claims match the selected filters.</td></tr>'}</tbody>
           </table>
           <div class="claims-pagination">
-            <span>Rows per page:</span>
-            <select class="claims-pg-sel"><option>15</option><option>25</option><option>50</option></select>
-            <span>1–${CLAIMS_ACCT_ROWS.length} of ${CLAIMS_ACCT_ROWS.length}</span>
-            <button class="claims-pg-btn"><i class="ph ph-caret-left" style="font-size:11px"></i></button>
-            <button class="claims-pg-btn"><i class="ph ph-caret-right" style="font-size:11px"></i></button>
+            <span>Rows per page: ${PAGE_SIZE}</span>
+            <span>${start+1}–${Math.min(start+PAGE_SIZE, claims.length)} of ${claims.length}</span>
+            ${pagerBtn('prev', page<=1)}
+            ${pagerBtn('next', page>=totalPages)}
           </div>
         </div>`;
     }
@@ -10575,6 +10719,23 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
           State.claimsAccount = null;
           render();
         };
+
+        // Claim Report tab — filter dropdowns
+        const crAccount = document.getElementById('cr-account');
+        const crProduct = document.getElementById('cr-product');
+        const crStatus  = document.getElementById('cr-status');
+        if (crAccount) crAccount.onchange = () => { State.claimsReport.account = crAccount.value; State.claimsReport.page = 1; render(); };
+        if (crProduct) crProduct.onchange = () => { State.claimsReport.product = crProduct.value; State.claimsReport.page = 1; render(); };
+        if (crStatus)  crStatus.onchange  = () => { State.claimsReport.status  = crStatus.value;  State.claimsReport.page = 1; render(); };
+        // Claim Report tab — pagination
+        document.querySelectorAll('[data-claims-page]').forEach(btn => {
+          btn.onclick = () => {
+            const dir = btn.dataset.claimsPage;
+            if (dir === 'prev') State.claimsReport.page = Math.max(1, (State.claimsReport.page||1) - 1);
+            else                State.claimsReport.page = (State.claimsReport.page||1) + 1;
+            render();
+          };
+        });
 
         // Chart tooltip — wire once on first claims visit; persists across re-renders
         if (!window._cttBound) {
