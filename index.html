@@ -5261,6 +5261,9 @@
       { id:'CLM-046', account:'ima-rrma',      insured:'IMA RRMA Group',            policy:'6210629IMA-GL1', product:'GL', location:'New Jersey, NJ',       desc:'Equipment Failure',           date:'Apr 05, 2026', status:'Open',   incurred:'$2,800'  },
       { id:'CLM-047', account:'ima-rrma',      insured:'IMA RRMA Group',            policy:'6210629IMA-GL1', product:'GL', location:'Connecticut, CT',      desc:'Slip & Fall',                 date:'May 12, 2026', status:'Open',   incurred:'$900'    },
     ];
+    // Auto-populate watchlist with severe claims (incurred ≥ $50K)
+    State.watchlist = ALL_CLAIMS_DATA.filter(c => parseInt(c.incurred.replace(/[$,]/g,'')) >= 50000).map(c => c.id);
+
     const CLAIMS_DETAIL_DATA = {
       hilbgrocery: {
         name:'hilbgrocery',
