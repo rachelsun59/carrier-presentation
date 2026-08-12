@@ -3804,7 +3804,7 @@
       claimsTab:       'performance',
       claimsAccount:   null,
       claimsDetailTab: 'portfolio',
-      claimsReport: { account:'', product:'', status:'', page:1 },
+      claimsReport: { account:'', product:'', status:'', page:1, severeOnly:false, dateFrom:'', dateTo:'' },
       claimsReportClaim: null,
       watchlist:         [],
       selectedClaims:    [],
@@ -6062,10 +6062,15 @@
       if (f.product) claims = claims.filter(c => c.product === f.product);
       if (f.status)  claims = claims.filter(c => c.status  === f.status);
 
-      // KPI aggregates from filtered set
+      // KPI aggregates (from top-level filters, before severity/date filter)
       const totalOpen   = claims.filter(c=>c.status==='Open').length;
       const totalClosed = claims.filter(c=>c.status==='Closed').length;
       const severe      = claims.filter(c=>parseInt(c.incurred.replace(/[$,]/g,''))>=50000).length;
+
+      // Severity + date filters (applied after KPI aggregates)
+      if (f.severeOnly) claims = claims.filter(c=>parseInt(c.incurred.replace(/[$,]/g,''))>=50000);
+      if (f.dateFrom) { const from = new Date(f.dateFrom); claims = claims.filter(c=>new Date(c.date)>=from); }
+      if (f.dateTo)   { const to   = new Date(f.dateTo);   claims = claims.filter(c=>new Date(c.date)<=to);   }
 
       // Pagination
       const totalPages = Math.max(1, Math.ceil(claims.length / PAGE_SIZE));
@@ -6135,10 +6140,10 @@
             </div>
             <div class="claims-kpi-sub">As of today</div>
           </div>
-          <div class="claims-kpi">
-            <div class="claims-kpi-label" style="font-size:10px;color:#868585">Severe Claims</div>
-            <div class="claims-kpi-val" style="margin:2px 0">${severe}</div>
-            <div class="claims-kpi-sub">Incurred ≥ $50K</div>
+          <div class="claims-kpi" id="cr-severe-kpi" style="cursor:pointer;${f.severeOnly?'background:#fdf4f1;border-color:#cf5c3f;outline:1px solid #cf5c3f;':''}" title="Click to filter severe claims">
+            <div class="claims-kpi-label" style="font-size:10px;color:${f.severeOnly?'#cf5c3f':'#868585'}">Severe Claims</div>
+            <div class="claims-kpi-val" style="margin:2px 0;color:${f.severeOnly?'#cf5c3f':'inherit'}">${severe}</div>
+            <div class="claims-kpi-sub" style="color:${f.severeOnly?'#cf5c3f':'inherit'}">Incurred ≥ $50K</div>
           </div>
           <div class="claims-kpi">
             <div class="claims-kpi-label" style="font-size:10px;color:#868585">New Premium</div>
@@ -6164,6 +6169,11 @@
             <option value="">All Status</option>
             ${selOpts(['Open','Closed'], f.status, 'status')}
           </select>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input type="date" id="cr-date-from" value="${f.dateFrom||''}" style="border:1px solid #cfcece;border-radius:6px;padding:5px 8px;font:400 13px/18px var(--font);color:#252424;background:white;cursor:pointer" title="From date" />
+            <span style="font:400 12px/16px var(--font);color:#868585">–</span>
+            <input type="date" id="cr-date-to" value="${f.dateTo||''}" style="border:1px solid #cfcece;border-radius:6px;padding:5px 8px;font:400 13px/18px var(--font);color:#252424;background:white;cursor:pointer" title="To date" />
+          </div>
           <div style="flex:1"></div>
           <button class="claims-dl-btn" id="cr-add-watchlist" style="display:inline-flex;align-items:center;gap:6px;border:1px solid #cfcece;border-radius:6px;padding:6px 12px;font:500 13px/18px var(--font);color:#252424;background:white;cursor:pointer;white-space:nowrap">
             <i class="ph ph-plus-circle" style="font-size:13px;color:#cf5c3f"></i> Add to watchlist
@@ -10991,6 +11001,14 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
         if (crAccount) crAccount.onchange = () => { State.claimsReport.account = crAccount.value; State.claimsReport.page = 1; render(); };
         if (crProduct) crProduct.onchange = () => { State.claimsReport.product = crProduct.value; State.claimsReport.page = 1; render(); };
         if (crStatus)  crStatus.onchange  = () => { State.claimsReport.status  = crStatus.value;  State.claimsReport.page = 1; render(); };
+        // Claim Report — date range pickers
+        const crDateFrom = document.getElementById('cr-date-from');
+        const crDateTo   = document.getElementById('cr-date-to');
+        if (crDateFrom) crDateFrom.onchange = () => { State.claimsReport.dateFrom = crDateFrom.value; State.claimsReport.page = 1; render(); };
+        if (crDateTo)   crDateTo.onchange   = () => { State.claimsReport.dateTo   = crDateTo.value;   State.claimsReport.page = 1; render(); };
+        // Claim Report — severe KPI card toggle
+        const crSevereKpi = document.getElementById('cr-severe-kpi');
+        if (crSevereKpi) crSevereKpi.onclick = () => { State.claimsReport.severeOnly = !State.claimsReport.severeOnly; State.claimsReport.page = 1; render(); };
         // Claim Report tab — pagination
         document.querySelectorAll('[data-claims-page]').forEach(btn => {
           btn.onclick = () => {
