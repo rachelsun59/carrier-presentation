@@ -3804,7 +3804,7 @@
       claimsTab:       'performance',
       claimsAccount:   null,
       claimsDetailTab: 'portfolio',
-      claimsReport: { account:'', product:'', status:'', page:1 },
+      claimsReport: { account:'', product:'', status:'', page:1, colFilters:{ account:'', insured:'', policy:'', product:'', location:'', desc:'', date:'', status:'' } },
       claimsReportClaim: null,
     };
 
@@ -6052,11 +6052,23 @@
       const f = State.claimsReport;
       const PAGE_SIZE = 15;
 
-      // Filter
+      // Filter — top-level selects
       let claims = ALL_CLAIMS_DATA.slice();
       if (f.account) claims = claims.filter(c => c.account === f.account);
       if (f.product) claims = claims.filter(c => c.product === f.product);
       if (f.status)  claims = claims.filter(c => c.status  === f.status);
+
+      // Column-level filters
+      const cf = f.colFilters || {};
+      const ci = s => s.toLowerCase();
+      if (cf.account)  claims = claims.filter(c => ci(c.account).includes(ci(cf.account)));
+      if (cf.insured)  claims = claims.filter(c => ci(c.insured).includes(ci(cf.insured)));
+      if (cf.policy)   claims = claims.filter(c => ci(c.policy).includes(ci(cf.policy)));
+      if (cf.product)  claims = claims.filter(c => c.product === cf.product);
+      if (cf.location) claims = claims.filter(c => ci(c.location).includes(ci(cf.location)));
+      if (cf.desc)     claims = claims.filter(c => ci(c.desc).includes(ci(cf.desc)));
+      if (cf.date)     claims = claims.filter(c => ci(c.date).includes(ci(cf.date)));
+      if (cf.status)   claims = claims.filter(c => c.status === cf.status);
 
       // KPI aggregates from filtered set
       const totalOpen   = claims.filter(c=>c.status==='Open').length;
@@ -6169,19 +6181,45 @@
             <span style="font:400 12px/16px var(--font);color:#868585">${claims.length} claim${claims.length!==1?'s':''}</span>
           </div>
           <table class="claims-full-tbl">
-            <thead><tr>
-              <th class="claims-full-th" style="width:48px;padding-left:16px">
-                <div style="width:16px;height:16px;border:1px solid #868585;border-radius:4px"></div>
-              </th>
-              <th class="claims-full-th">Account Name</th>
-              <th class="claims-full-th">Insured Name</th>
-              <th class="claims-full-th">Policy Number</th>
-              <th class="claims-full-th">Product</th>
-              <th class="claims-full-th">Location</th>
-              <th class="claims-full-th">Event Description</th>
-              <th class="claims-full-th">Claim Date</th>
-              <th class="claims-full-th">Status</th>
-            </tr></thead>
+            <thead>
+              <tr>
+                <th class="claims-full-th" style="width:48px;padding-left:16px">
+                  <div style="width:16px;height:16px;border:1px solid #868585;border-radius:4px"></div>
+                </th>
+                <th class="claims-full-th">Account Name</th>
+                <th class="claims-full-th">Insured Name</th>
+                <th class="claims-full-th">Policy Number</th>
+                <th class="claims-full-th">Product</th>
+                <th class="claims-full-th">Location</th>
+                <th class="claims-full-th">Event Description</th>
+                <th class="claims-full-th">Claim Date</th>
+                <th class="claims-full-th">Status</th>
+              </tr>
+              <tr style="background:#fafafa">
+                <th style="padding:4px 8px 6px 16px;border-bottom:1px solid #ebebeb"></th>
+                <th style="padding:4px 8px 6px"><input type="text" data-col-filter="account" value="${cf.account||''}" placeholder="Filter…" style="width:100%;border:1px solid #ebebeb;border-radius:4px;padding:3px 6px;font:400 12px/16px var(--font);color:#252424;background:white;box-sizing:border-box" /></th>
+                <th style="padding:4px 8px 6px"><input type="text" data-col-filter="insured" value="${cf.insured||''}" placeholder="Filter…" style="width:100%;border:1px solid #ebebeb;border-radius:4px;padding:3px 6px;font:400 12px/16px var(--font);color:#252424;background:white;box-sizing:border-box" /></th>
+                <th style="padding:4px 8px 6px"><input type="text" data-col-filter="policy" value="${cf.policy||''}" placeholder="Filter…" style="width:100%;border:1px solid #ebebeb;border-radius:4px;padding:3px 6px;font:400 12px/16px var(--font);color:#252424;background:white;box-sizing:border-box" /></th>
+                <th style="padding:4px 8px 6px">
+                  <select data-col-filter="product" style="width:100%;border:1px solid #ebebeb;border-radius:4px;padding:3px 6px;font:400 12px/16px var(--font);color:#252424;background:white;box-sizing:border-box;cursor:pointer;-webkit-appearance:none;appearance:none">
+                    <option value="">All</option>
+                    <option value="GL" ${(cf.product||'')==='GL'?'selected':''}>GL</option>
+                    <option value="PL" ${(cf.product||'')==='PL'?'selected':''}>PL</option>
+                    <option value="LL" ${(cf.product||'')==='LL'?'selected':''}>LL</option>
+                  </select>
+                </th>
+                <th style="padding:4px 8px 6px"><input type="text" data-col-filter="location" value="${cf.location||''}" placeholder="Filter…" style="width:100%;border:1px solid #ebebeb;border-radius:4px;padding:3px 6px;font:400 12px/16px var(--font);color:#252424;background:white;box-sizing:border-box" /></th>
+                <th style="padding:4px 8px 6px"><input type="text" data-col-filter="desc" value="${cf.desc||''}" placeholder="Filter…" style="width:100%;border:1px solid #ebebeb;border-radius:4px;padding:3px 6px;font:400 12px/16px var(--font);color:#252424;background:white;box-sizing:border-box" /></th>
+                <th style="padding:4px 8px 6px"><input type="text" data-col-filter="date" value="${cf.date||''}" placeholder="Filter…" style="width:100%;border:1px solid #ebebeb;border-radius:4px;padding:3px 6px;font:400 12px/16px var(--font);color:#252424;background:white;box-sizing:border-box" /></th>
+                <th style="padding:4px 8px 6px">
+                  <select data-col-filter="status" style="width:100%;border:1px solid #ebebeb;border-radius:4px;padding:3px 6px;font:400 12px/16px var(--font);color:#252424;background:white;box-sizing:border-box;cursor:pointer;-webkit-appearance:none;appearance:none">
+                    <option value="">All</option>
+                    <option value="Open" ${(cf.status||'')==='Open'?'selected':''}>Open</option>
+                    <option value="Closed" ${(cf.status||'')==='Closed'?'selected':''}>Closed</option>
+                  </select>
+                </th>
+              </tr>
+            </thead>
             <tbody>${tableRows || '<tr><td colspan="9" style="padding:24px;text-align:center;color:#868585">No claims match the selected filters.</td></tr>'}</tbody>
           </table>
           <div class="claims-pagination">
@@ -10843,6 +10881,28 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
           State.claimsAccount = null;
           render();
         };
+
+        // Claim Report — column filter text inputs (oninput so typing feels live; restore focus after re-render)
+        document.querySelectorAll('input[data-col-filter]').forEach(input => {
+          input.oninput = () => {
+            const key = input.dataset.colFilter;
+            if (!State.claimsReport.colFilters) State.claimsReport.colFilters = {};
+            State.claimsReport.colFilters[key] = input.value;
+            State.claimsReport.page = 1;
+            render();
+            const refocus = document.querySelector(`input[data-col-filter="${key}"]`);
+            if (refocus) { const len = refocus.value.length; refocus.focus(); refocus.setSelectionRange(len, len); }
+          };
+        });
+        // Claim Report — column filter select dropdowns
+        document.querySelectorAll('select[data-col-filter]').forEach(sel => {
+          sel.onchange = () => {
+            if (!State.claimsReport.colFilters) State.claimsReport.colFilters = {};
+            State.claimsReport.colFilters[sel.dataset.colFilter] = sel.value;
+            State.claimsReport.page = 1;
+            render();
+          };
+        });
 
         // Claim Report — individual claim row click → detail view
         document.querySelectorAll('[data-claim-id]').forEach(row => {
