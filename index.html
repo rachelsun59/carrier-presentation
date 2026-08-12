@@ -3806,6 +3806,10 @@
       claimsDetailTab: 'portfolio',
       claimsReport: { account:'', product:'', status:'', page:1, colFilters:{ account:'', insured:'', policy:'', product:'', location:'', desc:'', date:'', status:'' } },
       claimsReportClaim: null,
+      watchlist:         [],
+      selectedClaims:    [],
+      watchlistFilters:  { account:'', product:'' },
+      watchlistSelected: [],
     };
 
     // Home queue — sorted by urgency (Today first), per Figma 2:1829.
@@ -6100,8 +6104,8 @@
 
       const tableRows = pageClaims.map(c=>`
         <tr class="claims-tbl-row" data-claim-id="${c.id}" style="cursor:pointer">
-          <td class="claims-full-td" style="padding-left:16px">
-            <div style="width:16px;height:16px;border:1px solid #868585;border-radius:4px;flex-shrink:0"></div>
+          <td class="claims-full-td" style="padding-left:16px" onclick="event.stopPropagation()">
+            <input type="checkbox" class="cr-claim-cb" data-select-claim="${c.id}" ${(State.selectedClaims||[]).includes(c.id)?'checked':''} style="width:16px;height:16px;cursor:pointer;accent-color:#cf5c3f;flex-shrink:0" />
           </td>
           <td class="claims-full-td" style="font-weight:500;white-space:nowrap">${c.account}</td>
           <td class="claims-full-td" style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${c.insured}">${c.insured}</td>
@@ -6173,6 +6177,9 @@
             ${selOpts(['Open','Closed'], f.status, 'status')}
           </select>
           <div style="flex:1"></div>
+          <button class="claims-dl-btn" id="cr-add-watchlist" style="display:inline-flex;align-items:center;gap:6px;border:1px solid #cfcece;border-radius:6px;padding:6px 12px;font:500 13px/18px var(--font);color:#252424;background:white;cursor:pointer;white-space:nowrap">
+            <i class="ph ph-plus-circle" style="font-size:13px;color:#cf5c3f"></i> Add to watchlist
+          </button>
           <button class="claims-dl-btn"><i class="ph ph-download-simple" style="font-size:13px"></i> Download</button>
         </div>
         <div class="claims-tbl-section" style="flex-shrink:0">
@@ -6184,7 +6191,7 @@
             <thead>
               <tr>
                 <th class="claims-full-th" style="width:48px;padding-left:16px">
-                  <div style="width:16px;height:16px;border:1px solid #868585;border-radius:4px"></div>
+                  <input type="checkbox" id="cr-select-all" style="width:16px;height:16px;cursor:pointer;accent-color:#cf5c3f" />
                 </th>
                 <th class="claims-full-th">Account Name</th>
                 <th class="claims-full-th">Insured Name</th>
@@ -6235,6 +6242,8 @@
       const c = ALL_CLAIMS_DATA.find(x => x.id === claimId) || ALL_CLAIMS_DATA[0];
       const coverageLabel = c.product === 'GL' ? 'General Liability' : c.product === 'PL' ? 'Professional Liability' : 'Liquor Liability';
       const isOpen = c.status === 'Open';
+      const onWatchlist = (State.watchlist||[]).includes(c.id);
+      const prevTabLabel = State.claimsTab === 'watchlist' ? 'Watchlist' : 'Claim Report';
 
       const statusTag = isOpen
         ? `<span style="display:inline-flex;align-items:center;background:#ebf2fb;border:1px solid #afccef;border-radius:999px;padding:2px 8px;font:400 12px/14px var(--font);color:#2e69ae">${c.status}</span>`
@@ -6296,7 +6305,7 @@
           <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
             <button id="claimdetail-claims-back" style="background:none;border:0;padding:2px 4px;font:400 12px/14px var(--font);color:#868585;cursor:pointer">Claims</button>
             <i class="ph ph-caret-right" style="font-size:10px;color:#868585"></i>
-            <button id="claimdetail-report-back" style="background:none;border:0;padding:2px 4px;font:400 12px/14px var(--font);color:#868585;cursor:pointer">Claim Report</button>
+            <button id="claimdetail-report-back" style="background:none;border:0;padding:2px 4px;font:400 12px/14px var(--font);color:#868585;cursor:pointer">${prevTabLabel}</button>
             <i class="ph ph-caret-right" style="font-size:10px;color:#868585"></i>
             <span style="font:400 12px/14px var(--font);color:#868585">${c.id}</span>
           </div>
@@ -6314,6 +6323,10 @@
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
               <span style="font:400 14px/15px var(--font);color:#868585">Status:</span>
               ${statusTag}
+              <button id="claim-detail-watchlist-btn" data-claim-id="${c.id}" style="display:inline-flex;align-items:center;gap:6px;border:1px solid ${onWatchlist?'#cf5c3f':'#cfcece'};border-radius:4px;padding:6px 10px;font:400 13px/18px var(--font);color:${onWatchlist?'#cf5c3f':'#252424'};background:white;cursor:pointer;white-space:nowrap">
+                <i class="ph ph-${onWatchlist?'bookmark-simple-fill':'bookmark-simple'}" style="font-size:14px"></i>
+                ${onWatchlist ? 'On Watchlist' : 'Add to watchlist'}
+              </button>
               <button style="display:inline-flex;align-items:center;justify-content:center;border:1px solid #cfcece;border-radius:4px;padding:8px;background:white;cursor:pointer">
                 <i class="ph ph-download-simple" style="font-size:16px;color:#252424"></i>
               </button>
@@ -6353,18 +6366,123 @@
         </div>`;
     }
 
+    function renderWatchlist() {
+      const wf = State.watchlistFilters || {};
+      let claims = (ALL_CLAIMS_DATA || []).filter(c => (State.watchlist||[]).includes(c.id));
+      if (wf.account) claims = claims.filter(c => c.account.toLowerCase().includes(wf.account.toLowerCase()));
+      if (wf.product) claims = claims.filter(c => c.product === wf.product);
+
+      const closedCount = claims.filter(c => c.status === 'Closed').length;
+      const severCount  = claims.filter(c => parseFloat((c.incurred||'$0').replace(/[$,]/g,'')) > 50000).length;
+
+      const prodBadge = p => {
+        const m = {GL:['#e3f1fa','#1a6596'],PL:['#f3eafd','#7c3aed'],LL:['#fff3e0','#b45309']};
+        const [bg,fg] = m[p]||['#f3f3f3','#444'];
+        return `<span style="display:inline-flex;align-items:center;background:${bg};border-radius:4px;padding:2px 6px;font:500 11px/16px var(--font);color:${fg}">${p}</span>`;
+      };
+      const statusBadge = s => s === 'Open'
+        ? `<span style="display:inline-flex;align-items:center;gap:4px;font:400 13px/18px var(--font);color:#2e69ae"><span style="width:6px;height:6px;border-radius:50%;background:#2e69ae;flex-shrink:0"></span>Open</span>`
+        : `<span style="display:inline-flex;align-items:center;gap:4px;font:400 13px/18px var(--font);color:#2e7d32"><span style="width:6px;height:6px;border-radius:50%;background:#2e7d32;flex-shrink:0"></span>Closed</span>`;
+
+      const hasSelected = (State.watchlistSelected||[]).length > 0;
+      const allChecked  = claims.length > 0 && claims.every(c => (State.watchlistSelected||[]).includes(c.id));
+
+      const rows = claims.map(c => `
+        <tr class="claims-tbl-row" style="cursor:pointer" data-claim-id="${c.id}">
+          <td class="claims-full-td" style="padding-left:16px" onclick="event.stopPropagation()">
+            <input type="checkbox" class="wl-select-cb" data-select-wl="${c.id}" ${(State.watchlistSelected||[]).includes(c.id)?'checked':''} style="width:16px;height:16px;cursor:pointer;accent-color:#cf5c3f;flex-shrink:0" />
+          </td>
+          <td class="claims-full-td">${c.account}</td>
+          <td class="claims-full-td">${c.insured}</td>
+          <td class="claims-full-td">${c.policy}</td>
+          <td class="claims-full-td">${prodBadge(c.product)}</td>
+          <td class="claims-full-td">${c.location}</td>
+          <td class="claims-full-td">${c.desc}</td>
+          <td class="claims-full-td">${c.date}</td>
+          <td class="claims-full-td">${c.incurred}</td>
+          <td class="claims-full-td">${statusBadge(c.status)}</td>
+        </tr>`).join('');
+
+      const emptyRow = `<tr><td colspan="10" style="text-align:center;padding:40px;font:400 14px/20px var(--font);color:#868585">No watchlisted claims</td></tr>`;
+
+      return `
+        <div style="display:flex;gap:16px;flex-shrink:0">
+          <div style="flex:1;border:1px solid #ebebeb;border-radius:8px;background:white;padding:16px 20px;display:flex;flex-direction:column;gap:4px">
+            <div style="font:500 13px/18px var(--font);color:#868585">Total Closed Claims</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="font-family:var(--font-display);font-size:28px;line-height:32px;color:#252424">${closedCount}</div>
+              <span style="display:inline-flex;align-items:center;gap:3px;background:#e8f5e9;border-radius:4px;padding:2px 6px;font:500 12px/16px var(--font);color:#2e7d32">+20</span>
+            </div>
+          </div>
+          <div style="flex:1;border:1px solid #ebebeb;border-radius:8px;background:white;padding:16px 20px;display:flex;flex-direction:column;gap:4px">
+            <div style="font:500 13px/18px var(--font);color:#868585">Sever Claim</div>
+            <div style="font-family:var(--font-display);font-size:28px;line-height:32px;color:#252424">${severCount}</div>
+            <div style="font:400 12px/16px var(--font);color:#868585">Number of Sever Claims</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0">
+          <select id="wl-account" style="border:1px solid #868585;border-radius:6px;padding:6px 10px;font:400 13px/18px var(--font);color:#252424;background:white;cursor:pointer">
+            <option value="">All Accounts</option>
+            ${[...new Set((ALL_CLAIMS_DATA||[]).map(c=>c.account))].map(a=>`<option value="${a}" ${wf.account===a?'selected':''}>${a}</option>`).join('')}
+          </select>
+          <select id="wl-product" style="border:1px solid #cfcece;border-radius:6px;padding:6px 10px;font:400 13px/18px var(--font);color:#252424;background:white;cursor:pointer">
+            <option value="">All Products</option>
+            <option value="GL" ${wf.product==='GL'?'selected':''}>GL</option>
+            <option value="PL" ${wf.product==='PL'?'selected':''}>PL</option>
+            <option value="LL" ${wf.product==='LL'?'selected':''}>LL</option>
+          </select>
+          <div style="flex:1"></div>
+          <button id="wl-remove-btn" class="claims-dl-btn" style="opacity:${hasSelected?1:0.4};pointer-events:${hasSelected?'auto':'none'};display:inline-flex;align-items:center;gap:6px;border:1px solid #cfcece;border-radius:6px;padding:6px 12px;font:500 13px/18px var(--font);color:${hasSelected?'#a31e17':'#b6b6b6'};background:white;cursor:${hasSelected?'pointer':'default'};white-space:nowrap">
+            <i class="ph ph-minus-circle" style="font-size:13px"></i> Remove
+          </button>
+          <button class="claims-dl-btn"><i class="ph ph-download-simple" style="font-size:13px"></i> Download</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0;border:1px solid #ebebeb;border-radius:8px;overflow:hidden;background:white;flex-shrink:0">
+          <div style="padding:12px 16px;border-bottom:1px solid #ebebeb">
+            <span style="font:500 14px/20px var(--font);color:#252424">All Claims</span>
+            <span style="margin-left:8px;font:400 12px/16px var(--font);color:#868585">${claims.length}</span>
+          </div>
+          <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;min-width:900px">
+              <thead>
+                <tr style="background:#fbfbfb;border-bottom:1px solid #ebebeb">
+                  <th class="claims-full-th" style="width:48px;padding-left:16px">
+                    <input type="checkbox" id="wl-select-all" ${allChecked?'checked':''} style="width:16px;height:16px;cursor:pointer;accent-color:#cf5c3f" />
+                  </th>
+                  <th class="claims-full-th">Account</th>
+                  <th class="claims-full-th">Insured</th>
+                  <th class="claims-full-th">Policy</th>
+                  <th class="claims-full-th">Product</th>
+                  <th class="claims-full-th">Location</th>
+                  <th class="claims-full-th">Description</th>
+                  <th class="claims-full-th">Date</th>
+                  <th class="claims-full-th">Incurred</th>
+                  <th class="claims-full-th">Status</th>
+                </tr>
+              </thead>
+              <tbody>${claims.length ? rows : emptyRow}</tbody>
+            </table>
+          </div>
+        </div>`;
+    }
+
     function renderClaims() {
       if (State.claimsAccount) return renderClaimsDetail(State.claimsAccount);
       if (State.claimsReportClaim) return renderClaimDetail(State.claimsReportClaim);
       const tab = State.claimsTab;
+      const wlCount = (State.watchlist||[]).length;
       return `
         <div class="claims-page">
           <div style="font-family:var(--font-display);font-size:24px;line-height:26px;font-weight:400;color:#252424;flex-shrink:0">Claims</div>
           <div class="claims-tab-bar">
             <button class="claims-tab-btn ${tab==='performance'?'active':''}" data-ctab="performance">Total Account Performance</button>
             <button class="claims-tab-btn ${tab==='report'?'active':''}" data-ctab="report">Claim Report</button>
+            <button class="claims-tab-btn ${tab==='watchlist'?'active':''}" data-ctab="watchlist" style="display:inline-flex;align-items:center;gap:6px">
+              Watchlist
+              ${wlCount > 0 ? `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;background:#cf5c3f;border-radius:999px;font:500 11px/14px var(--font);color:white">${wlCount}</span>` : ''}
+            </button>
           </div>
-          ${tab === 'report' ? renderClaimsReport() : renderClaimsPerformance()}
+          ${tab === 'report' ? renderClaimsReport() : tab === 'watchlist' ? renderWatchlist() : renderClaimsPerformance()}
         </div>`;
     }
     function renderRadar() {
@@ -10921,7 +11039,6 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
         const cdReportBack = document.getElementById('claimdetail-report-back');
         if (cdReportBack) cdReportBack.onclick = () => {
           State.claimsReportClaim = null;
-          State.claimsTab = 'report';
           render();
         };
 
@@ -10941,6 +11058,84 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
             render();
           };
         });
+
+        // Claim Report — row checkboxes
+        document.querySelectorAll('.cr-claim-cb').forEach(cb => {
+          cb.onchange = () => {
+            const id = cb.dataset.selectClaim;
+            if (cb.checked) { if (!(State.selectedClaims||[]).includes(id)) State.selectedClaims = [...(State.selectedClaims||[]), id]; }
+            else             { State.selectedClaims = (State.selectedClaims||[]).filter(x => x !== id); }
+            render();
+          };
+        });
+        // Claim Report — select-all checkbox
+        const crSelectAll = document.getElementById('cr-select-all');
+        if (crSelectAll) crSelectAll.onchange = () => {
+          // visible page claims
+          const visibleIds = [...document.querySelectorAll('.cr-claim-cb')].map(cb => cb.dataset.selectClaim);
+          if (crSelectAll.checked) {
+            const merged = new Set([...(State.selectedClaims||[]), ...visibleIds]);
+            State.selectedClaims = [...merged];
+          } else {
+            State.selectedClaims = (State.selectedClaims||[]).filter(id => !visibleIds.includes(id));
+          }
+          render();
+        };
+        // Claim Report — Add to watchlist button
+        const crAddWl = document.getElementById('cr-add-watchlist');
+        if (crAddWl) crAddWl.onclick = () => {
+          const toAdd = State.selectedClaims || [];
+          if (!toAdd.length) return;
+          const merged = new Set([...(State.watchlist||[]), ...toAdd]);
+          State.watchlist = [...merged];
+          State.selectedClaims = [];
+          render();
+        };
+        // Claim detail — watchlist toggle button
+        const cdWlBtn = document.getElementById('claim-detail-watchlist-btn');
+        if (cdWlBtn) cdWlBtn.onclick = () => {
+          const id = cdWlBtn.dataset.claimId;
+          if ((State.watchlist||[]).includes(id)) {
+            State.watchlist = (State.watchlist||[]).filter(x => x !== id);
+          } else {
+            State.watchlist = [...(State.watchlist||[]), id];
+          }
+          render();
+        };
+        // Watchlist — filter selects
+        const wlAccount = document.getElementById('wl-account');
+        const wlProduct = document.getElementById('wl-product');
+        if (wlAccount) wlAccount.onchange = () => { State.watchlistFilters = {...(State.watchlistFilters||{}), account: wlAccount.value}; render(); };
+        if (wlProduct) wlProduct.onchange = () => { State.watchlistFilters = {...(State.watchlistFilters||{}), product: wlProduct.value}; render(); };
+        // Watchlist — row checkboxes
+        document.querySelectorAll('.wl-select-cb').forEach(cb => {
+          cb.onchange = () => {
+            const id = cb.dataset.selectWl;
+            if (cb.checked) { if (!(State.watchlistSelected||[]).includes(id)) State.watchlistSelected = [...(State.watchlistSelected||[]), id]; }
+            else             { State.watchlistSelected = (State.watchlistSelected||[]).filter(x => x !== id); }
+            render();
+          };
+        });
+        // Watchlist — select-all checkbox
+        const wlSelectAll = document.getElementById('wl-select-all');
+        if (wlSelectAll) wlSelectAll.onchange = () => {
+          const visibleIds = [...document.querySelectorAll('.wl-select-cb')].map(cb => cb.dataset.selectWl);
+          if (wlSelectAll.checked) {
+            const merged = new Set([...(State.watchlistSelected||[]), ...visibleIds]);
+            State.watchlistSelected = [...merged];
+          } else {
+            State.watchlistSelected = (State.watchlistSelected||[]).filter(id => !visibleIds.includes(id));
+          }
+          render();
+        };
+        // Watchlist — Remove button
+        const wlRemoveBtn = document.getElementById('wl-remove-btn');
+        if (wlRemoveBtn) wlRemoveBtn.onclick = () => {
+          const toRemove = new Set(State.watchlistSelected||[]);
+          State.watchlist = (State.watchlist||[]).filter(id => !toRemove.has(id));
+          State.watchlistSelected = [];
+          render();
+        };
 
         // Chart tooltip — wire once on first claims visit; persists across re-renders
         if (!window._cttBound) {
