@@ -3805,6 +3805,7 @@
       claimsAccount:   null,
       claimsDetailTab: 'portfolio',
       claimsReport: { account:'', product:'', status:'', page:1 },
+      claimsReportClaim: null,
     };
 
     // Home queue — sorted by urgency (Today first), per Figma 2:1829.
@@ -6086,7 +6087,7 @@
       const accounts = [...new Set(ALL_CLAIMS_DATA.map(c=>c.account))].sort();
 
       const tableRows = pageClaims.map(c=>`
-        <tr class="claims-tbl-row">
+        <tr class="claims-tbl-row" data-claim-id="${c.id}" style="cursor:pointer">
           <td class="claims-full-td" style="padding-left:16px">
             <div style="width:16px;height:16px;border:1px solid #868585;border-radius:4px;flex-shrink:0"></div>
           </td>
@@ -6192,8 +6193,131 @@
         </div>`;
     }
 
+    function renderClaimDetail(claimId) {
+      const c = ALL_CLAIMS_DATA.find(x => x.id === claimId) || ALL_CLAIMS_DATA[0];
+      const coverageLabel = c.product === 'GL' ? 'General Liability' : c.product === 'PL' ? 'Professional Liability' : 'Liquor Liability';
+      const isOpen = c.status === 'Open';
+
+      const statusTag = isOpen
+        ? `<span style="display:inline-flex;align-items:center;background:#ebf2fb;border:1px solid #afccef;border-radius:999px;padding:2px 8px;font:400 12px/14px var(--font);color:#2e69ae">${c.status}</span>`
+        : `<span style="display:inline-flex;align-items:center;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:999px;padding:2px 8px;font:400 12px/14px var(--font);color:#2e7d32">${c.status}</span>`;
+
+      const detailRow = (label, value, link=false) => `
+        <div style="display:flex;gap:8px;align-items:flex-start;width:100%;flex-shrink:0">
+          <div style="flex-shrink:0;width:150px;text-align:right">
+            <span style="font:500 12px/14px var(--font);color:#868585">${label}</span>
+          </div>
+          <div style="flex:1;min-width:0">
+            <span style="font:400 14px/15px var(--font);color:${link?'#4b7174':'#252424'};${link?'text-decoration:underline;cursor:pointer':''}">${value}</span>
+          </div>
+        </div>`;
+
+      const incurredTable = (title) => `
+        <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">
+          <div style="font:500 16px/22px var(--font);color:#252424">${title}</div>
+          <div style="border:1px solid #cfcece;border-radius:8px;overflow:hidden;background:white">
+            <table style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr style="background:#fbfbfb;border-bottom:1px solid #cfcece">
+                  <th style="text-align:left;padding:8px 12px;font:500 14px/15px var(--font);color:#868585;border-right:1px solid #cfcece;white-space:nowrap">Carrier</th>
+                  <th style="text-align:left;padding:8px 12px;font:500 14px/15px var(--font);color:#868585;border-right:1px solid #cfcece;white-space:nowrap">Reserved</th>
+                  <th style="text-align:left;padding:8px 12px;font:500 14px/15px var(--font);color:#868585;border-right:1px solid #cfcece;white-space:nowrap">Payments</th>
+                  <th style="text-align:left;padding:8px 12px;font:500 14px/15px var(--font);color:#868585;border-right:1px solid #cfcece;white-space:nowrap">Recoveries</th>
+                  <th style="text-align:left;padding:8px 12px;font:500 14px/15px var(--font);color:#868585;white-space:nowrap">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid #ebebeb">
+                  <td style="padding:8px 12px;font:400 14px/15px var(--font);color:#252424">Indemnity</td>
+                  <td style="padding:8px 12px;font:400 14px/15px var(--font);color:#252424">$0</td>
+                  <td style="padding:8px 12px;font:400 14px/15px var(--font);color:#252424">${c.incurred}</td>
+                  <td style="padding:8px 12px;font:400 14px/15px var(--font);color:#252424">$0</td>
+                  <td style="padding:8px 12px;font:400 14px/15px var(--font);color:#252424">${c.incurred}</td>
+                </tr>
+                <tr style="border-bottom:1px solid #ebebeb">
+                  <td style="padding:8px 12px;font:400 14px/15px var(--font);color:#252424">Medical</td>
+                  <td style="padding:8px 12px;font:400 14px/15px var(--font);color:#252424">$0</td>
+                  <td style="padding:8px 12px;font:400 14px/15px var(--font);color:#252424">$0</td>
+                  <td style="padding:8px 12px;font:400 14px/15px var(--font);color:#252424">$0</td>
+                  <td style="padding:8px 12px;font:400 14px/15px var(--font);color:#252424">$0</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 12px;font:400 14px/15px var(--font);color:#252424">Legal</td>
+                  <td style="padding:8px 12px;font:400 14px/15px var(--font);color:#252424">$0</td>
+                  <td style="padding:8px 12px;font:400 14px/15px var(--font);color:#252424">$0</td>
+                  <td style="padding:8px 12px;font:400 14px/15px var(--font);color:#252424">$0</td>
+                  <td style="padding:8px 12px;font:400 14px/15px var(--font);color:#252424">$0</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>`;
+
+      return `
+        <div class="claims-page">
+          <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+            <button id="claimdetail-claims-back" style="background:none;border:0;padding:2px 4px;font:400 12px/14px var(--font);color:#868585;cursor:pointer">Claims</button>
+            <i class="ph ph-caret-right" style="font-size:10px;color:#868585"></i>
+            <button id="claimdetail-report-back" style="background:none;border:0;padding:2px 4px;font:400 12px/14px var(--font);color:#868585;cursor:pointer">Claim Report</button>
+            <i class="ph ph-caret-right" style="font-size:10px;color:#868585"></i>
+            <span style="font:400 12px/14px var(--font);color:#868585">${c.id}</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-shrink:0">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="font-family:var(--font-display);font-size:24px;line-height:26px;color:#252424">${c.insured}</div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <span style="display:inline-flex;align-items:center;background:#fbfbfb;border:1px solid #cfcece;border-radius:999px;padding:4px 8px;font:400 12px/14px var(--font);color:#252424">${c.date}</span>
+                <div style="width:1px;height:18px;background:#cfcece;flex-shrink:0"></div>
+                <span style="display:inline-flex;align-items:center;background:#fbfbfb;border:1px solid #cfcece;border-radius:999px;padding:4px 8px;font:400 12px/14px var(--font);color:#252424">${c.policy}</span>
+                <div style="width:1px;height:18px;background:#cfcece;flex-shrink:0"></div>
+                <span style="font:400 14px/15px var(--font);color:#4b7174;text-decoration:underline;cursor:pointer">${c.account}</span>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+              <span style="font:400 14px/15px var(--font);color:#868585">Status:</span>
+              ${statusTag}
+              <button style="display:inline-flex;align-items:center;justify-content:center;border:1px solid #cfcece;border-radius:4px;padding:8px;background:white;cursor:pointer">
+                <i class="ph ph-download-simple" style="font-size:16px;color:#252424"></i>
+              </button>
+            </div>
+          </div>
+          <div style="display:flex;gap:24px;align-items:flex-start;flex-shrink:0;padding:8px 0">
+            <div style="display:flex;flex:1;flex-direction:column;gap:8px;min-width:0">
+              <div style="font:500 16px/22px var(--font);color:#252424">Claim Summary</div>
+              ${detailRow('Claim Number', c.id)}
+              ${detailRow('Date of Loss', c.date)}
+              ${detailRow('Reported to Carrier', c.date)}
+              ${detailRow('Insured Name', c.insured)}
+              ${detailRow('Policy Number', c.policy, true)}
+              ${detailRow('Policy Effective Date', 'Jan 1, 2026')}
+              ${detailRow('Coverage', coverageLabel)}
+            </div>
+            <div style="display:flex;flex:1;flex-direction:column;gap:8px;min-width:0">
+              <div style="font:500 16px/22px var(--font);color:#252424">Claimant Information</div>
+              ${detailRow('Claimant', c.insured)}
+              ${detailRow('Occupation', 'Employee')}
+              ${detailRow('Date of Birth', '6/28/1974')}
+              ${detailRow('Weekly Wage', '$750.00')}
+              ${detailRow('Benefit Type', coverageLabel)}
+            </div>
+            <div style="display:flex;flex:1;flex-direction:column;gap:8px;min-width:0">
+              <div style="font:500 16px/22px var(--font);color:#252424">Adjuster Information</div>
+              ${detailRow('Adjuster', 'Fred Sachs')}
+              ${detailRow('Adjuster Phone Number', '838-293-2938')}
+              ${detailRow('Adjuster Email', 'fred.sachs@carrier.com')}
+              ${detailRow('Jurisdiction', c.location.split(',').pop().trim())}
+              ${detailRow('Supervisor', 'Roland David')}
+              ${detailRow('Supervisor Email', 'roland.david@carrier.com')}
+            </div>
+          </div>
+          ${incurredTable('Claim Incurred Summary')}
+          ${incurredTable('Loss Incurred Summary')}
+        </div>`;
+    }
+
     function renderClaims() {
       if (State.claimsAccount) return renderClaimsDetail(State.claimsAccount);
+      if (State.claimsReportClaim) return renderClaimDetail(State.claimsReportClaim);
       const tab = State.claimsTab;
       return `
         <div class="claims-page">
@@ -10717,6 +10841,27 @@ Standalone PL: Answering Service, Wedding Consultant, Copying/Duplicating, Court
         const breadcrumb = document.getElementById('claims-breadcrumb');
         if (breadcrumb) breadcrumb.onclick = () => {
           State.claimsAccount = null;
+          render();
+        };
+
+        // Claim Report — individual claim row click → detail view
+        document.querySelectorAll('[data-claim-id]').forEach(row => {
+          row.onclick = () => {
+            State.claimsReportClaim = row.dataset.claimId;
+            render();
+          };
+        });
+        // Claim detail breadcrumb back buttons
+        const cdClaimsBack = document.getElementById('claimdetail-claims-back');
+        if (cdClaimsBack) cdClaimsBack.onclick = () => {
+          State.claimsReportClaim = null;
+          State.claimsTab = 'performance';
+          render();
+        };
+        const cdReportBack = document.getElementById('claimdetail-report-back');
+        if (cdReportBack) cdReportBack.onclick = () => {
+          State.claimsReportClaim = null;
+          State.claimsTab = 'report';
           render();
         };
 
